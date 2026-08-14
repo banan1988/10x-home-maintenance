@@ -2,23 +2,72 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
+    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
   ci:
+    name: "Lint & Build"
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: "Checkout"
+        uses: actions/checkout@v4
+      - name: "Set up Node"
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - run: npx astro sync
-      - run: npm run lint
-      - run: npm run build
+      - name: "Install dependencies"
+        run: npm ci
+      - name: "Sync Astro types"
+        run: npx astro sync
+      - name: "Lint"
+        run: npm run lint
+      - name: "Test"
+        run: npm run test
+      - name: "Build"
+        run: npm run build
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+
+  deploy:
+    name: "Deploy to Cloudflare Workers"
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    permissions:
+      contents: read
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+      - name: "Set up Node"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: "Install dependencies"
+        run: npm ci
+      - name: "Build"
+        run: npm run build
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      - name: "Deploy"
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          secrets: |
+            SUPABASE_URL
+            SUPABASE_KEY
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
