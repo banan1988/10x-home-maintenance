@@ -5,7 +5,7 @@ project_name: home-maintenance
 hints:
   language_family: js
   team_size: solo
-  deployment_target: cloudflare-pages
+  deployment_target: cloudflare-workers
   ci_provider: github-actions
   ci_default_flow: auto-deploy-on-merge
   bootstrapper_confidence: first-class
@@ -26,5 +26,6 @@ agent-friendly starter that handles auth, a database, and edge deploy out of the
 piecemeal. 10x-astro-starter is the recommended default for (web-app, js), clears all four agent-friendly gates,
 and its Astro API routes cover the PRD's CRUD-via-API requirement alongside the UI. Auth is in scope (email/password
 registration, login, logout); payments, realtime, and AI are explicitly out of scope per the PRD's non-goals. CI
-runs on GitHub Actions with auto-deploy-on-merge, and deployment defaults to Cloudflare Pages — both the starter's
-out-of-the-box shape, chosen to keep the 3-week timeline realistic.
+runs on GitHub Actions with auto-deploy-on-merge, and deployment defaults to Cloudflare Workers (via the
+`@astrojs/cloudflare` adapter and `wrangler deploy`) — both the starter's out-of-the-box shape, chosen to keep the
+3-week timeline realistic.
