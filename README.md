@@ -15,7 +15,7 @@ A modern, opinionated starter template for building fast, accessible web applica
 
 ## Prerequisites
 
-- Node.js v22.14.0 (as specified in `.nvmrc`)
+- Node.js v26.7.0 (as specified in `.nvmrc`)
 - npm (comes with Node.js)
 
 ## Getting Started
@@ -168,7 +168,7 @@ Set `SUPABASE_URL` and `SUPABASE_KEY` as secrets in your Cloudflare dashboard or
 
 ## CI
 
-GitHub Actions runs lint + build on every push and PR to `master`. Configure `SUPABASE_URL` and `SUPABASE_KEY` as repository secrets in GitHub for the build step.
+GitHub Actions runs lint + test + build on every push and PR to `main`. A separate `deploy` job publishes to Cloudflare Workers via `wrangler-action` on push to `main`. Configure `SUPABASE_URL` and `SUPABASE_KEY` as repository secrets in GitHub for the build step.
 
 ## License
 
