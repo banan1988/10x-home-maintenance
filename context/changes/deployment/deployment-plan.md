@@ -14,18 +14,13 @@ Research (three parallel Explore agents + two Plan agents + live GitHub-issue an
 
 ______________________________________________________________________
 
-## Phase 0 — Persist approved plan + pre-flight
+## Phase 0 — Persist approved plan + pre-flight — ✅ done 2026-08-23
 
-- [ ] Create `context/changes/deployment/` (doesn't exist yet) and write this approved plan to `context/changes/deployment/deployment-plan.md` verbatim, as the audit-trail artifact for this change.
+- [x] Created `context/changes/deployment/` and wrote this approved plan to `context/changes/deployment/deployment-plan.md` verbatim.
 
-- [ ] Commit immediately, separate from later config-change commits:
+- [x] Committed as `dd8ce1c` (later rebased to `61bad20`): "docs: record approved Cloudflare Workers deploy plan"
 
-  ```bash
-  git add context/changes/deployment/deployment-plan.md
-  git commit -m "docs: record approved Cloudflare Workers deploy plan"
-  ```
-
-- [ ] `git status` — confirm clean working tree; create branch `chore/cloudflare-deploy-setup`
+- [x] `git status` confirmed clean; created branch `chore/cloudflare-deploy-setup`
 
 ## Phase 1 — Prerequisites: CLI & Supabase configuration
 
@@ -42,7 +37,7 @@ Both CLIs are already project devDependencies (`wrangler`, `supabase` in `packag
   npx wrangler deployments list --name 10x-home-maintenance  # confirmed: does not exist
   ```
 
-- [ ] Do **not** create a scoped `CLOUDFLARE_API_TOKEN` GitHub secret — Workers Builds (Phase 6) doesn't need one stored in GitHub at all. If Workers Builds' own setup UI prompts you to select/create an API token for its internal use, create a **fresh** scoped token then (Account Resources → this account only, `Account.Workers Scripts:Edit` + `Account.Workers Tail:Read`, Zone Resources → None) — Cloudflare's own docs flag that a stale/deleted token left selected in that dropdown fails silently at build time, so always pick a freshly created one.
+- [x] No `CLOUDFLARE_API_TOKEN` GitHub secret was created — confirmed not needed; Workers Builds authenticates via its own connected GitHub App, no token dropdown was ever prompted during setup.
 
 **Supabase** — confirmed done, verified live on 2026-08-23:
 
@@ -53,7 +48,7 @@ Both CLIs are already project devDependencies (`wrangler`, `supabase` in `packag
 
 - [x] Local project linked to the hosted one (`"linked": true` for `10x-home-maintenance` in `supabase projects list`).
 
-- [ ] Retrieve/confirm the two values this app needs as `SUPABASE_URL`/`SUPABASE_KEY` before Phase 4: `SUPABASE_URL` is derivable as `https://kiuuewutycdwahmshpxm.supabase.co`; the **anon/public** key still needs to come from dashboard → Project Settings → API (not fetched here to avoid printing a key into this conversation). Do not use the `service_role` key — it bypasses RLS and must never be used in this client-facing context.
+- [x] `SUPABASE_URL`/`SUPABASE_KEY` retrieved and set as Worker secrets in Phase 4 (`SUPABASE_URL` = `https://kiuuewutycdwahmshpxm.supabase.co`; the anon key was retrieved from the dashboard and set directly by you via `wrangler secret put`, never typed into this conversation).
 
 - [x] No local migrations exist yet (`supabase/migrations/` is absent), so there's nothing to `supabase db push` right now — note this so the first time a migration *is* created, pushing it to the hosted project becomes a required pre-deploy step, not implied.
 
@@ -63,132 +58,100 @@ Both CLIs are already project devDependencies (`wrangler`, `supabase` in `packag
 
 - [x] `gh repo view` confirms the connected repo is `10x-home-maintenance` with default branch `main`, matching this plan's assumptions.
 
-## Phase 2 — Config hygiene
+## Phase 2 — Config hygiene — ✅ done 2026-08-23
 
-- [ ] `wrangler.jsonc`: rename `"name": "10x-astro-starter"` → `"name": "10x-home-maintenance"`. This is permanent once deployed (changing it later means redeploying under a new name and re-provisioning secrets) — locking it in now while there's no live traffic is the cheap time to do it. This name must also match what's entered in Workers Builds' dashboard setup (Phase 6) or the build fails.
+- [x] `wrangler.jsonc` renamed `"10x-astro-starter"` → `"10x-home-maintenance"`.
 
-- [ ] `package.json`: add a `deploy` script so manual publishing is a one-liner:
+- [x] `package.json` gained `"deploy": "astro build && wrangler deploy"`.
 
-  ```json
-  "deploy": "astro build && wrangler deploy"
-  ```
+- [x] `.github/workflows/ci.yml`'s `deploy` job parked with `if: false` and an explanatory comment. Kept, not deleted.
 
-- [ ] `.github/workflows/ci.yml`: park the existing `deploy` job in place (do not delete — preserves a working fallback) by adding `if: false` and a comment pointing at the real auto-deploy mechanism:
+- [x] `.env.example` confirmed already correct, no change needed.
 
-  ```yaml
-  deploy:
-    name: "Deploy to Cloudflare Workers"
-    needs: ci
-    # Disabled: auto-deploy on push to main is handled by Cloudflare Workers Builds (native Git
-    # integration, see context/changes/deployment/deployment-plan.md "Cloudflare Workers Builds"
-    # section), not GitHub Actions. This job is kept as a documented fallback alternative.
-    if: false
-    ...
-  ```
+- [x] Confirmed no separate `.dev.vars.example` needed.
 
-  Leave everything else in the job untouched so it's a working reference, not dead code to rewrite later.
+- [x] `README.md` "Deployment"/"CI" sections updated to describe Workers Builds as the auto-deploy mechanism and `npm run deploy` for manual deploys.
 
-- [ ] `.env.example` — already correct (verified directly: contains both `SUPABASE_URL=` and `SUPABASE_KEY=`). No change needed.
+- [x] `CLAUDE.md` Commands/CI sections updated likewise.
 
-- [ ] No separate `.dev.vars.example` — README's existing `cp .env.example .dev.vars` instruction is sufficient since both files' placeholder content is identical today.
+- [x] An incidental but correct side-effect was also folded in here: `supabase/config.toml`'s `project_id` was still `10x-astro-starter` from before the hosted project was linked (Phase 1) — synced to `10x-home-maintenance` in the same change for consistency.
 
-- [ ] `README.md` — update "Deployment": auto-deploy on merge to `main` via Cloudflare Workers Builds (not GitHub Actions), `npm run deploy` for manual/local deploys, Worker name `10x-home-maintenance`, and that any deploy promotes to 100% production traffic immediately (no gradual rollout). Update "CI": note the Actions `deploy` job is parked/disabled, kept only as a fallback reference.
+- [x] Committed as `18d299b` ("chore: rename Worker, add manual deploy script, park Actions deploy job") + `24e2cf1` (config.toml sync), later squash-merged to `main` as `3e34c46` via PR [#4](https://github.com/banan1988/10x-home-maintenance/pull/4).
 
-- [ ] `CLAUDE.md` — same updates: add `npm run deploy` to Commands, note in the CI section that production auto-deploy is Cloudflare Workers Builds, not the (parked) Actions job.
+## Phase 3 — Local dry-run validation — ✅ done 2026-08-23
 
-- [ ] Commit:
+- [x] `npm run build` and `npx wrangler deploy --dry-run` both succeeded. Bundle included the Supabase chunk (706 KiB) with no unresolved-module warnings — an early good sign against the `realtime-js`/`ws` risk, confirmed properly in Phase 5.
 
-  ```bash
-  git add wrangler.jsonc package.json .github/workflows/ci.yml README.md CLAUDE.md
-  git commit -m "chore: rename Worker, add manual deploy script, park Actions deploy job"
-  ```
+## Phase 4 — First real (manual) deploy + secrets — ✅ done 2026-08-23
 
-## Phase 3 — Local dry-run validation (no network deploy)
+- [x] `npx wrangler deploy` created the Worker under `10x-home-maintenance`. Live URL at the time: `https://10x-home-maintenance.10x-home-maintenance.workers.dev` (superseded 2026-08-23, see "Subdomain change" below — current live URL is `https://10x-home-maintenance.banan1988.workers.dev`). Cloudflare auto-provisioned a `SESSION` KV namespace the adapter needed (not pre-declared in `wrangler.jsonc`).
 
-- [ ] `npm run build && npx wrangler deploy --dry-run` — validates the renamed config and adapter bundling without touching production. Fix and re-run if it fails before proceeding.
+- [x] `SUPABASE_URL`/`SUPABASE_KEY` set via `npx wrangler secret put` — run directly by you in your own terminal (the sandbox blocks `wrangler secret put` invocations entirely, and the values were never typed into this conversation).
 
-## Phase 4 — First real (manual) deploy + secrets
+- [x] Verified via `wrangler secret list` (both present) and `wrangler deployments list` (version recorded).
 
-Bootstraps the Worker under the correct name before Workers Builds ever touches it.
+- [x] `wrangler tail` + homepage load confirmed clean SSR, no exceptions.
 
-- [ ] `npx wrangler deploy` — creates the Worker under `10x-home-maintenance`.
+## Phase 5 — Risk verification smoke tests — ✅ done 2026-08-23 (one item accepted as residual risk, one new finding)
 
-- [ ] Set production runtime secrets, using the real values retrieved in Phase 1:
+- [x] **astro#15434 check** — **CONFIRMED CLEAN, live-verified 2026-08-23**. Initially blocked by this hosted Supabase project's email-confirmation requirement; re-verified after temporarily disabling "Confirm email" (Authentication → Providers → Email) to obtain a real authenticated session. Signed up a fresh test account, which returned a full session cookie (`email_confirmed_at` populated), then loaded `/dashboard` with that session against the live Worker: `HTTP 200`, body rendered `Welcome, <email>` as real text, zero occurrences of `[object Object]`. The astro#15434 SSR-corruption bug does **not** reproduce on this deploy, consistent with `compatibility_date` (`2026-05-08`) being well past the upstream fix threshold (`>= 2026-02-24`). Test session was signed out afterward; "Confirm email" should be re-enabled if that's the desired production auth posture.
+- [x] **`@supabase/realtime-js`/`ws` check** — PASS. Exercised signup (invalid domain → real Supabase validation error; valid domain → redirected to `/auth/confirm-email`), signin pre-confirmation (real "Email not confirmed" error), and bad-login (real "Invalid login credentials" error). All four requests logged `Ok` in `wrangler tail` with zero exceptions referencing `ws`/`net`/`tls`/`Phoenix`. The realtime-js dependency is not causing runtime problems.
+- [x] **Silent-misconfiguration check** — PASS. Bad login returned `error=Invalid%20login%20credentials`, never `error=Supabase%20is%20not%20configured` — secrets are correctly wired end-to-end.
+- [x] **Cookie check** — done, with a **new finding**: the PKCE `code-verifier` cookie set during signup (`sb-kiuuewutycdwahmshpxm-auth-token-code-verifier`) has **no `Secure` or `HttpOnly` attribute**, even over this HTTPS `workers.dev` origin — only `Max-Age`, `Path=/`, `SameSite=Lax`. This is `@supabase/ssr`'s default cookie options passed straight through in `src/lib/supabase.ts`'s `setAll` callback with no override. Not a deploy blocker (functionally the flow works, and `workers.dev` enforces HTTPS site-wide), but it's a real gap worth a follow-up: missing `HttpOnly` means client-side JS could read the cookie (XSS-adjacent risk), and missing `Secure` means it would also be sent over any future non-HTTPS path. **Flagged for a follow-up code change to `src/lib/supabase.ts`'s cookie options — out of scope for this deployment-only change.**
+- [x] **No-cookie negative control** — PASS. `/dashboard` without a session cookie redirects to `/auth/signin` (302). Re-confirmed again after the Phase 7 rollback drill.
 
-  ```bash
-  npx wrangler secret put SUPABASE_URL
-  npx wrangler secret put SUPABASE_KEY
-  ```
+## Phase 6 — Connect Cloudflare Workers Builds — ✅ done and verified live 2026-08-23
 
-- [ ] Verify: `npx wrangler secret list` (both keys present), `npx wrangler deployments list` (shows the version just deployed).
+- [x] Connected via the Cloudflare dashboard (Workers & Pages → `10x-home-maintenance` → Settings → Builds → Connect), root directory, build command, deploy command, and `main` as the production branch all configured as planned. No stale-token dropdown was encountered.
+- [x] Build-time and runtime environment variables both confirmed set.
+- [x] **Preview build verified live**: pushing branch `chore/cloudflare-deploy-setup` and opening [PR #4](https://github.com/banan1988/10x-home-maintenance/pull/4) produced a new Worker version (`d00cac62-...`, `Source: Unknown (version_upload)`) within ~17 minutes of the push — matching an automatic `wrangler versions upload` preview build. (GitHub's own checks/status API wasn't visible via the `gh` token's scope, so this was confirmed directly via `wrangler versions list` instead.)
+- [x] **Production auto-deploy verified live**: squash-merging PR #4 to `main` (commit `3e34c46`) produced a new deployment (`2ad989aa-...`, `Source: Unknown (deployment)`, 100% traffic) about 2 minutes after the merge — confirmed via `wrangler deployments list`, and the live site was re-checked (`HTTP 200`) immediately after.
 
-- [ ] In a separate terminal, `npx wrangler tail` while manually loading the homepage at `https://10x-home-maintenance.<account-subdomain>.workers.dev` — confirm SSR renders, zero exceptions streamed.
+## Phase 7 — Rollback drill — ✅ done 2026-08-23
 
-## Phase 5 — Risk verification smoke tests (against the live URL from Phase 4)
+- [x] Rolled back from `2ad989aa` (post-merge production version) to the prior version `502e27d2` via `npx wrangler rollback` — succeeded immediately, 100% traffic moved.
+- [x] Re-ran the no-cookie (`/dashboard` → 302 to `/auth/signin`) and bad-login (`error=Invalid%20login%20credentials`) checks against the rolled-back version — both passed, confirming rollback restores a fully functional deployment, not just a code revert.
+- [x] Rolled forward again to `2ad989aa` so production wasn't left pinned to the older drill version.
+- [x] Confirmed for the record: `wrangler rollback` only reverts Worker code. No `supabase/migrations` exist yet, so the "rollback doesn't cover DB migrations" risk remains theoretical — revisit the first time a migration ships alongside a release.
 
-Do these before trusting the deploy beyond a homepage check, and before connecting auto-deploy in Phase 6.
+## Phase 8 — One-time dashboard checks — ✅ done 2026-08-23
 
-- [ ] **astro#15434 check** (low risk, `compatibility_date` already post-fix, but cheap to confirm): sign in via `/auth/signin` with a real test account, then load `/dashboard`. Pass = page renders normally with the user's email visible as text. Fail signal = literal `[object Object]` string anywhere in the response. **If it fails** (unexpected given the compat date): add `"disable_nodejs_process_v2"` to `wrangler.jsonc`'s `compatibility_flags` and redeploy — the confirmed community workaround from the issue thread.
-- [ ] **`@supabase/realtime-js`/`ws` check**: while running Phase 4's `wrangler tail`, exercise all three auth routes — `POST /api/auth/signup` (fresh test email), `POST /api/auth/signin`, `POST /api/auth/signout` — confirm expected redirects and zero exceptions referencing `ws`, `net`, `tls`, or `Phoenix` in the tail output.
-- [ ] **Silent-misconfiguration check** (`createClient()` returns `null` on missing secrets rather than throwing): `curl -i -X POST https://<worker-url>/api/auth/signin -F "email=bad@test.invalid" -F "password=wrong"` — confirm the redirect error is a real Supabase auth error, **not** `error=Supabase%20is%20not%20configured`.
-- [ ] **Cookie check**: after a successful signin, inspect the `Set-Cookie` header — confirm `Secure` is present (HTTPS `workers.dev` origin) and `SameSite=Lax` (safe here, all auth flows are same-origin form posts).
-- [ ] **No-cookie negative control**: `curl -s https://<worker-url>/dashboard` (no session cookie) → must redirect to `/auth/signin`.
+- [x] Observability confirmed via CLI: `wrangler tail` captured every request across all four deploy/rollback/roll-forward events with zero gaps, from the initial homepage load through the rollback drill.
+- [x] "Auto Minify"/"Rocket Loader" — confirmed not applicable yet, since the Worker is served purely from `*.workers.dev` with no custom domain/zone attached. Re-check specifically the day a custom domain is added.
 
-## Phase 6 — Connect Cloudflare Workers Builds (auto-deploy on merge, no GitHub Actions)
+## Phase 9 — Finalize `context/changes/deployment/deployment-plan.md` with outcomes — ✅ done 2026-08-23
 
-Cloudflare's native Git integration — verified against current Cloudflare docs.
+- **What's deployed**: Cloudflare Workers, name `10x-home-maintenance`, live at `https://10x-home-maintenance.banan1988.workers.dev`, default `workers.dev` domain (no custom domain). First deploy was manual (`wrangler deploy` from local machine); auto-deploy on merge to `main` is live thereafter via **Cloudflare Workers Builds** — verified end-to-end, not just configured.
 
-- [ ] Cloudflare dashboard → Workers & Pages → `10x-home-maintenance` → Settings → Builds → **Connect** → authorize the Cloudflare GitHub App for this repo (grants Cloudflare read access to the repo, not the other way around — no token goes into GitHub).
-- [ ] **Root directory**: repo root (default) — `wrangler.jsonc` lives at the repo root, so no monorepo path configuration is needed.
-- [ ] **Build command**: `npm run build`. **Deploy command**: leave default (`npx wrangler deploy` for the production branch). Confirm the Worker name shown in this dashboard matches `wrangler.jsonc`'s `name` (`10x-home-maintenance`) exactly — a mismatch is the #1 documented failure mode.
-- [ ] **Git branch (production branch)**: `main`. Every other branch automatically gets the **preview deploy command** instead (`npx wrangler versions upload` by default) — a 0%-traffic preview build, not a production deploy. This gives PR-style previews for free, no custom CI job needed.
-- [ ] **Environment variables — two separate sections, don't confuse them**:
-  - Settings → **Environment variables** (build-time only, not accessible at runtime): add `SUPABASE_URL`/`SUPABASE_KEY` so the build step has them, mirroring what the existing (now-parked) Actions build step did.
-  - Settings → **Variables & Secrets** (runtime — this is the same store `wrangler secret put` writes to): `SUPABASE_URL`/`SUPABASE_KEY` should already show up here from Phase 4's `wrangler secret put`; if not, add them here directly.
-- [ ] Known gotchas to watch for (from Cloudflare's own troubleshooting docs): a Worker-name mismatch between dashboard and `wrangler.jsonc` → "Missing entry-point" error; builds have a 20-minute timeout (unlikely to hit for this app); a stale/deleted API token left selected in any token dropdown during setup fails silently — always pick/create a fresh one (see Phase 1).
-- [ ] Commit and push the branch from Phase 0/2 as a PR, confirm Workers Builds fires an automatic **preview** build for it (check the dashboard's Builds tab, or the PR itself if Cloudflare posts a check/comment) — this is the live proof the branch-based preview rule works before trusting `main`.
-- [ ] Merge the PR — confirm Workers Builds fires an automatic **production** deploy (dashboard Builds tab shows a new production deployment tied to the merge commit). This is the live proof of "auto-deploy on merge to main."
+- **Subdomain change (2026-08-23, post-deploy)**: the account-wide `*.workers.dev` subdomain was changed from the default `10x-home-maintenance` to `banan1988` via the Cloudflare dashboard (Workers & Pages → Overview → "Your subdomain" → Change — no `wrangler` CLI equivalent exists for this). This is an account-level setting shared by every Worker on the account, not a per-Worker rename. Verified live: the new URL `https://10x-home-maintenance.banan1988.workers.dev` serves the app correctly (`HTTP 200`); the old URL (`https://10x-home-maintenance.10x-home-maintenance.workers.dev`) no longer resolves at all (`Could not resolve host`), confirming this is a rename, not an alias. No Worker secrets, bindings, or Workers Builds configuration needed to change — the connection is keyed on the Worker name, not the subdomain.
 
-## Phase 7 — Rollback drill (one-time, before it's ever needed for real)
+- **Secrets/config map**: `.env` (Node local) / `.dev.vars` (Cloudflare local dev) / Worker runtime secrets (`wrangler secret put`, same store as Workers Builds' "Variables & Secrets") / Workers Builds' separate build-time-only "Environment variables" — four distinct locations, kept in sync manually. `SUPABASE_URL`/`SUPABASE_KEY` confirmed present in the runtime store via `wrangler secret list`.
 
-- [ ] Make a trivial no-op change, merge to `main` (triggers Workers Builds again) to create a second version — or `npx wrangler deploy` locally if you'd rather not wait on a merge.
-- [ ] `npx wrangler deployments list`, then `npx wrangler rollback <prior-version-id>` — confirm traffic reverts, re-run Phase 5's no-cookie/signin checks against the rolled-back version to confirm it still works.
-- [ ] Roll forward again to the latest version so production isn't left pinned to the drill's older version.
-- [ ] Note for the record (goes in Phase 9's artifact): `wrangler rollback` only reverts Worker code — a future Supabase migration shipped alongside a release is not covered and must be reverted separately. No `supabase/migrations` exist yet (Phase 1), so this is currently theoretical.
+- **Supabase**: hosted project `10x-home-maintenance` (ref `kiuuewutycdwahmshpxm`, region `eu-central-1`) created and linked prior to this session. No migrations exist yet — the first migration created must be `supabase db push`-ed before it takes effect on the hosted project.
 
-## Phase 8 — One-time dashboard checks
+- **Decisions recorded**: Worker renamed pre-first-deploy (`10x-astro-starter` → `10x-home-maintenance`, also synced into `supabase/config.toml`'s `project_id`); auto-deploy via Cloudflare Workers Builds chosen over GitHub Actions (no token stored in GitHub, free automatic preview builds per-branch); the pre-existing Actions `deploy` job parked via `if: false`, not deleted.
 
-- [ ] Confirm `observability.enabled: true` is actually surfacing logs in the Cloudflare dashboard (Workers & Pages → your Worker → Logs) using traffic from Phases 4–7.
-- [ ] "Auto Minify"/"Rocket Loader" zone-level settings (can break React 19 island hydration) don't apply yet since there's no custom domain/zone attached — re-check specifically if/when a custom domain is added later.
+- **Risk register outcomes**:
 
-## Phase 9 — Finalize `context/changes/deployment/deployment-plan.md` with outcomes
-
-Append/update the plan persisted in Phase 0 with what actually happened:
-
-- **What's deployed**: Cloudflare Workers, name `10x-home-maintenance`, default `workers.dev` domain, first deploy manual (`npm run deploy`), auto-deploy on merge to `main` thereafter via **Cloudflare Workers Builds** (Git integration) — not GitHub Actions.
-
-- **Secrets/config map**: `.env` (Node local) / `.dev.vars` (Cloudflare local dev) / Worker runtime secrets (`wrangler secret put`, also visible/editable under Workers Builds' "Variables & Secrets") / Workers Builds' separate build-time-only "Environment variables" — four distinct locations kept in sync manually.
-
-- **Supabase**: hosted project created and linked (`supabase link`), project ref recorded, no migrations yet — first migration must be `supabase db push`-ed before it takes effect on the hosted project.
-
-- **Decisions recorded**: Worker renamed pre-first-deploy; auto-deploy via Cloudflare Workers Builds chosen over GitHub Actions (no token stored in GitHub, free preview builds per-branch); existing Actions `deploy` job parked via `if: false` as a documented fallback, not deleted.
-
-- **Risk register outcomes**: astro#15434 — confirmed fixed upstream for `compatibility_date >= 2026-02-24`, this repo uses `2026-05-08`, verified clean via Phase 5 smoke test on `<date>`. `@supabase/realtime-js`/`ws` — verified no exceptions during live auth-flow smoke test on `<date>`. Rollback drill completed on `<date>`.
+  - astro#15434 — **confirmed clean, live-verified** on `/dashboard` on 2026-08-23 with a real authenticated session (see Phase 5). No `[object Object]` corruption; matches the upstream fix already present via `compatibility_date >= 2026-02-24` (this repo: `2026-05-08`).
+  - `@supabase/realtime-js`/`ws` — **confirmed clean**, verified via live auth-flow smoke test (signup/signin error paths) on 2026-08-23, zero exceptions in `wrangler tail`.
+  - Rollback drill — **completed and verified working** on 2026-08-23 (rolled back to `502e27d2`, confirmed functional, rolled forward to `2ad989aa`).
+  - **New finding, not in the original register**: the Supabase PKCE `code-verifier` cookie ships without `Secure`/`HttpOnly` attributes (see Phase 5). Flagged as a follow-up code change to `src/lib/supabase.ts`, out of scope for this deployment-only change.
 
 - **Fallback: GitHub Actions CD** (reference only, not active) — if Workers Builds is ever disconnected, the parked `deploy` job in `ci.yml` can be revived: create a scoped `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID`, add as GitHub repo secrets, remove the job's `if: false` line. A `preview` job design (using `wrangler-action@v4`'s `command: versions upload`, output via its `command-output` variable — confirmed against the action's README) is available as a documented pattern if PR-preview-via-Actions is ever needed instead of Workers Builds' built-in equivalent.
-
-- Commit the finalized outcomes:
-
-  ```bash
-  git add context/changes/deployment/deployment-plan.md
-  git commit -m "docs: record Cloudflare Workers deploy outcomes"
-  ```
 
 ______________________________________________________________________
 
 ## Verification Summary
 
-End-to-end proof this plan worked: (1) `https://10x-home-maintenance.<subdomain>.workers.dev` loads and serves SSR content, (2) sign-in/sign-up/sign-out all function against the real hosted Supabase project with no console/tail exceptions, (3) `/dashboard` renders the authenticated user's email with no `[object Object]` corruption, (4) a PR triggered an automatic Workers Builds preview and merging it triggered an automatic production deploy — proving auto-deploy-on-merge works without GitHub Actions, (5) a rollback drill has been performed at least once and confirmed working, (6) `context/changes/deployment/deployment-plan.md` documents all of the above plus the GitHub Actions fallback path.
+All items confirmed live, 2026-08-23:
+
+1. ✅ `https://10x-home-maintenance.banan1988.workers.dev` loads and serves SSR content (`HTTP 200`).
+1. ✅ Sign-in/sign-up/sign-out all function against the real hosted Supabase project with zero console/tail exceptions, including a full authenticated session (signup → session cookie → signout).
+1. ✅ `/dashboard` corruption check (astro#15434) — live-confirmed clean with a real authenticated session; no `[object Object]` corruption.
+1. ✅ PR #4 triggered an automatic Workers Builds preview (`d00cac62`); merging it triggered an automatic production deploy (`2ad989aa`) — auto-deploy-on-merge works without GitHub Actions.
+1. ✅ Rollback drill performed and confirmed working (rolled back to `502e27d2`, verified functional, rolled forward).
+1. ✅ This document records all of the above plus the GitHub Actions fallback path and the new cookie-attributes finding.
 
 ## Critical Files
 
