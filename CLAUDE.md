@@ -8,6 +8,7 @@
 - `npm run format` — Prettier (includes prettier-plugin-astro + prettier-plugin-tailwindcss)
 - `npm run test` — run the Vitest suite once
 - `npm run test:watch` — run Vitest in watch mode
+- `npm run deploy` — build and deploy to Cloudflare Workers manually (`astro build && wrangler deploy`, promotes to 100% production traffic immediately)
 
 Pre-commit hooks: husky + lint-staged runs `eslint --fix` on `*.{ts,tsx,astro}` and `prettier --write` on `*.{json,css,md}`.
 
@@ -44,11 +45,11 @@ Full server-side rendering (`output: "server"` in astro.config.mjs). All pages a
 - Env vars: `SUPABASE_URL`, `SUPABASE_KEY` (copy `.env.example` to `.env` for Node, or `.dev.vars` for Cloudflare local dev)
 - Local Supabase: `npx supabase start` (requires Docker)
 - Cloudflare local dev: secrets go in `.dev.vars` (gitignored)
-- Deploy: `npx wrangler deploy` (requires Cloudflare account + `wrangler` auth)
+- Deploy: `npm run deploy` (requires Cloudflare account + `wrangler` auth)
 
 ## CI
 
-GitHub Actions workflow (`.github/workflows/ci.yml`) runs lint + test + build on every push and PR to `main`. Requires `SUPABASE_URL` and `SUPABASE_KEY` repository secrets for the build step. A separate `deploy` job publishes to Cloudflare Workers via `wrangler-action` on push to `main`.
+GitHub Actions workflow (`.github/workflows/ci.yml`) runs lint + test + build on every push and PR to `main`. Requires `SUPABASE_URL` and `SUPABASE_KEY` repository secrets for the build step. Production auto-deploy is **not** handled by GitHub Actions — it's handled by **Cloudflare Workers Builds** (Cloudflare's native Git integration, configured in the Cloudflare dashboard), which deploys on push to `main` and creates 0%-traffic preview builds for other branches. The repo's own `wrangler-action`-based `deploy` job is parked (`if: false`) and kept only as a documented fallback — see `context/changes/deployment/deployment-plan.md`.
 
 <!-- BEGIN @przeprogramowani/10x-cli -->
 

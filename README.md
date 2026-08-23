@@ -150,25 +150,22 @@ Route protection is handled in `src/middleware.ts`. Add paths to the `PROTECTED_
 
 ## Deployment
 
-This project deploys to [Cloudflare Workers](https://workers.cloudflare.com/).
+This project deploys to [Cloudflare Workers](https://workers.cloudflare.com/) under the Worker name `10x-home-maintenance`.
 
-1. Build the project:
-
-```bash
-npm run build
-```
-
-1. Deploy with Wrangler:
+- **Auto-deploy on merge**: pushes to `main` are automatically built and deployed by **Cloudflare Workers Builds** (Cloudflare's native Git integration, configured in the Cloudflare dashboard under the Worker's Settings → Builds) — not GitHub Actions. Other branches automatically get a 0%-traffic preview build (`wrangler versions upload`) instead of a production deploy.
+- **Manual/local deploy**:
 
 ```bash
-npx wrangler deploy
+npm run deploy
 ```
 
-Set `SUPABASE_URL` and `SUPABASE_KEY` as secrets in your Cloudflare dashboard or via `npx wrangler secret put`.
+This runs `astro build && wrangler deploy`, which promotes to 100% production traffic immediately (no gradual rollout).
+
+Set `SUPABASE_URL` and `SUPABASE_KEY` as secrets via `npx wrangler secret put` (or the Cloudflare dashboard) — these are runtime secrets, separate from `.env`/`.dev.vars`.
 
 ## CI
 
-GitHub Actions runs lint + test + build on every push and PR to `main`. A separate `deploy` job publishes to Cloudflare Workers via `wrangler-action` on push to `main`. Configure `SUPABASE_URL` and `SUPABASE_KEY` as repository secrets in GitHub for the build step.
+GitHub Actions runs lint + test + build on every push and PR to `main`. The repo also contains a `deploy` job wired to `wrangler-action`, but it is currently **parked** (`if: false`) since production auto-deploy is handled by Cloudflare Workers Builds instead — see `context/changes/deployment/deployment-plan.md` for the fallback re-enable steps if Workers Builds is ever disconnected.
 
 ## License
 
