@@ -39,7 +39,10 @@ jobs:
   deploy:
     name: "Deploy to Cloudflare Workers"
     needs: ci
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Disabled: auto-deploy on push to main is handled by Cloudflare Workers Builds (native Git
+    # integration, see context/changes/deployment/deployment-plan.md "Cloudflare Workers Builds"
+    # section), not GitHub Actions. This job is kept as a documented fallback alternative.
+    if: false
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: production
