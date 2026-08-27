@@ -12,6 +12,7 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "types:generate": "supabase gen types typescript --local --schema public > src/db/database.types.ts && eslint --fix src/db/database.types.ts",
     "deploy": "astro build && wrangler deploy"
   },
   "dependencies": {
