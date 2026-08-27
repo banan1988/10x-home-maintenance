@@ -26,3 +26,8 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# supabase local runtime artifacts (also listed in supabase/.gitignore; duplicated here so
+# eslint's includeIgnoreFile(), which only reads the root .gitignore, excludes them too)
+supabase/.temp/
+supabase/.branches/
