@@ -312,26 +312,26 @@ it needs to be undone, a follow-up down-migration would need to be authored expl
 
 #### Automated
 
-- [x] 1.1 Local stack is running: `npx supabase start` (idempotent if already running)
-- [x] 1.2 Migration applies cleanly against the local instance: `npx supabase db reset`
-- [x] 1.3 Lint passes: `npm run lint`
+- [x] 1.1 Local stack is running: `npx supabase start` (idempotent if already running) — 8378a54
+- [x] 1.2 Migration applies cleanly against the local instance: `npx supabase db reset` — 8378a54
+- [x] 1.3 Lint passes: `npm run lint` — 8378a54
 
 #### Manual
 
-- [x] 1.4 Table, enums, index, and all four RLS policies confirmed in Supabase Studio (local)
-- [x] 1.5 Cross-user RLS isolation confirmed via seeded rows (local)
+- [x] 1.4 Table, enums, index, and all four RLS policies confirmed in Supabase Studio (local) — 8378a54
+- [x] 1.5 Cross-user RLS isolation confirmed via seeded rows (local) — 8378a54
 
 ### Phase 2: TypeScript Type Generation & Client Wiring
 
 #### Automated
 
-- [ ] 2.1 Type generation succeeds: `npm run types:generate`
-- [ ] 2.2 Type-checked lint passes: `npm run lint`
-- [ ] 2.3 Existing unit tests still pass: `npm run test`
+- [x] 2.1 Type generation succeeds: `npm run types:generate`
+- [x] 2.2 Type-checked lint passes: `npm run lint`
+- [x] 2.3 Existing unit tests still pass: `npm run test`
 
 #### Manual
 
-- [ ] 2.4 `src/types.ts` exported shapes match the migration's columns and enum values
+- [x] 2.4 `src/types.ts` exported shapes match the migration's columns and enum values
 
 ### Phase 3: Push to Hosted Project & Final Verification
 
