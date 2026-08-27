@@ -25,7 +25,7 @@ every downstream slice (S-01, S-02, S-03) consumes the same types instead of eac
   region `eu-central-1` (`context/changes/deployment/deployment-plan.md:5`,
   `context/changes/bootstrap-verification/verification.md:130`). `SUPABASE_URL`/`SUPABASE_KEY` are already set as
   Cloudflare Worker secrets — no new secret plumbing is needed.
-- `context/changes/bootstrap-verification/verification.md:130` already flags that the first migration must be
+- `context/changes/deployment/deployment-plan.md:130` already flags that the first migration must be
   `supabase db push`-ed to the hosted project before it takes effect — this plan's Phase 3 is that push.
 - Postgres major version is 17 (`supabase/config.toml:36`), so `gen_random_uuid()` is available natively —no
   `pgcrypto`/`uuid-ossp` extension needs enabling.
@@ -126,6 +126,7 @@ is correct (do not hand-write the timestamp), then fill it in with the schema be
 
 #### Automated Verification
 
+- Local stack is running: `npx supabase start` (idempotent if already running)
 - Migration applies cleanly against the local instance: `npx supabase db reset`
 - Lint passes: `npm run lint`
 
@@ -133,9 +134,22 @@ is correct (do not hand-write the timestamp), then fill it in with the schema be
 
 - Open Supabase Studio (local, `npx supabase start` prints the URL) and confirm the table, its columns, the
   three enums, the index, and all four RLS policies exist as specified.
-- Using the SQL editor as the `postgres` role, insert one row for two different fake `user_id` UUIDs; then, using
-  the `authenticated` role with a JWT claiming one of those UUIDs (Studio's "Run as" / `set local role authenticated; set local request.jwt.claims = '...'`), confirm a `select * from maintenance_tasks` returns only
-  that user's row, and an `update`/`delete` attempt against the other user's row affects zero rows.
+
+- Using the SQL editor as the `postgres` role, insert one row for two different fake `user_id` UUIDs. Then
+  impersonate one of those users and confirm isolation:
+
+  ```sql
+  set local role authenticated;
+  set local request.jwt.claims = '{"sub":"<user-a-uuid>","role":"authenticated"}';
+  select * from maintenance_tasks; -- expect only user-a's row back
+  update maintenance_tasks set name = 'x' where user_id = '<user-b-uuid>'; -- expect 0 rows affected
+  delete from maintenance_tasks where user_id = '<user-b-uuid>'; -- expect 0 rows affected
+  reset role;
+  reset request.jwt.claims;
+  ```
+
+  `auth.uid()` reads the `sub` claim specifically — omitting it makes `auth.uid()` return `NULL`, which would
+  make the isolation check pass for the wrong reason (zero rows because of a NULL comparison, not real scoping).
 
 **Implementation Note**: After completing this phase and all automated verification passes, pause here for
 manual confirmation from the human that the manual testing was successful before proceeding to the next phase.
@@ -286,8 +300,8 @@ it needs to be undone, a follow-up down-migration would need to be authored expl
 
 - Roadmap: `context/foundation/roadmap.md:95-112` (F-01)
 - PRD: `context/foundation/prd.md:92-115` (FR-004, FR-008), `context/foundation/prd.md:158-162` (Access Control)
-- Prior infra decisions: `context/changes/bootstrap-verification/verification.md:130`,
-  `context/changes/deployment/deployment-plan.md:5`
+- Prior infra decisions: `context/changes/deployment/deployment-plan.md:5`,
+  `context/changes/deployment/deployment-plan.md:130`
 
 ## Progress
 
@@ -298,13 +312,14 @@ it needs to be undone, a follow-up down-migration would need to be authored expl
 
 #### Automated
 
-- [ ] 1.1 Migration applies cleanly against the local instance: `npx supabase db reset`
-- [ ] 1.2 Lint passes: `npm run lint`
+- [ ] 1.1 Local stack is running: `npx supabase start` (idempotent if already running)
+- [ ] 1.2 Migration applies cleanly against the local instance: `npx supabase db reset`
+- [ ] 1.3 Lint passes: `npm run lint`
 
 #### Manual
 
-- [ ] 1.3 Table, enums, index, and all four RLS policies confirmed in Supabase Studio (local)
-- [ ] 1.4 Cross-user RLS isolation confirmed via seeded rows (local)
+- [ ] 1.4 Table, enums, index, and all four RLS policies confirmed in Supabase Studio (local)
+- [ ] 1.5 Cross-user RLS isolation confirmed via seeded rows (local)
 
 ### Phase 2: TypeScript Type Generation & Client Wiring
 
