@@ -41,32 +41,35 @@
   - Tradeoff: One more small migration file for a single-line change.
   - Confidence: HIGH — standard Postgres/Supabase best practice, matches the linter's own recommendation.
   - Blind spot: None significant — current exploitability is low given this migration's grants.
-- **Decision**: PENDING
+- **Decision**: FIXED + ACCEPTED-AS-RULE: New Postgres functions must pin search_path (applied via
+  `supabase/migrations/20260828192519_harden_set_updated_at_search_path.sql`, pushed local + hosted; lesson
+  recorded in `context/foundation/lessons.md`)
 
-### F2 — `roadmap.md` still shows F-01 as unfinished, and inconsistently so
+### F2 — `roadmap.md` still shows F-01 as unfinished
 
 - **Severity**: ⚠️ WARNING
 - **Impact**: 🏃 LOW — quick decision; fix is obvious and narrowly scoped
 - **Dimension**: Plan Adherence
-- **Location**: `context/foundation/roadmap.md:54` (At-a-glance table says `in-progress`), `:107` (Foundations
-  detail section says `proposed`)
+- **Location**: `context/foundation/roadmap.md:54` (At-a-glance table), `:112` (Foundations detail section)
 - **Detail**: `change.md` was flipped to `status: implemented` and every Phase 1-3 Progress checkbox is `[x]`
   with commit SHAs, but the epilogue commit (`a25c770`) only touched `change.md` and `plan.md` — it never touched
-  `roadmap.md`. The roadmap's own two references to F-01 don't even agree with each other (`in-progress` vs.
-  `proposed`), and neither reflects the real, verified-complete state. Since the plan's own Overview states this
+  `roadmap.md`. Both of the roadmap's F-01 status fields still said `in-progress`, not reflecting the real,
+  verified-complete state. *(Correction from the original report: the two fields were consistent with each other —
+  not conflicting as first stated. The "proposed" value spotted during the initial review belonged to S-03's own
+  Status field, not F-01's; it was misattributed while grepping.)* Since the plan's own Overview states this
   change's purpose is to unlock S-01/S-02/S-03, a stale roadmap risks those slices staying un-planned even though
   their sole prerequisite is done.
 - **Fix**: Update `context/foundation/roadmap.md` — flip F-01's status to `done` in the At-a-glance table (line 54)
-  and the Foundations detail section (line 107), then reassess whether S-01/S-02/S-03 should move off `proposed`
-  now that F-01 is satisfied.
+  and the Foundations detail section (line 112).
   - Strength: Keeps the roadmap — the doc future planning sessions and `/10x-roadmap` read — truthful about what's
     actually unblocked.
   - Tradeoff: None; pure documentation catch-up, no code risk.
   - Confidence: HIGH — `change.md` and the plan's Progress section independently confirm completion, verified
     against both local and hosted Supabase.
-  - Blind spot: Whether to also run `/10x-roadmap`'s slice-closing flow now vs. just fixing the status field is a
-    call for the user.
-- **Decision**: PENDING
+  - Blind spot: Whether S-01/S-02/S-03 should also move off `proposed` now that their prerequisite is done is left
+    to the user — not applied as part of this fix.
+- **Decision**: FIXED + ACCEPTED-AS-RULE: Closing out a plan must also update roadmap.md (F-01 flipped to `done`
+  at roadmap.md:54 and :112; lesson recorded in `context/foundation/lessons.md`)
 
 ### F3 — Unplanned but benign tooling changes outside the plan's file list
 
@@ -81,7 +84,7 @@
   narrowly scoped to one file, not project-wide.
 - **Fix**: No code change needed. Optionally add a one-line addendum to `plan.md`'s Phase 1/2 "Changes Required"
   noting these two files, so a future reader of the plan isn't surprised they exist outside its listed contract.
-- **Decision**: PENDING
+- **Decision**: SKIPPED
 
 ### F4 — Plan's migration contract omitted the required `GRANT` statement
 
@@ -97,4 +100,4 @@
 - **Fix**: Add a short addendum to Phase 1's contract in `plan.md` documenting the GRANT requirement, and consider
   carrying it into `/10x-lesson` as a recurring rule for any future RLS-protected table in this project.
   - Fix: Amend `plan.md`'s Phase 1 contract text with the GRANT line for an accurate historical record.
-- **Decision**: PENDING
+- **Decision**: FIXED (addendum added to `plan.md` Phase 1 contract, dated 2026-08-28)

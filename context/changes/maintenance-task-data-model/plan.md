@@ -121,6 +121,13 @@ is correct (do not hand-write the timestamp), then fill it in with the schema be
   on `maintenance_tasks` for each row.
 - `alter table maintenance_tasks enable row level security;` followed by four separate policies, each `to authenticated`: `select` using `auth.uid() = user_id`; `insert` with check `auth.uid() = user_id`; `update`
   using `auth.uid() = user_id` with check `auth.uid() = user_id`; `delete` using `auth.uid() = user_id`.
+- `grant select, insert, update, delete on table maintenance_tasks to authenticated;` — RLS policies only restrict
+  rows within privileges a role already holds; they don't confer base table privileges, so this GRANT is required
+  alongside the policies above, not optional.
+
+**Addendum (2026-08-28, added during implementation review)**: the original contract above omitted this GRANT
+requirement; the implementation added it correctly on its own. Recorded here so the plan's history is accurate and
+future RLS-protected tables in this repo don't miss it (see `context/foundation/lessons.md`).
 
 ### Success Criteria
 
