@@ -337,10 +337,10 @@ it needs to be undone, a follow-up down-migration would need to be authored expl
 
 #### Automated
 
-- [x] 3.1 Migration applied and tracked locally and remotely: `npx supabase migration list`
-- [x] 3.2 Build passes: `npm run build`
+- [x] 3.1 Migration applied and tracked locally and remotely: `npx supabase migration list` — cc5bd77
+- [x] 3.2 Build passes: `npm run build` — cc5bd77
 
 #### Manual
 
-- [x] 3.3 Hosted schema (table, enums, index, trigger, RLS policies) matches local
-- [x] 3.4 Cross-user RLS isolation confirmed against the hosted project
+- [x] 3.3 Hosted schema (table, enums, index, trigger, RLS policies) matches local — cc5bd77
+- [x] 3.4 Cross-user RLS isolation confirmed against the hosted project — cc5bd77
