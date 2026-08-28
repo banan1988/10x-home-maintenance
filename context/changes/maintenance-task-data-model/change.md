@@ -1,9 +1,9 @@
 ---
 change_id: maintenance-task-data-model
 title: Maintenance task data model with per-user RLS isolation
-status: implementing
+status: implemented
 created: 2026-08-27
-updated: 2026-08-27
+updated: 2026-08-28
 archived_at:
 ---
 
