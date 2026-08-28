@@ -325,22 +325,22 @@ it needs to be undone, a follow-up down-migration would need to be authored expl
 
 #### Automated
 
-- [x] 2.1 Type generation succeeds: `npm run types:generate`
-- [x] 2.2 Type-checked lint passes: `npm run lint`
-- [x] 2.3 Existing unit tests still pass: `npm run test`
+- [x] 2.1 Type generation succeeds: `npm run types:generate` — 2c04163
+- [x] 2.2 Type-checked lint passes: `npm run lint` — 2c04163
+- [x] 2.3 Existing unit tests still pass: `npm run test` — 2c04163
 
 #### Manual
 
-- [x] 2.4 `src/types.ts` exported shapes match the migration's columns and enum values
+- [x] 2.4 `src/types.ts` exported shapes match the migration's columns and enum values — 2c04163
 
 ### Phase 3: Push to Hosted Project & Final Verification
 
 #### Automated
 
-- [ ] 3.1 Migration applied and tracked locally and remotely: `npx supabase migration list`
-- [ ] 3.2 Build passes: `npm run build`
+- [x] 3.1 Migration applied and tracked locally and remotely: `npx supabase migration list`
+- [x] 3.2 Build passes: `npm run build`
 
 #### Manual
 
-- [ ] 3.3 Hosted schema (table, enums, index, trigger, RLS policies) matches local
-- [ ] 3.4 Cross-user RLS isolation confirmed against the hosted project
+- [x] 3.3 Hosted schema (table, enums, index, trigger, RLS policies) matches local
+- [x] 3.4 Cross-user RLS isolation confirmed against the hosted project
