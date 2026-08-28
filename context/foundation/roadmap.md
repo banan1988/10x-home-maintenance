@@ -49,12 +49,12 @@ CRUD, automatic status computation, and an urgency-ordered dashboard.
 
 ## At a glance
 
-| ID   | Change ID                     | Outcome (user can …)                                                     | Prerequisites | PRD refs                                                      | Status      |
-| ---- | ----------------------------- | ------------------------------------------------------------------------ | ------------- | ------------------------------------------------------------- | ----------- |
-| F-01 | `maintenance-task-data-model` | (foundation) maintenance task schema with per-user RLS isolation lands   | —             | NFR (cross-user data isolation), Access Control               | in-progress |
-| S-01 | `first-task-on-dashboard`     | add a maintenance task and see it correctly prioritized on the dashboard | F-01          | US-01, FR-001, FR-002, FR-003, FR-004, FR-008, FR-009, FR-010 | proposed    |
-| S-02 | `manage-maintenance-tasks`    | view, edit (incl. mark-complete), and delete their maintenance tasks     | F-01          | FR-005, FR-006, FR-007                                        | proposed    |
-| S-03 | `maintenance-tasks-api`       | perform full CRUD on their maintenance tasks via the API                 | F-01          | FR-011                                                        | proposed    |
+| ID   | Change ID                     | Outcome (user can …)                                                     | Prerequisites | PRD refs                                                      | Status   |
+| ---- | ----------------------------- | ------------------------------------------------------------------------ | ------------- | ------------------------------------------------------------- | -------- |
+| F-01 | `maintenance-task-data-model` | (foundation) maintenance task schema with per-user RLS isolation lands   | —             | NFR (cross-user data isolation), Access Control               | done     |
+| S-01 | `first-task-on-dashboard`     | add a maintenance task and see it correctly prioritized on the dashboard | F-01          | US-01, FR-001, FR-002, FR-003, FR-004, FR-008, FR-009, FR-010 | proposed |
+| S-02 | `manage-maintenance-tasks`    | view, edit (incl. mark-complete), and delete their maintenance tasks     | F-01          | FR-005, FR-006, FR-007                                        | proposed |
+| S-03 | `maintenance-tasks-api`       | perform full CRUD on their maintenance tasks via the API                 | F-01          | FR-011                                                        | proposed |
 
 ## Streams
 
@@ -109,7 +109,7 @@ below assume these are present and do NOT re-scaffold them.
 - **Risk:** Highest-leverage item in the roadmap — every slice reuses this schema, and an isolation mistake here
   directly violates the PRD's guardrail that a user must never see another user's data. Sequenced first because
   nothing else can start, or be safely verified, without it.
-- **Status:** in-progress
+- **Status:** done
 
 ## Slices
 
