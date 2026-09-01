@@ -66,6 +66,11 @@ Before baking these into `plan.md`, run `/10x-research first-task-on-dashboard` 
 internal convention (e.g. a `formatDate`/status helper stub, or a zod schema pattern already in `src/types.ts`)
 that these choices would need to align with.
 
+## date-fns API reference for S-01
+
+The exact date-fns functions, a reference implementation shape, and documented gotchas (fetched via Context7)
+live in `date-fns-api-docs.md` in this same change folder.
+
 ## Sources
 
 - <https://worksonworkers.southpolesteve.workers.dev/?category=date-time>
