@@ -19,17 +19,19 @@
 ```typescript
 import { addDays, addWeeks, addMonths, addYears, differenceInCalendarDays, parseISO } from "date-fns";
 
-type FrequencyUnit = "days" | "weeks" | "months" | "years";
+// Matches the shipped `maintenance_frequency_unit` Postgres enum (singular), not date-fns' own naming —
+// see `src/types.ts`'s `MaintenanceFrequencyUnit`.
+type FrequencyUnit = "day" | "week" | "month" | "year";
 
 function computeDueDate(lastDoneDate: Date, frequencyValue: number, frequencyUnit: FrequencyUnit): Date {
   switch (frequencyUnit) {
-    case "days":
+    case "day":
       return addDays(lastDoneDate, frequencyValue);
-    case "weeks":
+    case "week":
       return addWeeks(lastDoneDate, frequencyValue);
-    case "months":
+    case "month":
       return addMonths(lastDoneDate, frequencyValue);
-    case "years":
+    case "year":
       return addYears(lastDoneDate, frequencyValue);
   }
 }
