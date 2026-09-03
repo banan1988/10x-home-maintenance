@@ -1,0 +1,379 @@
+# User adds a maintenance task and sees it correctly prioritized on the dashboard — Implementation Plan
+
+## Overview
+
+Implement S-01 (`first-task-on-dashboard`): a logged-in user can add a maintenance task (name, category,
+importance, frequency, last-done date) via a modal on the dashboard, and immediately see it there with an
+automatically computed status (OK / DUE SOON / OVERDUE), sorted by status then importance. This is the roadmap's
+north star — the smallest end-to-end slice that proves the product's central bet (automatic status derivation vs.
+a manually-tracked list).
+
+## Current State Analysis
+
+F-01 shipped the `maintenance_tasks` table with per-user RLS and deliberately deferred all status/due-date
+computation to this slice (`context/changes/maintenance-task-data-model/plan.md:35-38,62-63`). `src/types.ts`
+already re-exports `MaintenanceTask`/`MaintenanceTaskInsert`/`MaintenanceFrequencyUnit` etc. from the generated
+`src/db/database.types.ts`. `src/pages/dashboard.astro` currently only renders a welcome message and a sign-out
+button — no task query, no add-task UI. No API route exists for tasks; the only API routes are
+`src/pages/api/auth/{signin,signup,signout}.ts`. Only one shadcn component (`button.tsx`) is installed; `zod`,
+`react-hook-form`, and any `Dialog`/`Select` component are all net-new. `src/middleware.ts`'s `PROTECTED_ROUTES`
+list covers only `/dashboard`, not `/api/*` — API routes must enforce their own auth check.
+
+## Desired End State
+
+A user lands on `/dashboard` and sees either an empty-state message with an "Add task" button (no tasks yet), or
+their tasks sorted OVERDUE → DUE SOON → OK, then HIGH → MEDIUM → LOW importance within each status. Clicking "Add
+task" opens a modal with fields for name, category, importance, frequency (value + unit), and last-done date.
+Submitting a valid task redirects back to `/dashboard`, where the new task appears with a correctly computed
+status. Submitting invalid data (missing fields, non-positive frequency, or a future last-done date) redirects
+back with the modal reopened and the error shown. A second user's dashboard never shows the first user's tasks.
+
+**Verification**: `npm run test`, `npm run lint`, and `npx astro check` all pass; manual walkthrough of the empty
+state, add-task happy path, validation-error path, and cross-user isolation (see per-phase Manual Verification).
+
+### Key Discoveries
+
+- `context/changes/maintenance-task-data-model/plan.md:35-38,62-63` — status/due-date computation is explicitly
+  this slice's responsibility; no DB columns or migration needed.
+- `src/db/database.types.ts:58,187` / `src/types.ts:9` — `MaintenanceFrequencyUnit` is singular
+  (`"day"|"week"|"month"|"year"`); `context/changes/first-task-on-dashboard/date-fns-api-docs.md` already carries
+  the corrected (singular) reference implementation for `computeDueDate`/`computeStatus`.
+- `src/middleware.ts:4` — `PROTECTED_ROUTES = ["/dashboard"]` does not cover `/api/*`; the new `POST /api/tasks`
+  route must check `context.locals.user` itself rather than relying on middleware.
+- `src/pages/api/auth/signup.ts:1-20` — the established pattern for a mutating API route: `formData()` parsing,
+  `context.redirect(...)` with an `?error=` query param on failure, no JSON responses.
+- `src/pages/auth/signin.astro:5` — the established pattern for surfacing a server error back into a client
+  component: read `Astro.url.searchParams.get("error")`, pass as a `serverError` prop.
+- `src/db/database.types.ts:174-191` (`Constants.public.Enums`) — the single source of truth for
+  `maintenance_category`/`maintenance_importance`/`maintenance_frequency_unit` literal values; the zod schema
+  must read from here, not hand-duplicate the lists.
+- `components.json` — shadcn "new-york" style already configured; only `button.tsx` installed so far.
+
+## What We're NOT Doing
+
+- Full FR-011 CRUD API (S-03, `maintenance-tasks-api`) — this slice adds only `POST /api/tasks`, on a path S-03
+  can extend later.
+- View/edit/delete of existing tasks (S-02, `manage-maintenance-tasks`).
+- `react-hook-form`, `@hookform/resolvers`, or any component-testing library (e.g. React Testing Library) — not
+  needed given the chosen hand-rolled + zod approach and Vitest-only unit test scope.
+- Retrofitting `export const prerender = false;` onto the existing auth routes — only the new route added here
+  gets it.
+- Preserving submitted form field values across a validation-error redirect — matches existing auth-form UX
+  (fields reset; only the error message persists).
+- Any client-side fetch/SPA-style submission — the form is a native `POST` with a full-page redirect, like every
+  existing form in the repo.
+- Category filtering, notifications, or any other PRD Non-Goal.
+
+## Implementation Approach
+
+Three phases, each independently testable, following data → business logic → API → UI ordering (the data model
+already exists from F-01):
+
+1. **Business logic** (`src/lib/status.ts`): pure functions computing due date and status from a task's stored
+   fields, plus the urgency sort comparator. No I/O, fully unit-testable, no dependency on the other phases.
+1. **Validation + API** (`src/lib/task-schema.ts`, `src/pages/api/tasks/index.ts`): a zod schema shared by the
+   client form and the server route, and a `POST /api/tasks` handler that validates, checks auth itself, and
+   inserts via the RLS-scoped Supabase client.
+1. **UI** (`src/pages/dashboard.astro`, `src/components/tasks/AddTaskDialog.tsx`): query the user's tasks, run
+   them through Phase 1's functions, render the sorted list (or empty state), and wire up the add-task modal from
+   Phase 2's schema/route.
+
+## Critical Implementation Details
+
+**Future-date validation must be evaluated per-request, not baked in at module load.** Cloudflare Workers can
+keep a module's top-level scope alive across multiple requests in the same isolate. Writing the "no future
+last-done date" rule as `z.coerce.date().max(new Date())` at module scope captures `new Date()` once, at whatever
+moment the isolate happened to load the module — not at request time. The rule must instead be a
+`.refine((date) => date <= new Date(), ...)` (or equivalent), which calls `new Date()` inside the callback,
+evaluated fresh on every `parse`/`safeParse` call.
+
+**`POST /api/tasks` must check `context.locals.user` itself.** `src/middleware.ts`'s `PROTECTED_ROUTES` list only
+matches `/dashboard`, so an unauthenticated request to `/api/tasks` is never redirected by middleware the way
+`/dashboard` is. The route handler must redirect to `/auth/signin` (or reject) itself when `context.locals.user`
+is `null`, before touching the request body — otherwise this is the first API route in the repo with no auth
+gate at all, on a route that writes data.
+
+**The add-task dialog must reopen itself when the URL carries a server error.** Because submission is a native
+form POST + full-page redirect (matching the rest of the repo), a server-side validation failure lands the user
+back on `/dashboard?error=...` with the dialog's React state freshly mounted (closed by default). The dialog's
+open state must default to `true` when `Astro.url.searchParams.get("error")` is non-null (read in
+`dashboard.astro`, passed down as a prop), mirroring how `signin.astro`/`signup.astro` already pass a
+`serverError` prop — otherwise the error redirect is silent and the user sees a plain dashboard with no visible
+feedback.
+
+## Phase 1: Status & Due-Date Computation
+
+### Overview
+
+Pure business logic: given a task's `frequency_value`, `frequency_unit`, and `last_done_date`, compute its due
+date and status (OK / DUE_SOON / OVERDUE per FR-008/FR-009's fixed 7-day threshold), and provide the comparator
+used to sort tasks by urgency (FR-010).
+
+### Changes Required
+
+#### 1. Status/due-date module
+
+**File**: `src/lib/status.ts`
+
+**Intent**: Compute a task's due date from its frequency and last-done date, derive its status against a fixed
+7-day DUE SOON threshold, and provide a comparator that orders tasks OVERDUE → DUE_SOON → OK, then HIGH → MEDIUM
+→ LOW importance within each status group.
+
+**Contract**: Exports `computeDueDate(lastDoneDate: Date, frequencyValue: number, frequencyUnit: MaintenanceFrequencyUnit): Date` (using `date-fns`' `addDays`/`addWeeks`/`addMonths`/`addYears`, switching on the
+singular `day|week|month|year` literals — see `date-fns-api-docs.md`); `computeStatus(dueDate: Date, today: Date): TaskStatus` using `differenceInCalendarDays` against a `DUE_SOON_THRESHOLD_DAYS = 7` constant, implementing FR-009's
+exact rule (`< today` → OVERDUE; `today..today+7` inclusive → DUE_SOON; beyond → OK); and
+`compareByUrgency(a: MaintenanceTaskWithStatus, b: MaintenanceTaskWithStatus): number` ranking status then
+importance. Add a `default`-less exhaustive switch (or a `satisfies never` fallthrough guard) in `computeDueDate`
+so a future enum addition fails to compile rather than silently returning `undefined`, per the exhaustiveness gap
+noted in `research.md`.
+
+#### 2. Shared types
+
+**File**: `src/types.ts`
+
+**Intent**: Give the computed status a shared type so `status.ts`, the dashboard, and the dialog all reference
+the same vocabulary.
+
+**Contract**: Add `export type TaskStatus = "OK" | "DUE_SOON" | "OVERDUE";` and
+`export type MaintenanceTaskWithStatus = MaintenanceTask & { dueDate: Date; status: TaskStatus };`.
+
+#### 3. Unit tests
+
+**File**: `src/lib/status.test.ts`
+
+**Intent**: Cover `computeDueDate` (each frequency unit, plus the `addMonths` month-end clamp gotcha),
+`computeStatus` (the OVERDUE/DUE_SOON/OK boundaries at exactly today, exactly +7 days, +8 days, -1 day), and
+`compareByUrgency` (status takes priority over importance; importance breaks ties within a status).
+
+**Contract**: `describe`/`it("should ...")` Vitest style, colocated, matching `src/lib/utils.test.ts`'s convention.
+
+### Success Criteria
+
+#### Automated Verification
+
+- Unit tests pass: `npm run test`
+- Type checking passes: `npx astro check`
+- Linting passes: `npm run lint`
+
+#### Manual Verification
+
+- Manually trace 3 worked examples against PRD FR-008/FR-009's business rule table (a task due in exactly 7 days,
+  a task 1 day overdue, a monthly task last done on Jan 31) using a scratch script or the Vitest UI, confirming
+  each matches the table by hand, not just by the test's own assertion.
+
+**Implementation Note**: Pause here for manual confirmation before proceeding to Phase 2.
+
+______________________________________________________________________
+
+## Phase 2: Add-Task Validation & API
+
+### Overview
+
+A zod schema shared between the client form and the server route, and a `POST /api/tasks` handler that validates,
+enforces its own auth check, and inserts the new task scoped to the authenticated user.
+
+### Changes Required
+
+#### 1. Validation schema
+
+**File**: `src/lib/task-schema.ts`
+
+**Intent**: Validate the five add-task fields with one schema reusable on both the client (pre-submit hint) and
+the server (authoritative), sourcing enum values from the generated `Constants` rather than hand-duplicating them.
+
+**Contract**: `export const addTaskSchema = z.object({ name, category, importance, frequency_value, frequency_unit, last_done_date })`, with field names matching `MaintenanceTaskInsert` exactly (no camelCase
+mapping layer). `category`/`importance`/`frequency_unit` are `z.enum(Constants.public.Enums.maintenance_category)`
+etc. `frequency_value` is `z.coerce.number().int().positive(...)` (mirrors the DB's `check (frequency_value > 0)`).
+`last_done_date` is `z.coerce.date()` with a `.refine` rejecting any date after "now" (evaluated per-call — see
+Critical Implementation Details). Export the inferred `AddTaskInput` type.
+
+#### 2. API route
+
+**File**: `src/pages/api/tasks/index.ts`
+
+**Intent**: Accept the add-task form submission, validate it, and insert it for the authenticated user only.
+
+**Contract**: `export const prerender = false;` plus a `POST: APIRoute` handler mirroring
+`src/pages/api/auth/signup.ts`'s shape: redirect to `/auth/signin` if `context.locals.user` is `null` (see
+Critical Implementation Details — this route is not covered by `PROTECTED_ROUTES`); parse `formData()`;
+`addTaskSchema.safeParse(...)` the raw fields; on failure, `context.redirect('/dashboard?error=' + encodeURIComponent(<first issue's message>))`; on success, insert via `createClient(...).from("maintenance_tasks") .insert({ ...parsed, user_id: user.id })`; redirect to `/dashboard` on success or `/dashboard?error=...` if the
+insert itself fails (e.g. Supabase misconfigured, matching `signup.ts`'s "Supabase is not configured" branch).
+
+#### 3. Schema unit tests
+
+**File**: `src/lib/task-schema.test.ts`
+
+**Intent**: Cover the schema's accept/reject behavior independent of the route.
+
+**Contract**: Cases for a fully valid payload, a missing/blank `name`, a non-positive `frequency_value`, an
+invalid enum value, and a future `last_done_date` — each asserting `safeParse(...).success` and, for failures,
+that the relevant issue is present.
+
+### Success Criteria
+
+#### Automated Verification
+
+- Unit tests pass: `npm run test`
+- Type checking passes: `npx astro check`
+- Linting passes: `npm run lint`
+- Build succeeds under the Cloudflare adapter: `npm run build`
+
+#### Manual Verification
+
+- With an authenticated session cookie, POST valid form-data to `/api/tasks` (e.g. via a REST client) and confirm
+  a redirect to `/dashboard` and a new row scoped to that user in Supabase Studio.
+- Repeat with no session cookie and confirm the route redirects to `/auth/signin` rather than inserting a row.
+- POST a payload with a future `last_done_date` and confirm the redirect carries the validation error.
+
+**Implementation Note**: Pause here for manual confirmation before proceeding to Phase 3.
+
+______________________________________________________________________
+
+## Phase 3: Dashboard & Add-Task Dialog
+
+### Overview
+
+Render the user's tasks (or an empty state) on the dashboard, sorted by urgency, and wire up the add-task modal
+that submits to Phase 2's route.
+
+### Changes Required
+
+#### 1. Dashboard page
+
+**File**: `src/pages/dashboard.astro`
+
+**Intent**: Replace the placeholder welcome content with the real task list: query the user's tasks, compute
+each one's due date/status via `src/lib/status.ts`, sort by `compareByUrgency`, and render the list or an
+empty-state message. Read the `error` query param and pass it into the dialog as `serverError`.
+
+**Contract**: Server-side frontmatter query (`await createClient(...).from("maintenance_tasks").select("*")`,
+relying on RLS for the user scope — no redundant `.eq("user_id", ...)`), mapped through `computeDueDate` +
+`computeStatus` into `MaintenanceTaskWithStatus[]`, sorted with `compareByUrgency`, rendered as a list (task name,
+category, importance, computed status label, due date) with an "Add task" trigger button. When the list is
+empty, render a short message (e.g. "No maintenance tasks yet.") alongside the same trigger button — no separate
+empty-state component.
+
+#### 2. Add-task dialog
+
+**File**: `src/components/tasks/AddTaskDialog.tsx`
+
+**Intent**: A self-contained React island — new `src/components/tasks/` folder, not reusing or refactoring
+`src/components/auth/*` — providing the modal form: shadcn `Dialog` (net-new, `npx shadcn add dialog`) wrapping a
+native `<form method="POST" action="/api/tasks">`, with shadcn `Select` (net-new, `npx shadcn add select`) for
+`category`/`importance`/`frequency_unit` and plain labeled inputs for `name`/`frequency_value`/`last_done_date`.
+Client-side, `addTaskSchema.safeParse` runs on submit; on failure, `preventDefault()` and show per-field errors
+(mirroring `SignUpForm.tsx`'s `validate()` pattern but backed by the shared zod schema); on success, let the
+native POST proceed. Accepts a `serverError?: string | null` prop; the dialog's `open` state defaults to `true`
+when `serverError` is non-null (see Critical Implementation Details), otherwise defaults to `false` and opens via
+the trigger button.
+
+### Success Criteria
+
+#### Automated Verification
+
+- Unit tests pass: `npm run test`
+- Type checking passes: `npx astro check`
+- Linting passes: `npm run lint`
+- Build succeeds: `npm run build`
+
+#### Manual Verification
+
+- Sign in with no existing tasks: confirm the empty-state message and "Add task" button both render.
+- Add 3 tasks spanning all three statuses and varying importance; confirm they render sorted OVERDUE → DUE_SOON →
+  OK, then HIGH → MEDIUM → LOW within each group.
+- Submit the dialog with a blank name and with a future last-done date; confirm the redirect reopens the dialog
+  with the corresponding error visible.
+- Sign in as a second test user and confirm their dashboard shows zero tasks from the first user.
+- Check the dashboard and dialog at a mobile viewport width and in at least two browsers, per the NFR on
+  cross-browser/device usability.
+
+**Implementation Note**: This completes S-01. Pause here for final manual confirmation before closing out the
+change.
+
+______________________________________________________________________
+
+## Testing Strategy
+
+### Unit Tests
+
+- `computeDueDate`/`computeStatus`/`compareByUrgency` (Phase 1) — all frequency units, the `addMonths` clamp, and
+  every status-boundary and sort-tiebreak case.
+- `addTaskSchema` (Phase 2) — valid payload, each field's rejection case, including the future-date rule.
+
+### Integration Tests
+
+- None planned — no integration test runner is configured in this repo (Vitest only); the manual verification
+  steps in Phases 2–3 cover the API route and end-to-end add-task flow instead.
+
+### Manual Testing Steps
+
+1. Empty-dashboard first-session flow (empty state → add first task → see it prioritized).
+1. Multi-task sort ordering across all status/importance combinations.
+1. Validation-error redirect (blank field, future date) reopening the dialog with the error shown.
+1. Cross-user isolation on the dashboard.
+1. Mobile viewport + cross-browser check.
+
+## Performance Considerations
+
+None beyond what's already true: a single per-user Supabase query plus an in-memory sort over a small task list
+(NFR target scale is "small" data volume, "low" QPS) — no pagination or caching needed at this scale.
+
+## Migration Notes
+
+None — no schema changes; F-01's migration already shipped the table and RLS this slice reads/writes against.
+
+## References
+
+- Internal research: `context/changes/first-task-on-dashboard/research.md`
+- External research: `context/changes/first-task-on-dashboard/external-research.md`
+- date-fns API reference: `context/changes/first-task-on-dashboard/date-fns-api-docs.md`
+- Upstream schema: `context/changes/maintenance-task-data-model/plan.md`
+- Existing form pattern: `src/components/auth/SignUpForm.tsx`, `src/pages/api/auth/signup.ts`
+
+## Progress
+
+> Convention: `- [ ]` pending, `- [x]` done. Append `— <commit sha>` when a step lands. Do not rename step titles.
+
+### Phase 1: Status & Due-Date Computation
+
+#### Automated
+
+- [ ] 1.1 Unit tests pass: `npm run test`
+- [ ] 1.2 Type checking passes: `npx astro check`
+- [ ] 1.3 Linting passes: `npm run lint`
+
+#### Manual
+
+- [ ] 1.4 Manually traced 3 worked examples against PRD FR-008/FR-009's business rule table
+
+### Phase 2: Add-Task Validation & API
+
+#### Automated
+
+- [ ] 2.1 Unit tests pass: `npm run test`
+- [ ] 2.2 Type checking passes: `npx astro check`
+- [ ] 2.3 Linting passes: `npm run lint`
+- [ ] 2.4 Build succeeds under the Cloudflare adapter: `npm run build`
+
+#### Manual
+
+- [ ] 2.5 Authenticated POST to `/api/tasks` redirects to `/dashboard` and inserts a row scoped to that user
+- [ ] 2.6 Unauthenticated POST redirects to `/auth/signin` instead of inserting
+- [ ] 2.7 Future `last_done_date` POST redirects with the validation error
+
+### Phase 3: Dashboard & Add-Task Dialog
+
+#### Automated
+
+- [ ] 3.1 Unit tests pass: `npm run test`
+- [ ] 3.2 Type checking passes: `npx astro check`
+- [ ] 3.3 Linting passes: `npm run lint`
+- [ ] 3.4 Build succeeds: `npm run build`
+
+#### Manual
+
+- [ ] 3.5 Empty-state message + "Add task" button render with zero tasks
+- [ ] 3.6 3 tasks across all statuses/importances render sorted per FR-010
+- [ ] 3.7 Blank-name and future-date submissions reopen the dialog with the error visible
+- [ ] 3.8 Second test user sees zero tasks from the first user
+- [ ] 3.9 Mobile viewport + cross-browser check
