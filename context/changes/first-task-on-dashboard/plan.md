@@ -111,7 +111,15 @@ used to sort tasks by urgency (FR-010).
 
 ### Changes Required
 
-#### 1. Status/due-date module
+#### 1. Install dependency
+
+**Intent**: `date-fns` is not currently installed anywhere in this repo (absent from `package.json` and
+`node_modules`) — `computeDueDate`/`computeStatus` cannot import it until it's added.
+
+**Contract**: Run `npm install date-fns` before writing `src/lib/status.ts`, adding it to `package.json`
+dependencies.
+
+#### 2. Status/due-date module
 
 **File**: `src/lib/status.ts`
 
@@ -123,11 +131,14 @@ used to sort tasks by urgency (FR-010).
 singular `day|week|month|year` literals — see `date-fns-api-docs.md`); `computeStatus(dueDate: Date, today: Date): TaskStatus` using `differenceInCalendarDays` against a `DUE_SOON_THRESHOLD_DAYS = 7` constant, implementing FR-009's
 exact rule (`< today` → OVERDUE; `today..today+7` inclusive → DUE_SOON; beyond → OK); and
 `compareByUrgency(a: MaintenanceTaskWithStatus, b: MaintenanceTaskWithStatus): number` ranking status then
-importance. Add a `default`-less exhaustive switch (or a `satisfies never` fallthrough guard) in `computeDueDate`
-so a future enum addition fails to compile rather than silently returning `undefined`, per the exhaustiveness gap
-noted in `research.md`.
+importance. This repo's ESLint config doesn't enable `@typescript-eslint/switch-exhaustiveness-check`, and
+`noImplicitReturns` is off in `tsconfig.json` — so a plain `default`-less switch would NOT fail to compile if a
+future enum value went unhandled (per the exhaustiveness gap noted in `research.md`). Guard `computeDueDate`
+against that with an explicit `default` branch that assigns the narrowed value to a `never`-typed variable —
+e.g. `const _exhaustive: never = frequencyUnit;` followed by `throw new Error(...)` inside `default:` — this is a
+genuine TS type error if a case is missing, independent of the ESLint/tsconfig gaps above.
 
-#### 2. Shared types
+#### 3. Shared types
 
 **File**: `src/types.ts`
 
@@ -137,7 +148,7 @@ the same vocabulary.
 **Contract**: Add `export type TaskStatus = "OK" | "DUE_SOON" | "OVERDUE";` and
 `export type MaintenanceTaskWithStatus = MaintenanceTask & { dueDate: Date; status: TaskStatus };`.
 
-#### 3. Unit tests
+#### 4. Unit tests
 
 **File**: `src/lib/status.test.ts`
 
@@ -174,7 +185,15 @@ enforces its own auth check, and inserts the new task scoped to the authenticate
 
 ### Changes Required
 
-#### 1. Validation schema
+#### 1. Install dependency
+
+**Intent**: `zod` is not a direct dependency of this repo — it happens to be reachable today only transitively
+(pulled in by another package), which is fragile and could disappear on a future lockfile change.
+
+**Contract**: Run `npm install zod` before writing `src/lib/task-schema.ts`, pinning it as a direct dependency
+in `package.json`.
+
+#### 2. Validation schema
 
 **File**: `src/lib/task-schema.ts`
 
@@ -187,7 +206,7 @@ etc. `frequency_value` is `z.coerce.number().int().positive(...)` (mirrors the D
 `last_done_date` is `z.coerce.date()` with a `.refine` rejecting any date after "now" (evaluated per-call — see
 Critical Implementation Details). Export the inferred `AddTaskInput` type.
 
-#### 2. API route
+#### 3. API route
 
 **File**: `src/pages/api/tasks/index.ts`
 
@@ -199,7 +218,23 @@ Critical Implementation Details — this route is not covered by `PROTECTED_ROUT
 `addTaskSchema.safeParse(...)` the raw fields; on failure, `context.redirect('/dashboard?error=' + encodeURIComponent(<first issue's message>))`; on success, insert via `createClient(...).from("maintenance_tasks") .insert({ ...parsed, user_id: user.id })`; redirect to `/dashboard` on success or `/dashboard?error=...` if the
 insert itself fails (e.g. Supabase misconfigured, matching `signup.ts`'s "Supabase is not configured" branch).
 
-#### 3. Schema unit tests
+#### 4. API route unit tests
+
+**File**: `src/pages/api/tasks/index.test.ts`
+
+**Intent**: Automate coverage of the route's self-checked auth gate — the property this plan's own Critical
+Implementation Details flags as the phase's biggest risk, since `PROTECTED_ROUTES` middleware doesn't cover
+`/api/*`. Manual REST-client checks alone would let a future refactor silently drop the null-user check with
+nothing to catch it.
+
+**Contract**: Mock `@/lib/supabase`'s `createClient` (following `src/lib/supabase.test.ts`'s existing
+`vi.hoisted()` + dynamic-import convention for modules with side-effecting top-level state) and construct a
+minimal stand-in for Astro's `APIContext` (`locals.user`, `request.formData()`, `redirect()`, `cookies`). Two
+cases: (1) `locals.user: null` — assert the handler redirects to `/auth/signin` and the mocked Supabase client's
+`insert` is never called; (2) `locals.user` set + valid form data — assert `insert` is called with the parsed
+fields plus `user_id: user.id`, and the handler redirects to `/dashboard`.
+
+#### 5. Schema unit tests
 
 **File**: `src/lib/task-schema.test.ts`
 
@@ -214,6 +249,7 @@ that the relevant issue is present.
 #### Automated Verification
 
 - Unit tests pass: `npm run test`
+- API route auth-check and happy-path unit tests pass (`src/pages/api/tasks/index.test.ts`)
 - Type checking passes: `npx astro check`
 - Linting passes: `npm run lint`
 - Build succeeds under the Cloudflare adapter: `npm run build`
@@ -299,6 +335,8 @@ ______________________________________________________________________
 - `computeDueDate`/`computeStatus`/`compareByUrgency` (Phase 1) — all frequency units, the `addMonths` clamp, and
   every status-boundary and sort-tiebreak case.
 - `addTaskSchema` (Phase 2) — valid payload, each field's rejection case, including the future-date rule.
+- `POST /api/tasks` route handler (Phase 2) — null-user redirect (no insert call), and a valid-user happy path
+  (insert called with the right payload, redirect to `/dashboard`).
 
 ### Integration Tests
 
@@ -351,15 +389,16 @@ None — no schema changes; F-01's migration already shipped the table and RLS t
 #### Automated
 
 - [ ] 2.1 Unit tests pass: `npm run test`
-- [ ] 2.2 Type checking passes: `npx astro check`
-- [ ] 2.3 Linting passes: `npm run lint`
-- [ ] 2.4 Build succeeds under the Cloudflare adapter: `npm run build`
+- [ ] 2.2 API route auth-check and happy-path unit tests pass (`src/pages/api/tasks/index.test.ts`)
+- [ ] 2.3 Type checking passes: `npx astro check`
+- [ ] 2.4 Linting passes: `npm run lint`
+- [ ] 2.5 Build succeeds under the Cloudflare adapter: `npm run build`
 
 #### Manual
 
-- [ ] 2.5 Authenticated POST to `/api/tasks` redirects to `/dashboard` and inserts a row scoped to that user
-- [ ] 2.6 Unauthenticated POST redirects to `/auth/signin` instead of inserting
-- [ ] 2.7 Future `last_done_date` POST redirects with the validation error
+- [ ] 2.6 Authenticated POST to `/api/tasks` redirects to `/dashboard` and inserts a row scoped to that user
+- [ ] 2.7 Unauthenticated POST redirects to `/auth/signin` instead of inserting
+- [ ] 2.8 Future `last_done_date` POST redirects with the validation error
 
 ### Phase 3: Dashboard & Add-Task Dialog
 
