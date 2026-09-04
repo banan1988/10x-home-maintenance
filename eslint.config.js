@@ -55,6 +55,10 @@ const reactConfig = tseslint.config({
   rules: {
     ...eslintPluginReactHooks.configs.recommended.rules,
     "react/react-in-jsx-scope": "off",
+    // TS's strictTypeChecked already validates prop shapes at compile time; this rule is for
+    // runtime PropTypes and false-positives on inline-typed destructured params (e.g. shadcn's
+    // generated components/*.tsx callbacks).
+    "react/prop-types": "off",
     "react-compiler/react-compiler": "error",
   },
 });
