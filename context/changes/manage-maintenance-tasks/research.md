@@ -7,8 +7,9 @@ repository: banan1988/10x-home-maintenance
 topic: "Is external-research.md compatible with the codebase for S-02 (manage-maintenance-tasks)?"
 tags: [research, codebase, S-02, react-hook-form, zod, react-day-picker, sonner, shadcn, react-compiler]
 status: complete
-last_updated: 2026-09-03
+last_updated: 2026-09-04
 last_updated_by: Claude Sonnet 5
+last_updated_note: "Recorded user decisions on all 4 open questions, plus the agreed execution sequence (shared prep branch, S-01 plan patch, then S-02 planning)."
 ---
 
 # Research: Is `external-research.md` compatible with the codebase for S-02?
@@ -215,3 +216,49 @@ This is a genuine open design choice, not a compatibility question — see Open 
    explicitly parallel (`roadmap.md` Stream B/A), whichever slice's dependency additions land second should
    verify the shadcn CLI's generated component code against that issue before merging — confirm at
    implementation time, not as a blocker to planning.
+
+## Follow-up Research 2026-09-04
+
+User reviewed the four open questions above and made the following decisions. All four are now resolved; the
+items above are kept verbatim as the historical record of the trade-offs considered.
+
+### Decisions
+
+1. **Form library (Open Question 1) — CONFIRMED as recommended.** Edit flow follows S-01's hand-rolled `useState`
+
+   - shared zod schema convention. No `react-hook-form`. No further action needed on this question.
+
+1. **Date input (Open Question 2) — `react-day-picker` v9 adopted in BOTH S-01 and S-02.** Rationale given by the
+   user: consistent UX across add/edit outweighs the (real, and explicitly named as such — this is not "less
+   code," it's a UX-consistency trade against a small added dependency) cost of introducing a new dependency.
+   Each slice wires its own instance independently (no shared `<DateField>` abstraction attempted now) — this
+   preserves the parallel-work property the roadmap explicitly relies on for Streams A/B, since the only shared
+   artifact is the already-installed shadcn primitives (see Decision 4), not a shared component file.
+
+1. **Mutation feedback (Open Question 3) — `sonner` adopted for ALL mutations (add, edit, delete) in BOTH
+   S-01 and S-02.** The user chose full consistency over the narrower "delete-only" option. Concretely: the
+   existing native `<form method="POST">` + full-page-redirect architecture is **not** replaced by client-side
+   fetch/mutation hooks (out of scope, avoids an architecture rewrite under deadline pressure) — instead, the
+   destination page reads a success/error query-param (as it already does for `serverError`) and fires
+   `toast.success(...)` / `toast.error(...)` on mount. Field-level validation errors continue to reopen the
+   add/edit dialog inline (unchanged) — toast is reserved for mutation *outcome* confirmation, not per-field
+   validation feedback.
+
+1. **`AlertDialog` + `Select` collision risk (Open Question 4) — mitigated via a shared upfront prep step**,
+   done once, before either slice's plan is touched, rather than left to "whichever lands second":
+   `npx shadcn add select alert-dialog calendar popover sonner` in one shot, plus mounting `<Toaster />` in
+   `src/layouts/Layout.astro`, verified with `npm run build && npm run lint && npm run test`. This is treated as
+   infrastructure (analogous to F-01, but far smaller) — logged in `context/foundation/lessons.md`, not folded
+   into either slice's FR scope, so both plans stay minimal and can still be planned/implemented independently.
+
+### Agreed execution sequence
+
+1. This research.md update (current step, branch `feat/plan-S-02-manage-maintenance-tasks`).
+1. New branch off `main` (`chore/shared-ui-primitives`): the Decision 4 prep step. Merge to `main`.
+1. New branch off updated `main` (patch to `first-task-on-dashboard`): amend `plan.md` with the Decision 2/3
+   deltas (react-day-picker for `last_done_date`, sonner for mutation feedback), re-run a delta `/10x-plan-review`.
+   Merge to `main`.
+1. Rebase `feat/plan-S-02-manage-maintenance-tasks` onto updated `main`, then run `/10x-plan manage-maintenance-tasks`
+   — S-02's plan inherits all four decisions with zero remaining open questions on library choice.
+
+No pushes to any remote occur without separate confirmation at each step.
