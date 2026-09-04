@@ -90,3 +90,67 @@ repo — that check was skipped.
   an option, since this repo's config gives it no enforcement.
 - **Decision**: FIXED — Phase 1 Contract now specifies the explicit `never`-assertion `default` branch and
   drops "default-less" as an option
+
+## Follow-up Review 2026-09-04 — delta patch (date-picker + toast)
+
+Scope: only the delta applied after this original review — `react-day-picker` adopted for `last_done_date`,
+`sonner` toast-on-success via a new `?success=` query param, and updated dependency-install notes reflecting the
+shared `chore(m2l4): install shared shadcn primitives for S-01/S-02` prep commit (see
+`context/changes/manage-maintenance-tasks/research.md`, "Follow-up Research 2026-09-04"). The rest of the plan
+(Phases 1–2, F1–F3 above) is unchanged and not re-reviewed here.
+
+- **Verdict**: SOUND (delta only)
+- **Findings**: 0 critical, 1 warning, 0 observations
+
+### Verdicts (delta only)
+
+| Dimension             | Verdict |
+| --------------------- | ------- |
+| End-State Alignment   | PASS    |
+| Lean Execution        | WARNING |
+| Architectural Fitness | PASS    |
+| Blind Spots           | PASS    |
+| Plan Completeness     | PASS    |
+
+### Grounding
+
+5/5 paths ✓ (`src/components/ui/{calendar,popover,sonner}.tsx`, `src/layouts/Layout.astro`'s
+`<Toaster client:load/>` mount, `package.json`'s `react-day-picker`/`date-fns`/`sonner` entries), brief↔plan ✓
+(`plan-brief.md` is silent on date-picker/toast, so the delta doesn't contradict it).
+
+### F4 — New React island for a one-shot toast is heavier than needed
+
+- **Severity**: ⚠️ WARNING
+- **Impact**: 🔎 MEDIUM — real tradeoff; pause to reason through it
+- **Dimension**: Lean Execution
+- **Location**: Phase 3, Item 1 (Dashboard page) + Critical Implementation Details (toast paragraph)
+- **Detail**: The delta introduces a new hydrated React component, `TaskAddedToast.tsx` (`client:load`), whose
+  only job is to call `sonner`'s `toast.success(...)` once on mount when a `success` query param is present.
+  `sonner`'s `toast` is an imperative function, not a React hook — it writes to an external store that
+  `<Toaster/>` (already globally mounted in `Layout.astro`) subscribes to. It does not need a React component or
+  a hydration boundary to be called. Separately, the plan's own Manual Verification claims the toast "does not
+  reappear on a plain page refresh once the `?success=` param is gone from the URL" — but no Contract text
+  specifies *how* the param gets removed from the URL. As written, a refresh would re-send the same
+  `?success=task-added` query string and the toast would refire every time, contradicting the plan's own stated
+  behavior.
+- **Fix**: Drop `TaskAddedToast.tsx`. In `dashboard.astro`, add a small inline `<script>` (module script,
+  consistent with Astro's islands-only-when-needed philosophy — no other page in this repo hydrates a whole
+  component for a side effect this small) that reads `new URLSearchParams(location.search)`, calls
+  `toast.success("Task added")` from `"sonner"` when `success` is present, and immediately calls
+  `history.replaceState(null, "", location.pathname)` to strip the param so a refresh doesn't refire it. This
+  removes a file, a hydration boundary, and the server→client `success` prop-threading step, while actually
+  satisfying (rather than just asserting) the "not on refresh" claim.
+  - Strength: Fewer moving parts (no new component, no prop threading, no extra `client:load` bundle) and it's
+    the only version that actually implements the "not on refresh" behavior the plan already promises in Manual
+    Verification 3.8.
+  - Tradeoff: A raw `<script>` block is slightly less unit-testable in isolation than a component would be — but
+    no unit test was planned for the toast behavior either way (it's manual-only, per Testing Strategy), so this
+    costs nothing here.
+  - Confidence: HIGH — `sonner`'s imperative `toast()` API and the existing `<Toaster client:load/>` mount in
+    `Layout.astro` (verified present) are exactly what this pattern relies on; no other React state is needed.
+  - Blind spot: Not verified whether `sonner` buffers `toast()` calls made before `<Toaster/>`'s own
+    `client:load` hydration completes (a race if the inline script runs first). This is a common, documented
+    pattern in sonner/react-hot-toast-style libraries (calls write to an external store the Toaster subscribes to
+    whenever it mounts), so the risk is low, but worth a quick manual check during Phase 3 implementation rather
+    than assuming it away.
+- **Decision**: PENDING

@@ -15,9 +15,17 @@ computation to this slice (`context/changes/maintenance-task-data-model/plan.md:
 already re-exports `MaintenanceTask`/`MaintenanceTaskInsert`/`MaintenanceFrequencyUnit` etc. from the generated
 `src/db/database.types.ts`. `src/pages/dashboard.astro` currently only renders a welcome message and a sign-out
 button — no task query, no add-task UI. No API route exists for tasks; the only API routes are
-`src/pages/api/auth/{signin,signup,signout}.ts`. Only one shadcn component (`button.tsx`) is installed; `zod`,
-`react-hook-form`, and any `Dialog`/`Select` component are all net-new. `src/middleware.ts`'s `PROTECTED_ROUTES`
-list covers only `/dashboard`, not `/api/*` — API routes must enforce their own auth check.
+`src/pages/api/auth/{signin,signup,signout}.ts`. `react-hook-form` is explicitly not used (see What We're NOT
+Doing) — `zod` is still net-new to this slice's own code.
+
+A shared prep step (`chore(m2l4): install shared shadcn primitives for S-01/S-02`, done ahead of both S-01 and
+S-02 specifically to avoid each slice separately hitting the shadcn CLI's `select`/`alert-dialog` type-collision
+risk — see `context/changes/manage-maintenance-tasks/research.md` Decision 4) already installed `select`,
+`alert-dialog`, `calendar`, `popover`, and `sonner` under `src/components/ui/`, added `react-day-picker`,
+`radix-ui`, `date-fns`, and `sonner` as direct dependencies, and mounted `<Toaster client:load />` in
+`src/layouts/Layout.astro`. This slice does **not** need to install any of those again — only `Dialog` remains
+net-new here. `src/middleware.ts`'s `PROTECTED_ROUTES` list covers only `/dashboard`, not `/api/*` — API routes
+must enforce their own auth check.
 
 ## Desired End State
 
@@ -47,7 +55,13 @@ state, add-task happy path, validation-error path, and cross-user isolation (see
 - `src/db/database.types.ts:174-191` (`Constants.public.Enums`) — the single source of truth for
   `maintenance_category`/`maintenance_importance`/`maintenance_frequency_unit` literal values; the zod schema
   must read from here, not hand-duplicate the lists.
-- `components.json` — shadcn "new-york" style already configured; only `button.tsx` installed so far.
+- `components.json` — shadcn "new-york" style already configured; `button.tsx`, `select.tsx`, `alert-dialog.tsx`,
+  `calendar.tsx`, `popover.tsx`, and `sonner.tsx` are already installed (the last five via the shared prep step
+  above) — only `Dialog` is net-new to this slice.
+- `context/changes/manage-maintenance-tasks/research.md` (Follow-up Research 2026-09-04) — records the decisions
+  behind this patch: `react-day-picker` adopted for `last_done_date` in both S-01 and S-02 (UX consistency over
+  the marginal dependency cost), and `sonner` adopted for mutation-outcome feedback in both slices, without
+  replacing the existing native-POST/redirect/inline-dialog-error architecture.
 
 ## What We're NOT Doing
 
@@ -101,6 +115,16 @@ open state must default to `true` when `Astro.url.searchParams.get("error")` is 
 `serverError` prop — otherwise the error redirect is silent and the user sees a plain dashboard with no visible
 feedback.
 
+**A successful add must fire a `sonner` toast, without replacing the existing error/dialog-reopen mechanism.**
+Per the S-02 compatibility research's Decision 3 (`context/changes/manage-maintenance-tasks/research.md`),
+mutation *outcomes* get a toast; field-level validation stays on the existing inline-dialog-reopen path above —
+the two are not redundant, so this does not become an "error toast + error dialog" double-up. Concretely:
+`src/pages/api/tasks/index.ts`'s success branch redirects to `/dashboard?success=task-added` (rather than a bare
+`/dashboard`); `dashboard.astro` reads `Astro.url.searchParams.get("success")` and passes it as a prop into a
+small client island that calls `toast.success("Task added")` on mount when present (the already-mounted
+`<Toaster client:load />` in `Layout.astro` renders it — no per-page `Toaster` needed). No toast is added for the
+validation-error path; the reopened dialog with its inline message already covers that outcome.
+
 ## Phase 1: Status & Due-Date Computation
 
 ### Overview
@@ -111,13 +135,13 @@ used to sort tasks by urgency (FR-010).
 
 ### Changes Required
 
-#### 1. Install dependency
+#### 1. Dependency already installed
 
-**Intent**: `date-fns` is not currently installed anywhere in this repo (absent from `package.json` and
-`node_modules`) — `computeDueDate`/`computeStatus` cannot import it until it's added.
+**Intent**: `date-fns` is a direct dependency already (pulled in as `react-day-picker`'s dependency by the shared
+`chore(m2l4): install shared shadcn primitives for S-01/S-02` prep commit, at the version this slice's own
+research selected — v4) — no install step needed before writing `src/lib/status.ts`.
 
-**Contract**: Run `npm install date-fns` before writing `src/lib/status.ts`, adding it to `package.json`
-dependencies.
+**Contract**: Import `date-fns` directly in `src/lib/status.ts`; do not re-run `npm install date-fns`.
 
 #### 2. Status/due-date module
 
@@ -215,8 +239,9 @@ Critical Implementation Details). Export the inferred `AddTaskInput` type.
 **Contract**: `export const prerender = false;` plus a `POST: APIRoute` handler mirroring
 `src/pages/api/auth/signup.ts`'s shape: redirect to `/auth/signin` if `context.locals.user` is `null` (see
 Critical Implementation Details — this route is not covered by `PROTECTED_ROUTES`); parse `formData()`;
-`addTaskSchema.safeParse(...)` the raw fields; on failure, `context.redirect('/dashboard?error=' + encodeURIComponent(<first issue's message>))`; on success, insert via `createClient(...).from("maintenance_tasks") .insert({ ...parsed, user_id: user.id })`; redirect to `/dashboard` on success or `/dashboard?error=...` if the
-insert itself fails (e.g. Supabase misconfigured, matching `signup.ts`'s "Supabase is not configured" branch).
+`addTaskSchema.safeParse(...)` the raw fields; on failure, `context.redirect('/dashboard?error=' + encodeURIComponent(<first issue's message>))`; on success, insert via `createClient(...).from("maintenance_tasks") .insert({ ...parsed, user_id: user.id })`; redirect to `/dashboard?success=task-added` on success (see Critical
+Implementation Details — the toast-on-mount island reads this) or `/dashboard?error=...` if the insert itself
+fails (e.g. Supabase misconfigured, matching `signup.ts`'s "Supabase is not configured" branch).
 
 #### 4. API route unit tests
 
@@ -232,7 +257,7 @@ nothing to catch it.
 minimal stand-in for Astro's `APIContext` (`locals.user`, `request.formData()`, `redirect()`, `cookies`). Two
 cases: (1) `locals.user: null` — assert the handler redirects to `/auth/signin` and the mocked Supabase client's
 `insert` is never called; (2) `locals.user` set + valid form data — assert `insert` is called with the parsed
-fields plus `user_id: user.id`, and the handler redirects to `/dashboard`.
+fields plus `user_id: user.id`, and the handler redirects to `/dashboard?success=task-added`.
 
 #### 5. Schema unit tests
 
@@ -280,14 +305,18 @@ that submits to Phase 2's route.
 
 **Intent**: Replace the placeholder welcome content with the real task list: query the user's tasks, compute
 each one's due date/status via `src/lib/status.ts`, sort by `compareByUrgency`, and render the list or an
-empty-state message. Read the `error` query param and pass it into the dialog as `serverError`.
+empty-state message. Read the `error` query param and pass it into the dialog as `serverError`; read the new
+`success` query param (see Critical Implementation Details) and pass it to the toast-on-mount island.
 
 **Contract**: Server-side frontmatter query (`await createClient(...).from("maintenance_tasks").select("*")`,
 relying on RLS for the user scope — no redundant `.eq("user_id", ...)`), mapped through `computeDueDate` +
 `computeStatus` into `MaintenanceTaskWithStatus[]`, sorted with `compareByUrgency`, rendered as a list (task name,
 category, importance, computed status label, due date) with an "Add task" trigger button. When the list is
 empty, render a short message (e.g. "No maintenance tasks yet.") alongside the same trigger button — no separate
-empty-state component.
+empty-state component. Also renders a small `<TaskAddedToast client:load success={...} />` island (new file,
+`src/components/tasks/TaskAddedToast.tsx`) that calls `toast.success("Task added")` from `sonner` in a
+`useEffect` when `success` is non-null — kept separate from `AddTaskDialog` since the toast must fire even though
+the dialog itself is closed on a successful redirect.
 
 #### 2. Add-task dialog
 
@@ -295,13 +324,19 @@ empty-state component.
 
 **Intent**: A self-contained React island — new `src/components/tasks/` folder, not reusing or refactoring
 `src/components/auth/*` — providing the modal form: shadcn `Dialog` (net-new, `npx shadcn add dialog`) wrapping a
-native `<form method="POST" action="/api/tasks">`, with shadcn `Select` (net-new, `npx shadcn add select`) for
-`category`/`importance`/`frequency_unit` and plain labeled inputs for `name`/`frequency_value`/`last_done_date`.
-Client-side, `addTaskSchema.safeParse` runs on submit; on failure, `preventDefault()` and show per-field errors
-(mirroring `SignUpForm.tsx`'s `validate()` pattern but backed by the shared zod schema); on success, let the
-native POST proceed. Accepts a `serverError?: string | null` prop; the dialog's `open` state defaults to `true`
-when `serverError` is non-null (see Critical Implementation Details), otherwise defaults to `false` and opens via
-the trigger button.
+native `<form method="POST" action="/api/tasks">`, with shadcn `Select` (already installed) for
+`category`/`importance`/`frequency_unit`, a plain labeled input for `name`/`frequency_value`, and a
+`react-day-picker`-backed date field for `last_done_date` (shadcn `Calendar` + `Popover`, both already installed —
+a trigger button showing the formatted selected date, opening a `Popover` containing the `Calendar`; the
+`Calendar`'s `disabled` prop excludes future dates client-side as a UX nicety, mirroring but not replacing the
+schema's own server-side future-date `.refine`). The `Calendar`'s selected `Date` is serialized to the
+`YYYY-MM-DD` string the native form POST and `addTaskSchema` both expect via `date-fns`' `format(date, "yyyy-MM-dd")`
+in a hidden `<input type="hidden" name="last_done_date">`, since `react-day-picker` itself has no form-native
+`<input>` to submit. Client-side, `addTaskSchema.safeParse` runs on submit; on failure, `preventDefault()` and
+show per-field errors (mirroring `SignUpForm.tsx`'s `validate()` pattern but backed by the shared zod schema); on
+success, let the native POST proceed. Accepts a `serverError?: string | null` prop; the dialog's `open` state
+defaults to `true` when `serverError` is non-null (see Critical Implementation Details), otherwise defaults to
+`false` and opens via the trigger button.
 
 ### Success Criteria
 
@@ -319,6 +354,10 @@ the trigger button.
   OK, then HIGH → MEDIUM → LOW within each group.
 - Submit the dialog with a blank name and with a future last-done date; confirm the redirect reopens the dialog
   with the corresponding error visible.
+- Submit a valid task and confirm a "Task added" toast appears on the dashboard (and does not reappear on a
+  plain page refresh once the `?success=` param is gone from the URL).
+- Pick a `last_done_date` via the calendar popup and confirm the same date reaches Supabase (no off-by-one from
+  timezone handling in the `date-fns` `format` call).
 - Sign in as a second test user and confirm their dashboard shows zero tasks from the first user.
 - Check the dashboard and dialog at a mobile viewport width and in at least two browsers, per the NFR on
   cross-browser/device usability.
@@ -345,9 +384,11 @@ ______________________________________________________________________
 
 ### Manual Testing Steps
 
-1. Empty-dashboard first-session flow (empty state → add first task → see it prioritized).
+1. Empty-dashboard first-session flow (empty state → add first task → see it prioritized), confirming the
+   "Task added" toast fires on success.
 1. Multi-task sort ordering across all status/importance combinations.
 1. Validation-error redirect (blank field, future date) reopening the dialog with the error shown.
+1. Calendar date-picker round-trip (pick a date, confirm it's stored and displayed without an off-by-one shift).
 1. Cross-user isolation on the dashboard.
 1. Mobile viewport + cross-browser check.
 
@@ -367,6 +408,8 @@ None — no schema changes; F-01's migration already shipped the table and RLS t
 - date-fns API reference: `context/changes/first-task-on-dashboard/date-fns-api-docs.md`
 - Upstream schema: `context/changes/maintenance-task-data-model/plan.md`
 - Existing form pattern: `src/components/auth/SignUpForm.tsx`, `src/pages/api/auth/signup.ts`
+- Date-picker/toast decisions (this patch): `context/changes/manage-maintenance-tasks/research.md`
+  ("Follow-up Research 2026-09-04")
 
 ## Progress
 
@@ -414,5 +457,7 @@ None — no schema changes; F-01's migration already shipped the table and RLS t
 - [ ] 3.5 Empty-state message + "Add task" button render with zero tasks
 - [ ] 3.6 3 tasks across all statuses/importances render sorted per FR-010
 - [ ] 3.7 Blank-name and future-date submissions reopen the dialog with the error visible
-- [ ] 3.8 Second test user sees zero tasks from the first user
-- [ ] 3.9 Mobile viewport + cross-browser check
+- [ ] 3.8 Valid submission shows a "Task added" toast, not repeated on refresh
+- [ ] 3.9 Calendar-picked `last_done_date` reaches Supabase without an off-by-one date shift
+- [ ] 3.10 Second test user sees zero tasks from the first user
+- [ ] 3.11 Mobile viewport + cross-browser check
