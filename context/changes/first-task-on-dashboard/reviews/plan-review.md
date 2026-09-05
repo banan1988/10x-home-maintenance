@@ -99,8 +99,8 @@ shared `chore(m2l4): install shared shadcn primitives for S-01/S-02` prep commit
 `context/changes/manage-maintenance-tasks/research.md`, "Follow-up Research 2026-09-04"). The rest of the plan
 (Phases 1–2, F1–F3 above) is unchanged and not re-reviewed here.
 
-- **Verdict**: SOUND (delta only)
-- **Findings**: 0 critical, 1 warning, 0 observations
+- **Verdict**: SOUND (delta only, all findings fixed in triage)
+- **Findings**: 0 critical, 1 warning, 0 observations — all FIXED
 
 ### Verdicts (delta only)
 
@@ -153,4 +153,6 @@ shared `chore(m2l4): install shared shadcn primitives for S-01/S-02` prep commit
     pattern in sonner/react-hot-toast-style libraries (calls write to an external store the Toaster subscribes to
     whenever it mounts), so the risk is low, but worth a quick manual check during Phase 3 implementation rather
     than assuming it away.
-- **Decision**: PENDING
+- **Decision**: FIXED — dropped `TaskAddedToast.tsx`; `plan.md` now specifies an inline module `<script>` in
+  `dashboard.astro` that reads `location.search`, calls `toast.success(...)`, and calls `history.replaceState`
+  to strip the `success` param

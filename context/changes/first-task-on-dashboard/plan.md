@@ -120,10 +120,14 @@ Per the S-02 compatibility research's Decision 3 (`context/changes/manage-mainte
 mutation *outcomes* get a toast; field-level validation stays on the existing inline-dialog-reopen path above —
 the two are not redundant, so this does not become an "error toast + error dialog" double-up. Concretely:
 `src/pages/api/tasks/index.ts`'s success branch redirects to `/dashboard?success=task-added` (rather than a bare
-`/dashboard`); `dashboard.astro` reads `Astro.url.searchParams.get("success")` and passes it as a prop into a
-small client island that calls `toast.success("Task added")` on mount when present (the already-mounted
-`<Toaster client:load />` in `Layout.astro` renders it — no per-page `Toaster` needed). No toast is added for the
-validation-error path; the reopened dialog with its inline message already covers that outcome.
+`/dashboard`). `sonner`'s `toast()` is an imperative function, not a React hook — it writes to an external store
+that the already-mounted `<Toaster client:load />` (`Layout.astro`) subscribes to, so firing it needs no React
+component or hydration boundary of its own. `dashboard.astro` therefore adds a small inline module `<script>`
+(not a new React island) that reads `new URLSearchParams(location.search)`, calls
+`toast.success("Task added")` from `"sonner"` when `success` is present, and immediately calls
+`history.replaceState(null, "", location.pathname)` to strip the param — otherwise a plain page refresh would
+resend `?success=task-added` and refire the toast every time. No toast is added for the validation-error path;
+the reopened dialog with its inline message already covers that outcome.
 
 ## Phase 1: Status & Due-Date Computation
 
@@ -305,18 +309,16 @@ that submits to Phase 2's route.
 
 **Intent**: Replace the placeholder welcome content with the real task list: query the user's tasks, compute
 each one's due date/status via `src/lib/status.ts`, sort by `compareByUrgency`, and render the list or an
-empty-state message. Read the `error` query param and pass it into the dialog as `serverError`; read the new
-`success` query param (see Critical Implementation Details) and pass it to the toast-on-mount island.
+empty-state message. Read the `error` query param and pass it into the dialog as `serverError`.
 
 **Contract**: Server-side frontmatter query (`await createClient(...).from("maintenance_tasks").select("*")`,
 relying on RLS for the user scope — no redundant `.eq("user_id", ...)`), mapped through `computeDueDate` +
 `computeStatus` into `MaintenanceTaskWithStatus[]`, sorted with `compareByUrgency`, rendered as a list (task name,
 category, importance, computed status label, due date) with an "Add task" trigger button. When the list is
 empty, render a short message (e.g. "No maintenance tasks yet.") alongside the same trigger button — no separate
-empty-state component. Also renders a small `<TaskAddedToast client:load success={...} />` island (new file,
-`src/components/tasks/TaskAddedToast.tsx`) that calls `toast.success("Task added")` from `sonner` in a
-`useEffect` when `success` is non-null — kept separate from `AddTaskDialog` since the toast must fire even though
-the dialog itself is closed on a successful redirect.
+empty-state component. Also includes an inline module `<script>` (see Critical Implementation Details) reading
+`location.search` client-side for `?success=task-added` and firing the `sonner` toast — no new React component
+or `client:*` island for this; the existing `<Toaster client:load />` in `Layout.astro` renders it.
 
 #### 2. Add-task dialog
 
