@@ -153,7 +153,12 @@ research selected — v4) — no install step needed before writing `src/lib/sta
 
 **Intent**: Compute a task's due date from its frequency and last-done date, derive its status against a fixed
 7-day DUE SOON threshold, and provide a comparator that orders tasks OVERDUE → DUE_SOON → OK, then HIGH → MEDIUM
-→ LOW importance within each status group.
+→ LOW importance within each status group. S-02 (`manage-maintenance-tasks`) needs this exact same module for
+its task list view and specifies an identical contract in its own plan — since S-01 and S-02 build in parallel
+off the same foundation, **check whether this file already exists before creating it**. If S-02 landed first,
+read the existing file, confirm it exports `computeDueDate`/`computeStatus`/`compareByUrgency` matching the
+signatures below, and skip straight to importing it rather than recreating it. If it exists but diverges from
+this contract, stop and flag the discrepancy rather than overwriting it.
 
 **Contract**: Exports `computeDueDate(lastDoneDate: Date, frequencyValue: number, frequencyUnit: MaintenanceFrequencyUnit): Date` (using `date-fns`' `addDays`/`addWeeks`/`addMonths`/`addYears`, switching on the
 singular `day|week|month|year` literals — see `date-fns-api-docs.md`); `computeStatus(dueDate: Date, today: Date): TaskStatus` using `differenceInCalendarDays` against a `DUE_SOON_THRESHOLD_DAYS = 7` constant, implementing FR-009's
@@ -227,6 +232,11 @@ in `package.json`.
 
 **Intent**: Validate the five add-task fields with one schema reusable on both the client (pre-submit hint) and
 the server (authoritative), sourcing enum values from the generated `Constants` rather than hand-duplicating them.
+S-02's edit form reuses this same `addTaskSchema` (its plan specifies an identical contract rather than a
+separate schema) — since S-01 and S-02 build in parallel, **check whether this file already exists before
+creating it**. If S-02 landed first, read the existing file, confirm it exports `addTaskSchema`/`AddTaskInput`
+matching the contract below, and skip straight to importing it. If it exists but diverges, stop and flag the
+discrepancy rather than overwriting it.
 
 **Contract**: `export const addTaskSchema = z.object({ name, category, importance, frequency_value, frequency_unit, last_done_date })`, with field names matching `MaintenanceTaskInsert` exactly (no camelCase
 mapping layer). `category`/`importance`/`frequency_unit` are `z.enum(Constants.public.Enums.maintenance_category)`
@@ -325,7 +335,9 @@ or `client:*` island for this; the existing `<Toaster client:load />` in `Layout
 **File**: `src/components/tasks/AddTaskDialog.tsx`
 
 **Intent**: A self-contained React island — new `src/components/tasks/` folder, not reusing or refactoring
-`src/components/auth/*` — providing the modal form: shadcn `Dialog` (net-new, `npx shadcn add dialog`) wrapping a
+`src/components/auth/*` — providing the modal form: shadcn `Dialog` (net-new — check
+`src/components/ui/dialog.tsx` doesn't already exist from S-02 landing first, since S-02's `EditTaskDialog` needs
+the same component; `npx shadcn add dialog` only if absent) wrapping a
 native `<form method="POST" action="/api/tasks">`, with shadcn `Select` (already installed) for
 `category`/`importance`/`frequency_unit`, a plain labeled input for `name`/`frequency_value`, and a
 `react-day-picker`-backed date field for `last_done_date` (shadcn `Calendar` + `Popover`, both already installed —
