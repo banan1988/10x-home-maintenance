@@ -7,9 +7,9 @@ repository: banan1988/10x-home-maintenance
 topic: "Is external-research.md compatible with the codebase for S-02 (manage-maintenance-tasks)?"
 tags: [research, codebase, S-02, react-hook-form, zod, react-day-picker, sonner, shadcn, react-compiler]
 status: complete
-last_updated: 2026-09-04
+last_updated: 2026-09-06
 last_updated_by: Claude Sonnet 5
-last_updated_note: "Recorded user decisions on all 4 open questions, plus the agreed execution sequence (shared prep branch, S-01 plan patch, then S-02 planning)."
+last_updated_note: "Post-merge audit against PR #11/#12: corrected react-day-picker version (v9 -> v10.0.1) and narrowed the toast decision to success-only (no toast.error exists in the implemented plan)."
 ---
 
 # Research: Is `external-research.md` compatible with the codebase for S-02?
@@ -262,3 +262,26 @@ items above are kept verbatim as the historical record of the trade-offs conside
    — S-02's plan inherits all four decisions with zero remaining open questions on library choice.
 
 No pushes to any remote occur without separate confirmation at each step.
+
+## Follow-up Research 2026-09-06
+
+Post-merge audit against the actually-implemented state (PR #11 `chore/shared-ui-primitives` and PR #12
+`fix/S-01-datepicker-and-toast`, both merged to `main`). Two corrections to the Decisions above — both are
+drift between what was recorded here and what `first-task-on-dashboard/plan.md` actually ended up specifying;
+`plan.md` itself is correct, this document was stale relative to it.
+
+1. **Decision 2 version correction**: recorded as "`react-day-picker` v9". The version actually installed by the
+   shared prep step (`package.json`) is **v10.0.1**, not v9 — `external-research.md`'s comparison table (v9) was
+   superseded by whatever `npx shadcn add calendar popover` resolved to at install time. `plan.md` never pins a
+   version itself, so this drift was isolated to this document. No functional impact found (the build/lint/test
+   pass), but S-02's own plan should not assume v9-specific API details from the external research table without
+   re-checking against the v10 docs actually in `node_modules`.
+
+1. **Decision 3 scope correction**: recorded as the destination page firing `toast.success(...)` **or**
+   `toast.error(...)`. The actual `plan.md` (`first-task-on-dashboard`, Critical Implementation Details, as fixed
+   by the delta review's F4 finding) only ever calls `toast.success(...)` — the validation/error path stays on
+   the pre-existing dialog-reopen-with-inline-message mechanism; no `toast.error(...)` call exists anywhere in
+   the plan. **This matters for S-02's own plan**: when S-02 designs edit/delete mutation feedback, "error
+   toast" is not an established pattern to match — only "success toast, dialog-reopen for validation errors" is.
+   If S-02's delete flow needs failure feedback (it has no dialog to reopen the way add/edit do — see Open
+   Question 3's original note), that is still an open design choice for `/10x-plan`, not a decided convention.
