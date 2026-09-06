@@ -163,7 +163,9 @@ already exist from S-01.
 
 **Intent**: Check whether this file already exists. If absent, create the shared zod schema both the (future)
 add flow and this plan's edit flow validate against, sourcing enum values from the generated `Constants` rather
-than hand-duplicating them.
+than hand-duplicating them. `zod` is currently reachable only transitively (not listed in `package.json`) — if
+this file is being created fresh, run `npm install zod` first to pin it as a direct dependency, mirroring S-01's
+Phase 2 Item 1. Skip the install if the file already exists (S-01 having landed first already pinned it).
 
 **Contract**: `export const addTaskSchema = z.object({ name, category, importance, frequency_value, frequency_unit, last_done_date })`, field names matching `MaintenanceTaskInsert` exactly. `category`/`importance`/`frequency_unit` are `z.enum(Constants.public.Enums.maintenance_category)` etc. `frequency_value` is
 `z.coerce.number().int().positive(...)`. `last_done_date` is `z.coerce.date()` with a `.refine` rejecting any
@@ -327,9 +329,11 @@ authenticated user.
 
 **Contract**: `export const prerender = false;` plus `POST: APIRoute`: redirect to `/auth/signin` if
 `context.locals.user` is `null`; parse `formData()`; `addTaskSchema.safeParse(...)`; on failure, redirect to
-`/tasks?error=<first issue message>`; on success, `createClient(...).from("maintenance_tasks").update({ ...parsed }).eq("id", context.params.id).select()` — if the returned row array is empty, redirect to
-`/tasks?error=Task not found` (covers both nonexistent and other-user's task, per Critical Implementation
-Details); otherwise redirect to `/tasks?success=task-updated`.
+`/tasks?error=${encodeURIComponent(<first issue message>)}`; on success, `createClient(...).from("maintenance_tasks").update({ ...parsed }).eq("id", context.params.id).select()` — destructure `{ data, error }` from the result; if `error` is set
+(e.g. a malformed, non-UUID `id` that PostgREST can't cast) **or** `data` is an empty array, redirect to
+`/tasks?error=${encodeURIComponent("Task not found")}` (covers nonexistent, other-user's, and malformed task IDs
+alike, per Critical Implementation Details — never let a DB error surface raw); otherwise redirect to
+`/tasks?success=task-updated`.
 
 #### 5. API route tests
 
@@ -402,8 +406,9 @@ renders with the matching task — one shared instance, matching the Edit dialog
 **Intent**: Permanently delete the task if it belongs to the authenticated user.
 
 **Contract**: `export const prerender = false;` plus `POST: APIRoute`, mirroring `signout.ts`'s body-less shape:
-redirect to `/auth/signin` if `context.locals.user` is `null`; `createClient(...).from("maintenance_tasks").delete().eq("id", context.params.id).select()`; empty result → `/tasks?error=Task not found`; otherwise
-`/tasks?success=task-deleted`.
+redirect to `/auth/signin` if `context.locals.user` is `null`; `createClient(...).from("maintenance_tasks").delete().eq("id", context.params.id).select()` — destructure `{ data, error }`; `error` set (e.g. malformed
+non-UUID `id`) or empty `data` array → `/tasks?error=${encodeURIComponent("Task not found")}` (never let a DB
+error surface raw); otherwise `/tasks?success=task-deleted`.
 
 #### 4. API route tests
 
@@ -455,7 +460,9 @@ of a one-click shortcut is that no date needs picking), scoped to the authentica
 **Contract**: `export const prerender = false;` plus `POST: APIRoute`, mirroring `delete.ts`'s body-less shape:
 redirect to `/auth/signin` if `context.locals.user` is `null`; compute today's date *inside the handler* (see
 Critical Implementation Details — never at module scope) as `format(new Date(), "yyyy-MM-dd")`;
-`createClient(...).from("maintenance_tasks").update({ last_done_date: today }).eq("id", context.params.id).select()`; empty result → `/tasks?error=Task not found`; otherwise `/tasks?success=task-completed`.
+`createClient(...).from("maintenance_tasks").update({ last_done_date: today }).eq("id", context.params.id).select()` — destructure `{ data, error }`; `error` set (e.g. malformed non-UUID `id`) or empty `data` array →
+`/tasks?error=${encodeURIComponent("Task not found")}` (never let a DB error surface raw); otherwise redirect to
+`/tasks?success=task-completed`.
 
 #### 2. Row action
 
