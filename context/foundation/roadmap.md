@@ -3,7 +3,7 @@ project: Home Maintenance
 version: 1
 status: draft
 created: 2026-08-25
-updated: 2026-09-02
+updated: 2026-09-06
 prd_version: 1
 main_goal: speed
 top_blocker: capacity
@@ -53,7 +53,7 @@ CRUD, automatic status computation, and an urgency-ordered dashboard.
 | ---- | ----------------------------- | ------------------------------------------------------------------------ | ------------- | ------------------------------------------------------------- | -------- |
 | F-01 | `maintenance-task-data-model` | (foundation) maintenance task schema with per-user RLS isolation lands   | —             | NFR (cross-user data isolation), Access Control               | done     |
 | S-01 | `first-task-on-dashboard`     | add a maintenance task and see it correctly prioritized on the dashboard | F-01          | US-01, FR-001, FR-002, FR-003, FR-004, FR-008, FR-009, FR-010 | planning |
-| S-02 | `manage-maintenance-tasks`    | view, edit (incl. mark-complete), and delete their maintenance tasks     | F-01          | FR-005, FR-006, FR-007                                        | proposed |
+| S-02 | `manage-maintenance-tasks`    | view, edit (incl. mark-complete), and delete their maintenance tasks     | F-01          | FR-005, FR-006, FR-007                                        | planning |
 | S-03 | `maintenance-tasks-api`       | perform full CRUD on their maintenance tasks via the API                 | F-01          | FR-011                                                        | proposed |
 
 ## Streams
@@ -145,7 +145,7 @@ below assume these are present and do NOT re-scaffold them.
   due cycle every time they act on it — a defect here breaks the core value loop just as surely as a broken add
   flow, so it must not be treated as lower-priority polish. It depends only on F-01, so it can be planned and
   built in parallel with S-01 rather than queued behind it.
-- **Status:** proposed
+- **Status:** planning
 
 ### S-03: User performs task CRUD via the API
 
