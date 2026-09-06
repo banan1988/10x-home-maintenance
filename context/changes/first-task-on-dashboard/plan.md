@@ -439,17 +439,17 @@ None — no schema changes; F-01's migration already shipped the table and RLS t
 
 #### Manual
 
-- [ ] 1.4 Manually traced 3 worked examples against PRD FR-008/FR-009's business rule table
+- [x] 1.4 Manually traced 3 worked examples against PRD FR-008/FR-009's business rule table — 6f7e5fd
 
 ### Phase 2: Add-Task Validation & API
 
 #### Automated
 
-- [ ] 2.1 Unit tests pass: `npm run test`
-- [ ] 2.2 API route auth-check and happy-path unit tests pass (`src/pages/api/tasks/index.test.ts`)
-- [ ] 2.3 Type checking passes: `npx astro check`
-- [ ] 2.4 Linting passes: `npm run lint`
-- [ ] 2.5 Build succeeds under the Cloudflare adapter: `npm run build`
+- [x] 2.1 Unit tests pass: `npm run test`
+- [x] 2.2 API route auth-check and happy-path unit tests pass (`src/pages/api/tasks/index.test.ts`)
+- [x] 2.3 Type checking passes: `npx astro check`
+- [x] 2.4 Linting passes: `npm run lint`
+- [x] 2.5 Build succeeds under the Cloudflare adapter: `npm run build`
 
 #### Manual
 
