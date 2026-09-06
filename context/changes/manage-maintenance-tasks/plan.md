@@ -553,14 +553,14 @@ None — no schema changes; F-01's migration already shipped the table and RLS t
 
 #### Automated
 
-- [ ] 1.1 Unit tests pass: `npm run test`
-- [ ] 1.2 Type checking passes: `npx astro check`
-- [ ] 1.3 Linting passes: `npm run lint`
+- [x] 1.1 Unit tests pass: `npm run test`
+- [x] 1.2 Type checking passes: `npx astro check`
+- [x] 1.3 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 1.4 No silent duplicate-export collision if files were created fresh
-- [ ] 1.5 No contract drift if files were reused from S-01
+- [x] 1.4 No silent duplicate-export collision if files were created fresh
+- [x] 1.5 No contract drift if files were reused from S-01
 
 ### Phase 2: Task List Page
 
