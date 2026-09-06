@@ -433,9 +433,9 @@ None — no schema changes; F-01's migration already shipped the table and RLS t
 
 #### Automated
 
-- [ ] 1.1 Unit tests pass: `npm run test`
-- [ ] 1.2 Type checking passes: `npx astro check`
-- [ ] 1.3 Linting passes: `npm run lint`
+- [x] 1.1 Unit tests pass: `npm run test`
+- [x] 1.2 Type checking passes: `npx astro check`
+- [x] 1.3 Linting passes: `npm run lint`
 
 #### Manual
 
