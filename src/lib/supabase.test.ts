@@ -25,7 +25,7 @@ describe("createClient", () => {
   it("should force Secure and HttpOnly on every cookie set via setAll, without dropping Supabase's other options", () => {
     createServerClientMock.mockImplementation(
       (_url: string, _key: string, { cookies }: { cookies: { setAll: SetAllCookies } }) => {
-        void cookies.setAll([{ name: "sb-session", value: "abc", options: { path: "/", sameSite: "lax" } }]);
+        void cookies.setAll([{ name: "sb-session", value: "abc", options: { path: "/", sameSite: "lax" } }], {});
         return {};
       },
     );

@@ -1,7 +1,7 @@
 ---
 change_id: first-task-on-dashboard
 title: Add a maintenance task and see it correctly prioritized on the dashboard
-status: plan_reviewed
+status: implementing
 created: 2026-09-01
 updated: 2026-09-06
 archived_at:

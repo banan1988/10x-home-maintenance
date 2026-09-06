@@ -7,3 +7,6 @@ export type MaintenanceTaskUpdate = Database["public"]["Tables"]["maintenance_ta
 export type MaintenanceCategory = Database["public"]["Enums"]["maintenance_category"];
 export type MaintenanceImportance = Database["public"]["Enums"]["maintenance_importance"];
 export type MaintenanceFrequencyUnit = Database["public"]["Enums"]["maintenance_frequency_unit"];
+
+export type TaskStatus = "OK" | "DUE_SOON" | "OVERDUE";
+export type MaintenanceTaskWithStatus = MaintenanceTask & { dueDate: Date; status: TaskStatus };
