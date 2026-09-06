@@ -29,3 +29,21 @@
 - **Problem**: `-y` only skips the "proceed with install?" confirmation. A separate per-file "this file already exists, overwrite?" prompt (here: `button.tsx`, silently touched because another requested component depends on it) is not covered by `-y` and blocks non-interactively without ever asking `-o` — the whole batch silently stopped partway through (`alert-dialog`/`calendar` were never written) with exit code 0, no error surfaced. Separately, the CLI's generated files used generic placeholder imports — `import { cn } from "cn"` (installed a phantom `cn` npm package instead of remapping to this project's `@/lib/utils`) and `import { useTheme } from "next-themes"` in `sonner.tsx` (an unrequested dependency; this project has no theme-switching system) — neither got rewritten to match `components.json`'s configured aliases.
 - **Rule**: Always pass both `-y -o` for a multi-component `shadcn add` batch, then diff `git status`/`git diff` against every touched file before committing — check for (a) unintended overwrites of already-installed components, (b) literal `"cn"` imports that must become `@/lib/utils`, (c) `next-themes` or other framework-specific imports that assume infrastructure (theme providers, etc.) this project doesn't have, and (d) missing `React`-namespace type imports (`React.CSSProperties` etc.) since generated files aren't always self-consistent on that. Run `npm run build && npm run lint && npm run test` after, not just `shadcn diff` beforehand (the diff command can report "no updates" for a file the actual `add` command then rewrites substantially).
 - **Applies to**: Any future `npx shadcn add` invocation, especially multi-component batches.
+
+## Parallel slices sharing a foundation must pin shared-file contracts as check-before-create
+
+- **Context**: `first-task-on-dashboard` (S-01) and `manage-maintenance-tasks` (S-02) both depend only on `F-01`
+  and are explicitly parallel (`roadmap.md` Streams A/B), but both plans independently need `src/lib/status.ts`,
+  `src/lib/task-schema.ts`, and the shadcn `Dialog` component — with neither slice's implementation order
+  guaranteed.
+- **Problem**: A plan written as "create file X" is only correct if that plan's own slice is guaranteed to be
+  implemented first. When a sibling slice not yet implemented needs the exact same file, an unconditional
+  "create" step either silently duplicates/overwrites the other slice's work (if implemented second) or never
+  gets written at all as the plan expects (if the sibling created it first and the plan wasn't updated).
+- **Rule**: When two roadmap items are marked "Parallel with" each other and both need a shared file, both
+  plans must specify that file's creation as conditional: check whether the file already exists before creating
+  it; if present, read it, confirm it matches the (identically pinned) contract, and reuse rather than recreate;
+  if absent, create it exactly as specified. Pin the exact same contract (exported names/signatures) in both
+  plans so reuse is safe either way.
+- **Applies to**: Any future roadmap item pair marked "Parallel with" each other that shares a foundation and
+  needs common files/components.
