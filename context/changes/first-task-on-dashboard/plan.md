@@ -453,9 +453,9 @@ None — no schema changes; F-01's migration already shipped the table and RLS t
 
 #### Manual
 
-- [ ] 2.6 Authenticated POST to `/api/tasks` redirects to `/dashboard` and inserts a row scoped to that user
-- [ ] 2.7 Unauthenticated POST redirects to `/auth/signin` instead of inserting
-- [ ] 2.8 Future `last_done_date` POST redirects with the validation error
+- [x] 2.6 Authenticated POST to `/api/tasks` redirects to `/dashboard` and inserts a row scoped to that user
+- [x] 2.7 Unauthenticated POST redirects to `/auth/signin` instead of inserting
+- [x] 2.8 Future `last_done_date` POST redirects with the validation error
 
 ### Phase 3: Dashboard & Add-Task Dialog
 
