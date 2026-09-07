@@ -553,30 +553,30 @@ None — no schema changes; F-01's migration already shipped the table and RLS t
 
 #### Automated
 
-- [x] 1.1 Unit tests pass: `npm run test`
-- [x] 1.2 Type checking passes: `npx astro check`
-- [x] 1.3 Linting passes: `npm run lint`
+- [x] 1.1 Unit tests pass: `npm run test` — c390e9c
+- [x] 1.2 Type checking passes: `npx astro check` — c390e9c
+- [x] 1.3 Linting passes: `npm run lint` — c390e9c
 
 #### Manual
 
-- [x] 1.4 No silent duplicate-export collision if files were created fresh
-- [x] 1.5 No contract drift if files were reused from S-01
+- [x] 1.4 No silent duplicate-export collision if files were created fresh — c390e9c
+- [x] 1.5 No contract drift if files were reused from S-01 — c390e9c
 
 ### Phase 2: Task List Page
 
 #### Automated
 
-- [ ] 2.1 Unit tests pass: `npm run test`
-- [ ] 2.2 Type checking passes: `npx astro check`
-- [ ] 2.3 Linting passes: `npm run lint`
-- [ ] 2.4 Build succeeds under the Cloudflare adapter: `npm run build`
+- [x] 2.1 Unit tests pass: `npm run test`
+- [x] 2.2 Type checking passes: `npx astro check`
+- [x] 2.3 Linting passes: `npm run lint`
+- [x] 2.4 Build succeeds under the Cloudflare adapter: `npm run build`
 
 #### Manual
 
-- [ ] 2.5 Empty-state message + "Back to dashboard" link render with zero tasks
-- [ ] 2.6 Tasks render sorted per the same urgency order as the dashboard
-- [ ] 2.7 "Manage tasks" link on `/dashboard` navigates to `/tasks`
-- [ ] 2.8 Second test user sees zero tasks from the first user
+- [x] 2.5 Empty-state message + "Back to dashboard" link render with zero tasks
+- [x] 2.6 Tasks render sorted per the same urgency order as the dashboard
+- [x] 2.7 "Manage tasks" link on `/dashboard` navigates to `/tasks`
+- [x] 2.8 Second test user sees zero tasks from the first user
 
 ### Phase 3: Edit Task
 

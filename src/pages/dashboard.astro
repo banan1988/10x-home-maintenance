@@ -45,6 +45,9 @@ const STATUS_LABEL: Record<MaintenanceTaskWithStatus["status"], string> = {
           <p class="text-blue-100/80">
             Welcome, <span class="font-semibold text-white">{user?.email}</span>
           </p>
+          <p class="mt-1">
+            <a href="/tasks" class="text-sm text-blue-100/80 underline hover:text-white">Manage tasks</a>
+          </p>
         </div>
         <AddTaskDialog client:load serverError={error} />
       </div>
