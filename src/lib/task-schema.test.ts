@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { format } from "date-fns";
 
 import { addTaskSchema } from "@/lib/task-schema";
 
@@ -46,5 +47,33 @@ describe("addTaskSchema", () => {
     });
 
     expect(result.success).toBe(false);
+  });
+});
+
+describe("addTaskSchema last_done_date timezone handling", () => {
+  const originalTz = process.env.TZ;
+
+  beforeAll(() => {
+    process.env.TZ = "America/New_York";
+  });
+
+  afterAll(() => {
+    process.env.TZ = originalTz;
+  });
+
+  it("should round-trip the exact calendar date regardless of the server's local timezone offset", () => {
+    const result = addTaskSchema.safeParse({
+      name: "Task",
+      category: "hvac",
+      importance: "medium",
+      frequency_value: "1",
+      frequency_unit: "month",
+      last_done_date: "2026-01-01",
+    });
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(format(result.data.last_done_date, "yyyy-MM-dd")).toBe("2026-01-01");
+    }
   });
 });
