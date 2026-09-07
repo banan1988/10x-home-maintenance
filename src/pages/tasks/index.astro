@@ -1,0 +1,36 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import TaskList from "@/components/tasks/TaskList";
+import { createClient } from "@/lib/supabase";
+import { compareByUrgency, computeDueDate, computeStatus } from "@/lib/status";
+import type { MaintenanceTaskWithStatus } from "@/types";
+
+const success = Astro.url.searchParams.get("success");
+const error = Astro.url.searchParams.get("error");
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+
+let tasks: MaintenanceTaskWithStatus[] = [];
+if (supabase) {
+  const { data } = await supabase.from("maintenance_tasks").select("*");
+  const today = new Date();
+  tasks = (data ?? [])
+    .map((task) => {
+      const dueDate = computeDueDate(new Date(task.last_done_date), task.frequency_value, task.frequency_unit);
+      return { ...task, dueDate, status: computeStatus(dueDate, today) };
+    })
+    .sort(compareByUrgency);
+}
+---
+
+<Layout title="Manage tasks">
+  <div class="bg-cosmic min-h-screen p-4 text-white">
+    <div class="mx-auto max-w-4xl">
+      <div class="mb-6 flex items-center justify-between">
+        <h1 class="text-2xl font-bold">Manage tasks</h1>
+        <a href="/dashboard" class="text-sm text-blue-100/80 hover:text-white">← Back to dashboard</a>
+      </div>
+      <TaskList tasks={tasks} success={success} error={error} client:load />
+    </div>
+  </div>
+</Layout>
