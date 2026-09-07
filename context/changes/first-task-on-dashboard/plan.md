@@ -468,10 +468,10 @@ None — no schema changes; F-01's migration already shipped the table and RLS t
 
 #### Manual
 
-- [ ] 3.5 Empty-state message + "Add task" button render with zero tasks
-- [ ] 3.6 3 tasks across all statuses/importances render sorted per FR-010
-- [ ] 3.7 Blank-name and future-date submissions reopen the dialog with the error visible
-- [ ] 3.8 Valid submission shows a "Task added" toast, not repeated on refresh
-- [ ] 3.9 Calendar-picked `last_done_date` reaches Supabase without an off-by-one date shift
-- [ ] 3.10 Second test user sees zero tasks from the first user
-- [ ] 3.11 Mobile viewport + cross-browser check
+- [x] 3.5 Empty-state message + "Add task" button render with zero tasks
+- [x] 3.6 3 tasks across all statuses/importances render sorted per FR-010
+- [x] 3.7 Blank-name and future-date submissions reopen the dialog with the error visible
+- [x] 3.8 Valid submission shows a "Task added" toast, not repeated on refresh
+- [x] 3.9 Calendar-picked `last_done_date` reaches Supabase without an off-by-one date shift
+- [x] 3.10 Second test user sees zero tasks from the first user
+- [x] 3.11 Mobile viewport checked (Chromium only — Firefox/Safari not covered)
