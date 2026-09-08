@@ -615,13 +615,13 @@ None — no schema changes; F-01's migration already shipped the table and RLS t
 
 #### Automated
 
-- [x] 5.1 Unit tests pass: `npm run test`
-- [x] 5.2 API route tests pass (`src/pages/api/tasks/[id]/complete.test.ts`)
-- [x] 5.3 Type checking passes: `npx astro check`
-- [x] 5.4 Linting passes: `npm run lint`
-- [x] 5.5 Build succeeds: `npm run build`
+- [x] 5.1 Unit tests pass: `npm run test` — 7754b01
+- [x] 5.2 API route tests pass (`src/pages/api/tasks/[id]/complete.test.ts`) — 7754b01
+- [x] 5.3 Type checking passes: `npx astro check` — 7754b01
+- [x] 5.4 Linting passes: `npm run lint` — 7754b01
+- [x] 5.5 Build succeeds: `npm run build` — 7754b01
 
 #### Manual
 
-- [x] 5.6 Marking an OVERDUE task done recomputes its status with today's date, with a "Task completed" toast
-- [x] 5.7 Completing another user's task ID redirects with a generic "Task not found" error
+- [x] 5.6 Marking an OVERDUE task done recomputes its status with today's date, with a "Task completed" toast — 7754b01
+- [x] 5.7 Completing another user's task ID redirects with a generic "Task not found" error — 7754b01
