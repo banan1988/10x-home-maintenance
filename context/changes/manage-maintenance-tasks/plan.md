@@ -599,29 +599,29 @@ None — no schema changes; F-01's migration already shipped the table and RLS t
 
 #### Automated
 
-- [x] 4.1 Unit tests pass: `npm run test`
-- [x] 4.2 API route tests pass (`src/pages/api/tasks/[id]/delete.test.ts`)
-- [x] 4.3 Type checking passes: `npx astro check`
-- [x] 4.4 Linting passes: `npm run lint`
-- [x] 4.5 Build succeeds: `npm run build`
+- [x] 4.1 Unit tests pass: `npm run test` — 2984d8e
+- [x] 4.2 API route tests pass (`src/pages/api/tasks/[id]/delete.test.ts`) — 2984d8e
+- [x] 4.3 Type checking passes: `npx astro check` — 2984d8e
+- [x] 4.4 Linting passes: `npm run lint` — 2984d8e
+- [x] 4.5 Build succeeds: `npm run build` — 2984d8e
 
 #### Manual
 
-- [x] 4.6 Cancel leaves the task unchanged
-- [x] 4.7 Confirm removes the row with a "Task deleted" toast
-- [x] 4.8 Deleting another user's task ID redirects with a generic "Task not found" error, task persists
+- [x] 4.6 Cancel leaves the task unchanged — 2984d8e
+- [x] 4.7 Confirm removes the row with a "Task deleted" toast — 2984d8e
+- [x] 4.8 Deleting another user's task ID redirects with a generic "Task not found" error, task persists — 2984d8e
 
 ### Phase 5: Mark-Complete Shortcut
 
 #### Automated
 
-- [ ] 5.1 Unit tests pass: `npm run test`
-- [ ] 5.2 API route tests pass (`src/pages/api/tasks/[id]/complete.test.ts`)
-- [ ] 5.3 Type checking passes: `npx astro check`
-- [ ] 5.4 Linting passes: `npm run lint`
-- [ ] 5.5 Build succeeds: `npm run build`
+- [x] 5.1 Unit tests pass: `npm run test`
+- [x] 5.2 API route tests pass (`src/pages/api/tasks/[id]/complete.test.ts`)
+- [x] 5.3 Type checking passes: `npx astro check`
+- [x] 5.4 Linting passes: `npm run lint`
+- [x] 5.5 Build succeeds: `npm run build`
 
 #### Manual
 
-- [ ] 5.6 Marking an OVERDUE task done recomputes its status with today's date, with a "Task completed" toast
-- [ ] 5.7 Completing another user's task ID redirects with a generic "Task not found" error
+- [x] 5.6 Marking an OVERDUE task done recomputes its status with today's date, with a "Task completed" toast
+- [x] 5.7 Completing another user's task ID redirects with a generic "Task not found" error
