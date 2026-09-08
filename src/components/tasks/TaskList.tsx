@@ -88,6 +88,11 @@ export default function TaskList({ tasks, success, error }: TaskListProps) {
                   >
                     Delete
                   </Button>
+                  <form method="POST" action={`/api/tasks/${task.id}/complete`} className="inline">
+                    <Button type="submit" variant="secondary" size="sm">
+                      Mark done
+                    </Button>
+                  </form>
                 </TableCell>
               </TableRow>
             ))}
