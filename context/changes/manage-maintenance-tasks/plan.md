@@ -566,34 +566,34 @@ None — no schema changes; F-01's migration already shipped the table and RLS t
 
 #### Automated
 
-- [x] 2.1 Unit tests pass: `npm run test`
-- [x] 2.2 Type checking passes: `npx astro check`
-- [x] 2.3 Linting passes: `npm run lint`
-- [x] 2.4 Build succeeds under the Cloudflare adapter: `npm run build`
+- [x] 2.1 Unit tests pass: `npm run test` — 8ddfc2e
+- [x] 2.2 Type checking passes: `npx astro check` — 8ddfc2e
+- [x] 2.3 Linting passes: `npm run lint` — 8ddfc2e
+- [x] 2.4 Build succeeds under the Cloudflare adapter: `npm run build` — 8ddfc2e
 
 #### Manual
 
-- [x] 2.5 Empty-state message + "Back to dashboard" link render with zero tasks
-- [x] 2.6 Tasks render sorted per the same urgency order as the dashboard
-- [x] 2.7 "Manage tasks" link on `/dashboard` navigates to `/tasks`
-- [x] 2.8 Second test user sees zero tasks from the first user
+- [x] 2.5 Empty-state message + "Back to dashboard" link render with zero tasks — 8ddfc2e
+- [x] 2.6 Tasks render sorted per the same urgency order as the dashboard — 8ddfc2e
+- [x] 2.7 "Manage tasks" link on `/dashboard` navigates to `/tasks` — 8ddfc2e
+- [x] 2.8 Second test user sees zero tasks from the first user — 8ddfc2e
 
 ### Phase 3: Edit Task
 
 #### Automated
 
-- [ ] 3.1 Unit tests pass: `npm run test`
-- [ ] 3.2 API route tests pass (`src/pages/api/tasks/[id].test.ts`)
-- [ ] 3.3 Type checking passes: `npx astro check`
-- [ ] 3.4 Linting passes: `npm run lint`
-- [ ] 3.5 Build succeeds: `npm run build`
+- [x] 3.1 Unit tests pass: `npm run test`
+- [x] 3.2 API route tests pass (`src/pages/api/tasks/[id].test.ts`)
+- [x] 3.3 Type checking passes: `npx astro check`
+- [x] 3.4 Linting passes: `npm run lint`
+- [x] 3.5 Build succeeds: `npm run build`
 
 #### Manual
 
-- [ ] 3.6 Edit dialog opens prefilled with current values
-- [ ] 3.7 Each field type updates correctly with a "Task updated" toast
-- [ ] 3.8 Blank name / future date reopens the dialog with the error
-- [ ] 3.9 Editing another user's task ID redirects with a generic "Task not found" error
+- [x] 3.6 Edit dialog opens prefilled with current values
+- [x] 3.7 Each field type updates correctly with a "Task updated" toast
+- [x] 3.8 Blank name / future date reopens the dialog with the error
+- [x] 3.9 Editing another user's task ID redirects with a generic "Task not found" error
 
 ### Phase 4: Delete Task
 
