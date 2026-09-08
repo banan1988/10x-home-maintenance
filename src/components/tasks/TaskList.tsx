@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { EditTaskDialog } from "@/components/tasks/EditTaskDialog";
 import type { MaintenanceTaskWithStatus } from "@/types";
 
 const SUCCESS_MESSAGES: Record<string, string> = {
@@ -18,6 +20,7 @@ interface TaskListProps {
 
 export default function TaskList({ tasks, success, error }: TaskListProps) {
   const [errorMessage] = useState(error ?? null);
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     if (success) {
@@ -50,6 +53,7 @@ export default function TaskList({ tasks, success, error }: TaskListProps) {
               <TableHead>Status</TableHead>
               <TableHead>Due date</TableHead>
               <TableHead>Last done</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -61,11 +65,29 @@ export default function TaskList({ tasks, success, error }: TaskListProps) {
                 <TableCell>{task.status}</TableCell>
                 <TableCell>{format(task.dueDate, "yyyy-MM-dd")}</TableCell>
                 <TableCell>{task.last_done_date}</TableCell>
+                <TableCell>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setEditingTaskId(task.id);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       )}
+      <EditTaskDialog
+        task={tasks.find((task) => task.id === editingTaskId) ?? null}
+        onOpenChange={() => {
+          setEditingTaskId(null);
+        }}
+      />
     </div>
   );
 }
