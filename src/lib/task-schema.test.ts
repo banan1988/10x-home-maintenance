@@ -25,19 +25,49 @@ describe("addTaskSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("should reject a name longer than 200 characters", () => {
+    const result = addTaskSchema.safeParse({ ...validPayload, name: "a".repeat(201) });
+
+    expect(result.success).toBe(false);
+  });
+
   it("should reject a non-positive frequency_value", () => {
     const result = addTaskSchema.safeParse({ ...validPayload, frequency_value: "0" });
 
     expect(result.success).toBe(false);
   });
 
-  it("should reject an invalid enum value", () => {
+  it("should reject an invalid enum value with a user-friendly message", () => {
     const result = addTaskSchema.safeParse({ ...validPayload, category: "landscaping" });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe("Select a valid category");
+    }
+  });
+
+  it("should reject a missing last_done_date with a user-friendly message", () => {
+    const result = addTaskSchema.safeParse({ ...validPayload, last_done_date: undefined });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe("Pick a last-done date");
+    }
+  });
+
+  it("should reject a last_done_date beyond the 1-day timezone grace window", () => {
+    const dayAfterTomorrow = new Date();
+    dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+
+    const result = addTaskSchema.safeParse({
+      ...validPayload,
+      last_done_date: dayAfterTomorrow.toISOString().slice(0, 10),
+    });
 
     expect(result.success).toBe(false);
   });
 
-  it("should reject a last_done_date in the future", () => {
+  it("should accept a last_done_date of tomorrow (within the timezone grace window)", () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
 
@@ -46,7 +76,7 @@ describe("addTaskSchema", () => {
       last_done_date: tomorrow.toISOString().slice(0, 10),
     });
 
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
   });
 });
 

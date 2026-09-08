@@ -80,4 +80,24 @@ describe("POST /api/tasks", () => {
     });
     expect(context.redirect).toHaveBeenCalledWith("/dashboard?success=task-added");
   });
+
+  it("should redirect with the validation error and never insert when the form data is invalid", async () => {
+    insertMock.mockClear();
+    const context = buildContext({
+      user: { id: "user-1" },
+      formData: {
+        name: "",
+        category: "hvac",
+        importance: "medium",
+        frequency_value: "3",
+        frequency_unit: "month",
+        last_done_date: "2026-01-01",
+      },
+    });
+
+    await POST(context);
+
+    expect(context.redirect).toHaveBeenCalledWith(`/dashboard?error=${encodeURIComponent("Name is required")}`);
+    expect(insertMock).not.toHaveBeenCalled();
+  });
 });

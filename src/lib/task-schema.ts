@@ -1,19 +1,22 @@
-import { parseISO } from "date-fns";
+import { addDays, parseISO } from "date-fns";
 import { z } from "zod";
 
 import { Constants } from "@/db/database.types";
 
 export const addTaskSchema = z.object({
-  name: z.string().trim().min(1, "Name is required"),
-  category: z.enum(Constants.public.Enums.maintenance_category),
-  importance: z.enum(Constants.public.Enums.maintenance_importance),
+  name: z.string().trim().min(1, "Name is required").max(200, "Name must be 200 characters or less"),
+  category: z.enum(Constants.public.Enums.maintenance_category, "Select a valid category"),
+  importance: z.enum(Constants.public.Enums.maintenance_importance, "Select a valid importance"),
   frequency_value: z.coerce.number().int().positive("Frequency must be a positive number"),
-  frequency_unit: z.enum(Constants.public.Enums.maintenance_frequency_unit),
+  frequency_unit: z.enum(Constants.public.Enums.maintenance_frequency_unit, "Select a valid frequency unit"),
   last_done_date: z
-    .string()
+    .string("Pick a last-done date")
     .transform((value) => parseISO(value))
     .refine((date) => !isNaN(date.getTime()), "Invalid date")
-    .refine((date) => date <= new Date(), "Last done date cannot be in the future"),
+    // A 1-day grace window absorbs timezone skew between the user's local "today" and the
+    // server's UTC clock (e.g. a user east of UTC can have their genuine today parsed as
+    // still-future relative to the server) without tracking each user's timezone.
+    .refine((date) => date <= addDays(new Date(), 1), "Last done date cannot be in the future"),
 });
 
 export type AddTaskInput = z.infer<typeof addTaskSchema>;

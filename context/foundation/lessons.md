@@ -47,3 +47,33 @@
   plans so reuse is safe either way.
 - **Applies to**: Any future roadmap item pair marked "Parallel with" each other that shares a foundation and
   needs common files/components.
+
+## Server-side "no future date" checks on a bare calendar-day string need a timezone grace window
+
+- **Context**: `src/lib/task-schema.ts:16` (`last_done_date`'s future-date `.refine`), discovered via F4 in
+  `context/changes/first-task-on-dashboard/reviews/impl-review.md`
+- **Problem**: When a form submits a date-only string (`YYYY-MM-DD`) with no timezone info, and the server
+  (Cloudflare Workers, UTC) validates it against its own `new Date()`, a user whose local timezone is ahead of
+  UTC (e.g. Warsaw, UTC+1/+2) can have their genuine "today" rejected as a future date during the 1-2 hour
+  window between their local midnight and UTC midnight — even though the client-side picker already used the
+  browser's own clock to prevent picking a truly future date.
+- **Rule**: When validating a bare calendar-day string server-side against "today," add a small grace window
+  (e.g. `date <= addDays(new Date(), 1)`) rather than comparing directly to the server's instant — unless the
+  app already captures and validates against the user's actual timezone offset. Don't build full
+  timezone-tracking infrastructure for this unless the product actually needs precise multi-timezone
+  correctness.
+- **Applies to**: Any future server-side validation of a date-only (no time/timezone) field submitted from a
+  client against "today" or "now."
+
+## String fields must always have a maximum length
+
+- **Context**: `src/lib/task-schema.ts:7` (`addTaskSchema.name`), discovered via F5 in
+  `context/changes/first-task-on-dashboard/reviews/impl-review.md`
+- **Problem**: `name: z.string().trim().min(1, ...)` had no `.max()`, and the underlying `name text` DB column
+  is unbounded too — nothing stopped an arbitrarily large string from being submitted and stored.
+- **Rule**: Every string/text form field's zod schema must declare an explicit `.max()`, sized to what's
+  realistic for that field (e.g. ~200 for a short title/name-style field, larger for free-text/description
+  fields). Pick a value using comparable real-world conventions (e.g. Jira summary ≈255, GitHub issue title
+  ≈256) rather than an arbitrary guess, and don't leave it unbounded even if the DB column itself has no length
+  constraint.
+- **Applies to**: Any new zod schema for a string/text form field, client or server side.

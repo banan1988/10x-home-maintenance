@@ -46,6 +46,10 @@ export default function AddTaskDialog({ serverError }: Props) {
   const [lastDoneDate, setLastDoneDate] = useState<Date | undefined>(undefined);
   const [errors, setErrors] = useState<FieldErrors>({});
 
+  function clearError(field: FieldName) {
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
+  }
+
   function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
     const result = addTaskSchema.safeParse({
       name,
@@ -101,6 +105,7 @@ export default function AddTaskDialog({ serverError }: Props) {
               value={name}
               onChange={(event) => {
                 setName(event.target.value);
+                clearError("name");
               }}
               className="w-full rounded-md border px-3 py-2 text-sm"
             />
@@ -111,7 +116,14 @@ export default function AddTaskDialog({ serverError }: Props) {
             <label htmlFor="category" className="mb-1 block text-sm">
               Category
             </label>
-            <Select name="category" value={category || undefined} onValueChange={setCategory}>
+            <Select
+              name="category"
+              value={category || undefined}
+              onValueChange={(value) => {
+                setCategory(value);
+                clearError("category");
+              }}
+            >
               <SelectTrigger id="category" className="w-full">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
@@ -130,7 +142,14 @@ export default function AddTaskDialog({ serverError }: Props) {
             <label htmlFor="importance" className="mb-1 block text-sm">
               Importance
             </label>
-            <Select name="importance" value={importance || undefined} onValueChange={setImportance}>
+            <Select
+              name="importance"
+              value={importance || undefined}
+              onValueChange={(value) => {
+                setImportance(value);
+                clearError("importance");
+              }}
+            >
               <SelectTrigger id="importance" className="w-full">
                 <SelectValue placeholder="Select importance" />
               </SelectTrigger>
@@ -158,6 +177,7 @@ export default function AddTaskDialog({ serverError }: Props) {
                 value={frequencyValue}
                 onChange={(event) => {
                   setFrequencyValue(event.target.value);
+                  clearError("frequency_value");
                 }}
                 className="w-full rounded-md border px-3 py-2 text-sm"
               />
@@ -170,7 +190,14 @@ export default function AddTaskDialog({ serverError }: Props) {
               <label htmlFor="frequency_unit" className="mb-1 block text-sm">
                 Unit
               </label>
-              <Select name="frequency_unit" value={frequencyUnit || undefined} onValueChange={setFrequencyUnit}>
+              <Select
+                name="frequency_unit"
+                value={frequencyUnit || undefined}
+                onValueChange={(value) => {
+                  setFrequencyUnit(value);
+                  clearError("frequency_unit");
+                }}
+              >
                 <SelectTrigger id="frequency_unit" className="w-full">
                   <SelectValue placeholder="Select unit" />
                 </SelectTrigger>
@@ -199,7 +226,10 @@ export default function AddTaskDialog({ serverError }: Props) {
                 <Calendar
                   mode="single"
                   selected={lastDoneDate}
-                  onSelect={setLastDoneDate}
+                  onSelect={(date) => {
+                    setLastDoneDate(date);
+                    clearError("last_done_date");
+                  }}
                   disabled={{ after: new Date() }}
                 />
               </PopoverContent>
