@@ -10,7 +10,14 @@ const { user } = Astro.locals;
 const error = Astro.url.searchParams.get("error");
 
 const supabase = createClient(Astro.request.headers, Astro.cookies);
-const { data: rawTasks } = supabase ? await supabase.from("maintenance_tasks").select("*") : { data: null };
+const { data: rawTasks, error: tasksError } = supabase
+  ? await supabase.from("maintenance_tasks").select("*")
+  : { data: null, error: null };
+
+if (tasksError) {
+  // eslint-disable-next-line no-console -- log the real error server-side; the banner below shows the user a generic message instead of the raw DB error.
+  console.error("Failed to load maintenance tasks:", tasksError);
+}
 
 const today = new Date();
 const tasks: MaintenanceTaskWithStatus[] = (rawTasks ?? [])
@@ -43,7 +50,11 @@ const STATUS_LABEL: Record<MaintenanceTaskWithStatus["status"], string> = {
       </div>
 
       {
-        tasks.length === 0 ? (
+        tasksError ? (
+          <p class="border-destructive/30 bg-destructive/10 text-destructive rounded-2xl border p-6 text-center">
+            We're having trouble loading your tasks right now. Please try refreshing the page.
+          </p>
+        ) : tasks.length === 0 ? (
           <p class="rounded-2xl border border-white/10 bg-white/10 p-6 text-center text-blue-100/80">
             No maintenance tasks yet.
           </p>

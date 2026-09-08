@@ -2,7 +2,7 @@ import { addDays } from "date-fns";
 import { describe, expect, it } from "vitest";
 
 import { compareByUrgency, computeDueDate, computeStatus } from "@/lib/status";
-import type { MaintenanceTaskWithStatus } from "@/types";
+import type { MaintenanceFrequencyUnit, MaintenanceTaskWithStatus } from "@/types";
 
 describe("computeDueDate", () => {
   const lastDoneDate = new Date(2026, 0, 1);
@@ -25,6 +25,12 @@ describe("computeDueDate", () => {
 
   it("should clamp to the end of the target month when the source day-of-month doesn't exist there", () => {
     expect(computeDueDate(new Date(2026, 0, 31), 1, "month")).toEqual(new Date(2026, 1, 28));
+  });
+
+  it("should throw for an unhandled frequency unit", () => {
+    const invalidUnit = "decade" as unknown as MaintenanceFrequencyUnit;
+
+    expect(() => computeDueDate(lastDoneDate, 1, invalidUnit)).toThrow("Unhandled frequency unit");
   });
 });
 

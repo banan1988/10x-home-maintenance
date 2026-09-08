@@ -474,4 +474,6 @@ None — no schema changes; F-01's migration already shipped the table and RLS t
 - [x] 3.8 Valid submission shows a "Task added" toast, not repeated on refresh
 - [x] 3.9 Calendar-picked `last_done_date` reaches Supabase without an off-by-one date shift
 - [x] 3.10 Second test user sees zero tasks from the first user
-- [x] 3.11 Mobile viewport checked (Chromium only — Firefox/Safari not covered)
+- [x] 3.11 Mobile viewport (375x667) checked in Chromium and Firefox — dashboard and Add Task dialog
+  render correctly, no horizontal overflow, "Add task" button and all dialog fields fully visible
+  (WebKit/Safari still not covered — see impl-review.md F3 for why)
