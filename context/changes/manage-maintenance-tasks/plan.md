@@ -582,34 +582,34 @@ None — no schema changes; F-01's migration already shipped the table and RLS t
 
 #### Automated
 
-- [x] 3.1 Unit tests pass: `npm run test`
-- [x] 3.2 API route tests pass (`src/pages/api/tasks/[id].test.ts`)
-- [x] 3.3 Type checking passes: `npx astro check`
-- [x] 3.4 Linting passes: `npm run lint`
-- [x] 3.5 Build succeeds: `npm run build`
+- [x] 3.1 Unit tests pass: `npm run test` — 5748fd7
+- [x] 3.2 API route tests pass (`src/pages/api/tasks/[id].test.ts`) — 5748fd7
+- [x] 3.3 Type checking passes: `npx astro check` — 5748fd7
+- [x] 3.4 Linting passes: `npm run lint` — 5748fd7
+- [x] 3.5 Build succeeds: `npm run build` — 5748fd7
 
 #### Manual
 
-- [x] 3.6 Edit dialog opens prefilled with current values
-- [x] 3.7 Each field type updates correctly with a "Task updated" toast
-- [x] 3.8 Blank name / future date reopens the dialog with the error
-- [x] 3.9 Editing another user's task ID redirects with a generic "Task not found" error
+- [x] 3.6 Edit dialog opens prefilled with current values — 5748fd7
+- [x] 3.7 Each field type updates correctly with a "Task updated" toast — 5748fd7
+- [x] 3.8 Blank name / future date reopens the dialog with the error — 5748fd7
+- [x] 3.9 Editing another user's task ID redirects with a generic "Task not found" error — 5748fd7
 
 ### Phase 4: Delete Task
 
 #### Automated
 
-- [ ] 4.1 Unit tests pass: `npm run test`
-- [ ] 4.2 API route tests pass (`src/pages/api/tasks/[id]/delete.test.ts`)
-- [ ] 4.3 Type checking passes: `npx astro check`
-- [ ] 4.4 Linting passes: `npm run lint`
-- [ ] 4.5 Build succeeds: `npm run build`
+- [x] 4.1 Unit tests pass: `npm run test`
+- [x] 4.2 API route tests pass (`src/pages/api/tasks/[id]/delete.test.ts`)
+- [x] 4.3 Type checking passes: `npx astro check`
+- [x] 4.4 Linting passes: `npm run lint`
+- [x] 4.5 Build succeeds: `npm run build`
 
 #### Manual
 
-- [ ] 4.6 Cancel leaves the task unchanged
-- [ ] 4.7 Confirm removes the row with a "Task deleted" toast
-- [ ] 4.8 Deleting another user's task ID redirects with a generic "Task not found" error, task persists
+- [x] 4.6 Cancel leaves the task unchanged
+- [x] 4.7 Confirm removes the row with a "Task deleted" toast
+- [x] 4.8 Deleting another user's task ID redirects with a generic "Task not found" error, task persists
 
 ### Phase 5: Mark-Complete Shortcut
 

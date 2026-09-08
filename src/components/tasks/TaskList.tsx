@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { EditTaskDialog } from "@/components/tasks/EditTaskDialog";
+import { DeleteTaskAlertDialog } from "@/components/tasks/DeleteTaskAlertDialog";
 import type { MaintenanceTaskWithStatus } from "@/types";
 
 const SUCCESS_MESSAGES: Record<string, string> = {
@@ -21,6 +22,7 @@ interface TaskListProps {
 export default function TaskList({ tasks, success, error }: TaskListProps) {
   const [errorMessage] = useState(error ?? null);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     if (success) {
@@ -65,7 +67,7 @@ export default function TaskList({ tasks, success, error }: TaskListProps) {
                 <TableCell>{task.status}</TableCell>
                 <TableCell>{format(task.dueDate, "yyyy-MM-dd")}</TableCell>
                 <TableCell>{task.last_done_date}</TableCell>
-                <TableCell>
+                <TableCell className="space-x-2">
                   <Button
                     type="button"
                     variant="outline"
@@ -75,6 +77,16 @@ export default function TaskList({ tasks, success, error }: TaskListProps) {
                     }}
                   >
                     Edit
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => {
+                      setDeletingTaskId(task.id);
+                    }}
+                  >
+                    Delete
                   </Button>
                 </TableCell>
               </TableRow>
@@ -86,6 +98,12 @@ export default function TaskList({ tasks, success, error }: TaskListProps) {
         task={tasks.find((task) => task.id === editingTaskId) ?? null}
         onOpenChange={() => {
           setEditingTaskId(null);
+        }}
+      />
+      <DeleteTaskAlertDialog
+        task={tasks.find((task) => task.id === deletingTaskId) ?? null}
+        onOpenChange={() => {
+          setDeletingTaskId(null);
         }}
       />
     </div>
