@@ -17,24 +17,26 @@ interface TaskListProps {
   tasks: MaintenanceTaskWithStatus[];
   success?: string | null;
   error?: string | null;
+  editing?: string | null;
 }
 
-export default function TaskList({ tasks, success, error }: TaskListProps) {
+export default function TaskList({ tasks, success, error, editing }: TaskListProps) {
   const [errorMessage] = useState(error ?? null);
-  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(editing ?? null);
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     if (success) {
       toast.success(SUCCESS_MESSAGES[success] ?? "Success");
     }
-    if (success || error) {
+    if (success || error || editing) {
       const url = new URL(window.location.href);
       url.searchParams.delete("success");
       url.searchParams.delete("error");
+      url.searchParams.delete("editing");
       window.history.replaceState({}, "", url);
     }
-  }, [success, error]);
+  }, [success, error, editing]);
 
   return (
     <div className="space-y-4">
