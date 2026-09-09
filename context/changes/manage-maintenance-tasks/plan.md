@@ -592,7 +592,7 @@ None — no schema changes; F-01's migration already shipped the table and RLS t
 
 - [x] 3.6 Edit dialog opens prefilled with current values — 5748fd7
 - [x] 3.7 Each field type updates correctly with a "Task updated" toast — 5748fd7
-- [x] 3.8 Blank name / future date reopens the dialog with the error — 5748fd7
+- [x] 3.8 Blank name / future date reopens the dialog with the error — 5748fd7, fixed via impl-review F2
 - [x] 3.9 Editing another user's task ID redirects with a generic "Task not found" error — 5748fd7
 
 ### Phase 4: Delete Task

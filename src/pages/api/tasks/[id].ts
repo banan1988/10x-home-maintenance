@@ -32,7 +32,8 @@ export const POST: APIRoute = async (context) => {
   });
 
   if (!parsed.success) {
-    return context.redirect(`/tasks?error=${encodeURIComponent(parsed.error.issues[0].message)}`);
+    const editing = encodeURIComponent(context.params.id);
+    return context.redirect(`/tasks?error=${encodeURIComponent(parsed.error.issues[0].message)}&editing=${editing}`);
   }
 
   const { data, error } = await supabase
