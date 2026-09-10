@@ -48,7 +48,7 @@ export function EditTaskDialog({ task, onOpenChange }: EditTaskDialogProps) {
       importance,
       frequency_value: frequencyValue,
       frequency_unit: frequencyUnit,
-      last_done_date: lastDoneDate,
+      last_done_date: lastDoneDate ? format(lastDoneDate, "yyyy-MM-dd") : undefined,
     });
 
     if (!result.success) {
