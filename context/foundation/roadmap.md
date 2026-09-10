@@ -3,7 +3,7 @@ project: Home Maintenance
 version: 1
 status: draft
 created: 2026-08-25
-updated: 2026-09-06
+updated: 2026-09-10
 prd_version: 1
 main_goal: speed
 top_blocker: capacity

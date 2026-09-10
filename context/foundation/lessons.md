@@ -77,3 +77,27 @@
   ≈256) rather than an arbitrary guess, and don't leave it unbounded even if the DB column itself has no length
   constraint.
 - **Applies to**: Any new zod schema for a string/text form field, client or server side.
+
+## `roadmap.md` status must only be synced by the epilogue step, not a mid-phase commit
+
+- **Context**: `context/foundation/roadmap.md`, commit `ffac278` ("shared status & validation modules (p1)" —
+  S-02's *first* implementation phase). The commit message claims "Syncs roadmap.md S-02 status to in-progress",
+  but the actual diff set S-02 straight to `done` and also flipped S-01 from `in-progress` to `done`, skipping
+  `in-progress` entirely — three-plus phases before either slice was actually finished. Neither slice's real
+  epilogue commit (the one that closes out the plan and flips `change.md` to `implemented`/`impl_reviewed`) ever
+  touched `roadmap.md` afterward, so the file was never re-synced at actual completion — it happened to already
+  read `done` by coincidence once both slices genuinely finished, not because the process worked.
+- **Problem**: A mid-phase commit silently wrote a final (`done`) roadmap status while its own commit message
+  described a different, more conservative status (`in-progress`) — a discrepancy between message and diff that
+  a reviewer skimming commit messages would miss entirely. If either slice had stalled or been abandoned after
+  that commit, `roadmap.md` would have shown `done` for work that was never finished, and nothing downstream
+  would have caught it, since the epilogue step (which the existing lesson "Closing out a plan must also update
+  roadmap.md" assumes is the one touching this file) never ran against `roadmap.md` at all for either slice.
+- **Rule**: `roadmap.md`'s per-item `Status` field should only ever be written by the epilogue close-out step
+  (when `change.md` flips to `implemented`/`impl_reviewed`), never by an earlier implementation-phase commit. If
+  an earlier commit's message claims to sync roadmap status, diff-check that the file change actually matches
+  the claimed status before merging — a message/diff mismatch on a status field is a signal the sync logic (or
+  the person/agent invoking it) made a mistake.
+- **Applies to**: Any commit during a change's implementation phases that touches `roadmap.md`'s status
+  fields; `/10x-impl-review` and plan/PR review should flag a phase-N commit that sets a roadmap item straight
+  to `done`.
