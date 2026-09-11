@@ -22,8 +22,8 @@ Testing in this project is governed by three non-negotiable rules:
 1. **User concerns are first-class evidence.** Risks anchored in "the team is
    worried about X, and a failure would show up somewhere in area Y" carry
    the same weight as PRD lines or hot-spot scan data.
-1. **Risks are scenarios, not code locations.** This plan documents *what
-   could break* and *why we believe it's likely* — based on documents,
+1. **Risks are scenarios, not code locations.** This plan documents _what
+   could break_ and _why we believe it's likely_ — based on documents,
    interview, and code signal (churn, structure, existing test base). It does
    NOT claim to know which line is responsible for a failure. That knowledge
    is delivered by `/10x-research` during each rollout phase. If the plan and
@@ -37,8 +37,8 @@ Hot-spot scan scope used to weight likelihood: `src/`, `supabase/`
 
 Primary failure scenarios this project must guard against, ordered by
 risk = impact × likelihood. Risks are failure scenarios in user/business
-terms, not test names. The Source column cites *the evidence that raised
-this risk to the top* — never a specific file as "where the failure lives"
+terms, not test names. The Source column cites _the evidence that raised
+this risk to the top_ — never a specific file as "where the failure lives"
 (that's research's job, see §1 rule 3).
 
 | #   | Risk (failure scenario)                                                                                                                                        | Impact | Likelihood | Source (evidence — not location)                                                                                      |
@@ -81,13 +81,13 @@ orchestrator updates Status as artifacts appear on disk.
 > holds an old `change.md`/`research.md` from before the reorder, but that work
 > will be redone from scratch rather than resumed.
 
-| #   | Phase name                                                  | Goal (one line)                                                                                                                           | Risks               | Test types                         | Status      | Change folder |
-| --- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ---------------------------------- | ----------- | ------------- |
-| 1   | Auth/isolation contract — generalized and required for S-03 | Turn the existing auth-gate + cross-user isolation pattern into an explicit, testable convention required for S-03 too                    | #1, #2, #3          | unit + integration                 | not started | —             |
-| 2   | Shared-component UI regression                              | Prove dialogs and shared views don't drift visually and that validation still blocks invalid input after a change                         | #4                  | component tests                    | not started | —             |
-| 3   | Status/date logic regression grid                           | Extend existing boundary tests to guard against future duplication/drift of the logic across parallel changes                             | #6                  | unit                               | not started | —             |
-| 4   | Injection guard + missing CI gates                          | Confirm no raw SQL exists today, add a safeguard for the future, close the CI gates already flagged as missing (typecheck, security scan) | #7                  | static check/lint + CI gate wiring | not started | —             |
-| 5   | Key-path e2e                                                | Close the explicit PRD guardrail gap — prove the full login→add→dashboard→edit/complete/delete flow works as a coherent whole             | #5 (touches #1, #4) | e2e                                | not started | —             |
+| #   | Phase name                                                  | Goal (one line)                                                                                                                           | Risks               | Test types                         | Status      | Change folder                     |
+| --- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ---------------------------------- | ----------- | --------------------------------- |
+| 1   | Auth/isolation contract — generalized and required for S-03 | Turn the existing auth-gate + cross-user isolation pattern into an explicit, testable convention required for S-03 too                    | #1, #2, #3          | unit + integration                 | complete    | `testing-auth-isolation-contract` |
+| 2   | Shared-component UI regression                              | Prove dialogs and shared views don't drift visually and that validation still blocks invalid input after a change                         | #4                  | component tests                    | not started | —                                 |
+| 3   | Status/date logic regression grid                           | Extend existing boundary tests to guard against future duplication/drift of the logic across parallel changes                             | #6                  | unit                               | not started | —                                 |
+| 4   | Injection guard + missing CI gates                          | Confirm no raw SQL exists today, add a safeguard for the future, close the CI gates already flagged as missing (typecheck, security scan) | #7                  | static check/lint + CI gate wiring | not started | —                                 |
+| 5   | Key-path e2e                                                | Close the explicit PRD guardrail gap — prove the full login→add→dashboard→edit/complete/delete flow works as a coherent whole             | #5 (touches #1, #4) | e2e                                | not started | —                                 |
 
 **Status vocabulary** (fixed — parser literals): `not started` → `change opened` → `researched` → `planned` → `implementing` → `complete`.
 
@@ -142,11 +142,26 @@ matching rollout phase lands; until then it reads "TBD — see §3 Phase N."
 
 ### 6.2 Adding an API route test (established pattern)
 
+- **Auth check**: every `/api/*` route's handler must call `requireUser(context)`
+  (`src/lib/auth.ts`) as its first step — `if (user instanceof Response) return user;`
+  — instead of repeating the inline `if (!context.locals.user) ...` check.
+- **Auth-check test**: every route's test file must prove the contract via
+  `assertRequiresAuth(handler, buildContext, createClientMock)` from
+  `@/test-utils/auth-contract`, instead of hand-writing the redirect +
+  `createClientMock`-not-called assertions per file.
+- **Cross-user case**: routes whose ownership check is deferred to RLS
+  (i.e. the query only filters `.eq("id", ...)`, never `.eq("user_id", ...)`)
+  must add a case asserting a request for another user's row produces the
+  identical generic not-found redirect as a nonexistent-id request, using an
+  id clearly labeled as belonging to another user (e.g. `"other-users-task"`).
 - **Location**: colocated next to the route, e.g. `src/pages/api/tasks/[id].test.ts`.
 - **Mocking policy**: mock only the Supabase client (`@/lib/supabase`,
   `vi.hoisted()` + dynamic import pattern), never mock the handler's internal
   logic.
-- **Reference test**: `src/pages/api/tasks/[id].test.ts`.
+- **Reference tests**: `src/lib/auth.test.ts` (the `requireUser()` helper
+  itself); `src/pages/api/tasks/index.test.ts` (auth-check contract +
+  `user_id` spoof-defense); `src/pages/api/tasks/[id].test.ts` (auth-check
+  contract + cross-user not-found case).
 - **Run locally**: `npm run test`.
 
 ### 6.3 Adding an e2e test
@@ -166,6 +181,29 @@ matching rollout phase lands; until then it reads "TBD — see §3 Phase N."
 ### 6.6 Per-phase rollout notes
 
 (Empty for now — fills in once the first phase closes.)
+
+### 6.7 Adding a real-RLS integration test
+
+- **When to use**: only when a mocked Supabase client can't prove what's
+  needed — i.e. proving RLS itself blocks cross-user access, not just that
+  the route queries `.eq(...)` correctly (that stays at the unit-mock tier,
+  §6.2). Not a substitute for the mocked-unit tier; it's additive.
+- **Naming convention**: `*.integration.test.ts` — excluded from the default
+  `vitest.config.ts` run, included only by `vitest.integration.config.ts`.
+- **Fixture**: `supabase/seed.sql` — two fixed users
+  (`isolation-test-user-a@example.com` / `isolation-test-user-b@example.com`,
+  both with a known password) plus one `maintenance_tasks` row each, loaded
+  automatically by `supabase db reset`. Never add an admin/service-role
+  client to a test — sign in as one of the seeded users via
+  `auth.signInWithPassword` instead, exactly like production.
+- **Client**: plain `@supabase/supabase-js` `createClient(url, anonKey)`
+  (not the app's `@/lib/supabase` SSR factory) — reads
+  `SUPABASE_URL`/`SUPABASE_ANON_KEY` from `process.env`, falling back to
+  Supabase CLI's well-known local defaults.
+- **Reference test**: `src/pages/api/tasks/isolation.integration.test.ts`.
+- **Run locally**: `npx supabase start && npx supabase db reset && npm run test:integration`
+  (`db reset` is what re-applies `seed.sql` — running only `start` is not
+  enough after fixture data has been mutated by a prior run).
 
 ## 7. What We Deliberately Don't Test
 
