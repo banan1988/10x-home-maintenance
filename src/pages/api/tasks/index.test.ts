@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type { AstroCookies } from "astro";
+import { assertRequiresAuth } from "@/test-utils/auth-contract";
 
 const { createClientMock, insertMock } = vi.hoisted(() => {
   const insertMock = vi.fn().mockResolvedValue({ error: null });
@@ -16,6 +17,17 @@ vi.mock("@/lib/supabase", () => ({
 const { POST } = await import("@/pages/api/tasks/index");
 
 type PostContext = Parameters<typeof POST>[0];
+
+function validFormFields() {
+  return {
+    name: "Replace furnace filter",
+    category: "hvac",
+    importance: "medium",
+    frequency_value: "3",
+    frequency_unit: "month",
+    last_done_date: "2026-01-01",
+  };
+}
 
 function buildContext({ user, formData }: { user: { id: string } | null; formData: Record<string, string> }) {
   const body = new FormData();
@@ -36,35 +48,14 @@ function buildContext({ user, formData }: { user: { id: string } | null; formDat
 
 describe("POST /api/tasks", () => {
   it("should redirect to sign-in and never insert when there is no authenticated user", async () => {
-    const context = buildContext({
-      user: null,
-      formData: {
-        name: "Replace furnace filter",
-        category: "hvac",
-        importance: "medium",
-        frequency_value: "3",
-        frequency_unit: "month",
-        last_done_date: "2026-01-01",
-      },
-    });
-
-    await POST(context);
-
-    expect(context.redirect).toHaveBeenCalledWith("/auth/signin");
+    await assertRequiresAuth(POST, (user) => buildContext({ user, formData: validFormFields() }), createClientMock);
     expect(insertMock).not.toHaveBeenCalled();
   });
 
   it("should insert the parsed task scoped to the user and redirect to the dashboard on success", async () => {
     const context = buildContext({
       user: { id: "user-1" },
-      formData: {
-        name: "Replace furnace filter",
-        category: "hvac",
-        importance: "medium",
-        frequency_value: "3",
-        frequency_unit: "month",
-        last_done_date: "2026-01-01",
-      },
+      formData: validFormFields(),
     });
 
     await POST(context);
@@ -85,19 +76,24 @@ describe("POST /api/tasks", () => {
     insertMock.mockClear();
     const context = buildContext({
       user: { id: "user-1" },
-      formData: {
-        name: "",
-        category: "hvac",
-        importance: "medium",
-        frequency_value: "3",
-        frequency_unit: "month",
-        last_done_date: "2026-01-01",
-      },
+      formData: { ...validFormFields(), name: "" },
     });
 
     await POST(context);
 
     expect(context.redirect).toHaveBeenCalledWith(`/dashboard?error=${encodeURIComponent("Name is required")}`);
     expect(insertMock).not.toHaveBeenCalled();
+  });
+
+  it("should ignore a client-supplied user_id and insert with the authenticated user's id", async () => {
+    insertMock.mockClear();
+    const context = buildContext({
+      user: { id: "user-1" },
+      formData: { ...validFormFields(), user_id: "user-2" },
+    });
+
+    await POST(context);
+
+    expect(insertMock).toHaveBeenCalledWith(expect.objectContaining({ user_id: "user-1" }));
   });
 });
