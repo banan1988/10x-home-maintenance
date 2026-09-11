@@ -5,7 +5,8 @@
 Turn the existing (already-correct) auth-gate + cross-user isolation pattern into an explicit,
 enforced, testable contract, so that S-03 (`maintenance-tasks-api`) and any future `/api/*` route
 inherit it automatically instead of by convention. This closes test-plan.md §3 Phase 1 (Risks #1,
-# 2, #3): IDOR, a route shipping without its own auth check, and S-03 parity.
+
+# 2, #3): IDOR, a route shipping without its own auth check, and S-03 parity
 
 ## Current State Analysis
 
@@ -390,13 +391,13 @@ touched.
 
 #### Automated
 
-- [ ] 1.1 Unit tests pass: `npm run test`
-- [ ] 1.2 Type checking passes: `npx astro check`
-- [ ] 1.3 Linting passes: `npm run lint`
+- [x] 1.1 Unit tests pass: `npm run test`
+- [x] 1.2 Type checking passes: `npx astro check`
+- [x] 1.3 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 1.4 Signed-out curl to `/api/tasks` still redirects to `/auth/signin`
+- [x] 1.4 Signed-out curl to `/api/tasks` still redirects to `/auth/signin`
 
 ### Phase 2: Shared test-utility contract + expanded unit tests
 

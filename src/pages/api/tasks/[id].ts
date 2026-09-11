@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
+import { requireUser } from "@/lib/auth";
 import { addTaskSchema } from "@/lib/task-schema";
 
 export const prerender = false;
@@ -8,9 +9,8 @@ export const prerender = false;
 const NOT_FOUND_REDIRECT = `/tasks?error=${encodeURIComponent("Task not found")}`;
 
 export const POST: APIRoute = async (context) => {
-  if (!context.locals.user) {
-    return context.redirect("/auth/signin");
-  }
+  const user = requireUser(context);
+  if (user instanceof Response) return user;
 
   if (!context.params.id) {
     return context.redirect(NOT_FOUND_REDIRECT);
