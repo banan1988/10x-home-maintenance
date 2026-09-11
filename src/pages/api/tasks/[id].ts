@@ -36,6 +36,8 @@ export const POST: APIRoute = async (context) => {
     return context.redirect(`/tasks?error=${encodeURIComponent(parsed.error.issues[0].message)}&editing=${editing}`);
   }
 
+  // Ownership enforced by RLS, not this filter — see
+  // supabase/migrations/20260827194321_create_maintenance_tasks.sql
   const { data, error } = await supabase
     .from("maintenance_tasks")
     .update({ ...parsed.data, last_done_date: format(parsed.data.last_done_date, "yyyy-MM-dd") })

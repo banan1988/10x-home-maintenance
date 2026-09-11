@@ -22,6 +22,8 @@ export const POST: APIRoute = async (context) => {
 
   const today = format(new Date(), "yyyy-MM-dd");
 
+  // Ownership enforced by RLS, not this filter — see
+  // supabase/migrations/20260827194321_create_maintenance_tasks.sql
   const { data, error } = await supabase
     .from("maintenance_tasks")
     .update({ last_done_date: today })

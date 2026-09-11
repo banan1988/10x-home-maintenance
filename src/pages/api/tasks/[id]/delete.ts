@@ -19,6 +19,8 @@ export const POST: APIRoute = async (context) => {
     return context.redirect(`/tasks?error=${encodeURIComponent("Supabase is not configured")}`);
   }
 
+  // Ownership enforced by RLS, not this filter — see
+  // supabase/migrations/20260827194321_create_maintenance_tasks.sql
   const { data, error } = await supabase.from("maintenance_tasks").delete().eq("id", context.params.id).select();
 
   if (error || data.length === 0) {

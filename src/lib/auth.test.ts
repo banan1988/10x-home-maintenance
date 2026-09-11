@@ -10,7 +10,7 @@ function makeContext(user: { id: string } | null) {
 }
 
 describe("requireUser", () => {
-  it("returns the authenticated user when present", () => {
+  it("should return the authenticated user when present", () => {
     const user = { id: "user-1" };
     const context = makeContext(user);
 
@@ -18,7 +18,7 @@ describe("requireUser", () => {
     expect(context.redirect).not.toHaveBeenCalled();
   });
 
-  it("returns a redirect to /auth/signin when there is no authenticated user", () => {
+  it("should return a redirect to /auth/signin when there is no authenticated user", () => {
     const context = makeContext(null);
 
     const result = requireUser(context);
