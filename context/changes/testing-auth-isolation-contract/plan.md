@@ -430,8 +430,8 @@ touched.
 
 #### Automated
 
-- [x] 4.1 Linting passes: `npm run lint`
+- [x] 4.1 Linting passes: `npm run lint` — 5db0f8f
 
 #### Manual
 
-- [x] 4.2 Reviewer confirms §6.2/§6.x read as concrete instructions, not restated plan prose
+- [x] 4.2 Reviewer confirms §6.2/§6.x read as concrete instructions, not restated plan prose — 5db0f8f
