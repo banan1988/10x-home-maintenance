@@ -13,6 +13,16 @@ const SUPABASE_ANON_KEY =
   process.env.SUPABASE_ANON_KEY ??
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0";
 
+// SUPABASE_URL is also the name production/CI use for the real project. If a shell has it
+// exported to something other than local Supabase, fail loudly here instead of silently trying
+// to sign in against a real project with these fixture credentials.
+if (!/^https?:\/\/(127\.0\.0\.1|localhost)(:|\/|$)/.test(SUPABASE_URL)) {
+  throw new Error(
+    `isolation.integration.test.ts refuses to run against a non-local SUPABASE_URL (got "${SUPABASE_URL}"). ` +
+      "Unset SUPABASE_URL or point it at your local Supabase instance before running npm run test:integration.",
+  );
+}
+
 const USER_A = {
   email: "isolation-test-user-a@example.com",
   password: "isolation-test-password",

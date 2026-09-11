@@ -120,3 +120,30 @@
   (`src/pages/api/tasks/isolation.integration.test.ts`, `supabase/seed.sql`) — see test-plan.md §6.2/§6.7.
 - **Applies to**: Any future `/api/*` route, including S-03 (`maintenance-tasks-api`) and any route added after
   it.
+
+## RLS-only ownership filters need an explicit code comment
+
+- **Context**: `src/pages/api/tasks/[id].ts:42-44`, `complete.ts:28-30`, `delete.ts:22-24`
+  (`testing-auth-isolation-contract`) — all three mutation routes filter only by `.eq("id", ...)`, deferring
+  ownership enforcement entirely to RLS.
+- **Problem**: This is a deliberate, already-tested design (proven by the real-RLS integration tier), but
+  nothing in the route code itself said so — a future editor unfamiliar with the plan could mistake the
+  missing `user_id` filter for a bug and "fix" it by adding a redundant or subtly wrong app-layer check.
+- **Rule**: Any query that relies on RLS alone for row-ownership enforcement (i.e. filters only by primary key,
+  no `user_id`/`owner_id` clause) must carry a one-line comment pointing to the RLS migration/policy that
+  enforces it.
+- **Applies to**: Any `/api/*` route or service-layer query that intentionally omits an app-layer ownership
+  filter in favor of RLS.
+
+## Test titles must use the `it("should ...")` phrasing
+
+- **Context**: `src/lib/auth.test.ts:13,21` (`testing-auth-isolation-contract`) — used bare descriptions
+  ("returns the authenticated user when present") instead of the "should ..." phrasing every other
+  `*.test.ts` file in the repo uses.
+- **Problem**: A new test file that skips the established `it("should ...")` convention is a small but real
+  inconsistency — test output reads oddly next to sibling suites, and nothing currently catches this at review
+  time besides a human noticing.
+- **Rule**: Every `it(...)` description in this repo must start with "should " (e.g.
+  `it("should return X when Y", ...)`), matching the convention already used in `task-schema.test.ts`,
+  `status.test.ts`, `supabase.test.ts`, and all `src/pages/api/tasks/*.test.ts` files.
+- **Applies to**: Any new or edited Vitest `it(...)` block in this repo.
