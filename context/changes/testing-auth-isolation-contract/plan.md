@@ -403,28 +403,28 @@ touched.
 
 #### Automated
 
-- [x] 2.1 Unit tests pass: `npm run test`
-- [x] 2.2 Type checking passes: `npx astro check`
-- [x] 2.3 Linting passes: `npm run lint`
+- [x] 2.1 Unit tests pass: `npm run test` — ff92e35
+- [x] 2.2 Type checking passes: `npx astro check` — ff92e35
+- [x] 2.3 Linting passes: `npm run lint` — ff92e35
 
 #### Manual
 
-- [x] 2.4 Reviewer confirms cross-user vs. nonexistent-id cases are clearly distinguishable in test output
+- [x] 2.4 Reviewer confirms cross-user vs. nonexistent-id cases are clearly distinguishable in test output — ff92e35
 
 ### Phase 3: Real-RLS integration tier (local-only)
 
 #### Automated
 
-- [ ] 3.1 `npx supabase start` succeeds locally
-- [ ] 3.2 `npx supabase db reset` applies `seed.sql` without error
-- [ ] 3.3 Integration tests pass: `npm run test:integration`
-- [ ] 3.4 `npm run test` (default/CI) still passes and does not attempt to reach Supabase
-- [ ] 3.5 Type checking passes: `npx astro check`
-- [ ] 3.6 Linting passes: `npm run lint`
+- [x] 3.1 `npx supabase start` succeeds locally
+- [x] 3.2 `npx supabase db reset` applies `seed.sql` without error
+- [x] 3.3 Integration tests pass: `npm run test:integration`
+- [x] 3.4 `npm run test` (default/CI) still passes and does not attempt to reach Supabase
+- [x] 3.5 Type checking passes: `npx astro check`
+- [x] 3.6 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 3.7 `npm run test` passes with local Supabase stopped
+- [x] 3.7 `npm run test` passes with local Supabase stopped
 
 ### Phase 4: Cookbook + lessons documentation
 
