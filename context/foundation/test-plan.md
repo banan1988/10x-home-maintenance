@@ -6,7 +6,10 @@
 >
 > Refresh: re-run `/10x-test-plan --refresh` when the plan goes stale (see §8).
 >
-> Last updated: 2026-09-11 (Phase 1: change opened)
+> Last updated: 2026-09-11 (rollout reordered: key-path e2e moved from Phase 1
+> to Phase 5 as a capstone over the API/UI/logic conventions built in Phases
+> 1–4; status reset to `not started` — prior work exists only on the unmerged
+> branch `chore/testing-e2e-critical-path` and will be redone, not resumed)
 
 ## 1. Strategy
 
@@ -66,13 +69,25 @@ Each row is a separate rollout phase that opens its own change folder via
 `/10x-new`. Status moves left to right using the values below; the
 orchestrator updates Status as artifacts appear on disk.
 
-| #   | Phase name                                                  | Goal (one line)                                                                                                                           | Risks               | Test types                         | Status        | Change folder                              |
-| --- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ---------------------------------- | ------------- | ------------------------------------------ |
-| 1   | Key-path e2e                                                | Close the explicit PRD guardrail gap — prove the full login→add→dashboard→edit/complete/delete flow works as a coherent whole             | #5 (touches #1, #4) | e2e                                | change opened | context/changes/testing-e2e-critical-path/ |
-| 2   | Auth/isolation contract — generalized and required for S-03 | Turn the existing auth-gate + cross-user isolation pattern into an explicit, testable convention required for S-03 too                    | #1, #2, #3          | unit + integration                 | not started   | —                                          |
-| 3   | Shared-component UI regression                              | Prove dialogs and shared views don't drift visually and that validation still blocks invalid input after a change                         | #4                  | component tests                    | not started   | —                                          |
-| 4   | Status/date logic regression grid                           | Extend existing boundary tests to guard against future duplication/drift of the logic across parallel changes                             | #6                  | unit                               | not started   | —                                          |
-| 5   | Injection guard + missing CI gates                          | Confirm no raw SQL exists today, add a safeguard for the future, close the CI gates already flagged as missing (typecheck, security scan) | #7                  | static check/lint + CI gate wiring | not started   | —                                          |
+> **Reorder note (2026-09-11):** key-path e2e was originally Phase 1 (risk-first
+> priority — it closes the highest-rated, currently-zero-coverage PRD
+> guardrail). It has been moved to Phase 5 so it lands as a capstone once the
+> API auth/isolation convention, shared-component UI regression, and
+> status/date logic phases have already stabilized the surfaces it exercises
+> (login, dialogs, task list, status). This defers, but does not drop, the
+> PRD guardrail — do not let it slip past Phase 5.
+>
+> Status reset to `not started`: an unmerged branch `chore/testing-e2e-critical-path`
+> holds an old `change.md`/`research.md` from before the reorder, but that work
+> will be redone from scratch rather than resumed.
+
+| #   | Phase name                                                  | Goal (one line)                                                                                                                           | Risks               | Test types                         | Status      | Change folder |
+| --- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ---------------------------------- | ----------- | ------------- |
+| 1   | Auth/isolation contract — generalized and required for S-03 | Turn the existing auth-gate + cross-user isolation pattern into an explicit, testable convention required for S-03 too                    | #1, #2, #3          | unit + integration                 | not started | —             |
+| 2   | Shared-component UI regression                              | Prove dialogs and shared views don't drift visually and that validation still blocks invalid input after a change                         | #4                  | component tests                    | not started | —             |
+| 3   | Status/date logic regression grid                           | Extend existing boundary tests to guard against future duplication/drift of the logic across parallel changes                             | #6                  | unit                               | not started | —             |
+| 4   | Injection guard + missing CI gates                          | Confirm no raw SQL exists today, add a safeguard for the future, close the CI gates already flagged as missing (typecheck, security scan) | #7                  | static check/lint + CI gate wiring | not started | —             |
+| 5   | Key-path e2e                                                | Close the explicit PRD guardrail gap — prove the full login→add→dashboard→edit/complete/delete flow works as a coherent whole             | #5 (touches #1, #4) | e2e                                | not started | —             |
 
 **Status vocabulary** (fixed — parser literals): `not started` → `change opened` → `researched` → `planned` → `implementing` → `complete`.
 
@@ -85,16 +100,16 @@ This project's classic test base. AI-native tools (where present) carry a
 | -------------------- | ------------------------------------------------------ | ------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | unit + integration   | Vitest                                                 | 4.1.10              | already configured (`vitest.config.ts`), 8 test files under `src/lib/` and `src/pages/api/tasks/`                            |
 | API mocking          | `vi.hoisted()` + dynamic import of the Supabase client | (built into Vitest) | established mocking pattern for `@/lib/supabase`, continue it, don't introduce a separate library                            |
-| e2e                  | none yet — see Phase 1                                 | —                   | none; Phase 1 introduces Playwright                                                                                          |
-| UI component tests   | none yet — see Phase 3                                 | —                   | no React Testing Library — deliberately rejected in prior implementation plans; Phase 3 decides on the tool                  |
+| e2e                  | none yet — see Phase 5                                 | —                   | none; Phase 5 introduces Playwright                                                                                          |
+| UI component tests   | none yet — see Phase 2                                 | —                   | no React Testing Library — deliberately rejected in prior implementation plans; Phase 2 decides on the tool                  |
 | accessibility        | none yet                                               | —                   | not flagged as a risk in the interview or the PRD — out of scope for this rollout                                            |
-| (optional) AI-native | Playwright MCP — checked: 2026-09-11                   | n/a                 | useful for building/verifying e2e scenarios in Phase 1; doesn't replace deterministic assertions, only supports writing them |
+| (optional) AI-native | Playwright MCP — checked: 2026-09-11                   | n/a                 | useful for building/verifying e2e scenarios in Phase 5; doesn't replace deterministic assertions, only supports writing them |
 
 **Stack grounding tools (current session):**
 
-- Docs: context7 MCP — available in this session, to be used when planning Phase 1 (current Playwright API) and Phase 5 (security scan tooling); checked: 2026-09-11
+- Docs: context7 MCP — available in this session, to be used when planning Phase 5 (current Playwright API) and Phase 4 (security scan tooling); checked: 2026-09-11
 - Search: Exa MCP (web_search/web_fetch) — available, not yet used in this session; checked: 2026-09-11
-- Runtime/browser: Playwright MCP — available, key for Phase 1 (e2e); checked: 2026-09-11
+- Runtime/browser: Playwright MCP — available, key for Phase 5 (e2e); checked: 2026-09-11
 - Provider/platform: GitHub MCP present in this session but not logged in — unused; Cloudflare/Supabase have no dedicated MCP in this session; checked: 2026-09-11
 
 ## 5. Quality Gates
@@ -106,11 +121,11 @@ rollout phase lands; before that, the gate is `planned`.
 | Gate                              | Where                | Required?                 | What it catches                                                                         |
 | --------------------------------- | -------------------- | ------------------------- | --------------------------------------------------------------------------------------- |
 | lint                              | local + CI           | required (already wired)  | syntactic drift                                                                         |
-| typecheck                         | local + CI           | required after §3 Phase 5 | type drift (today `npx astro check` only runs locally, not in CI — health-check.md)     |
+| typecheck                         | local + CI           | required after §3 Phase 4 | type drift (today `npx astro check` only runs locally, not in CI — health-check.md)     |
 | unit + integration                | local + CI           | required (already wired)  | logic regressions                                                                       |
-| e2e on critical paths             | CI on PR             | required after §3 Phase 1 | broken key user flows                                                                   |
-| UI component tests (dialogs/list) | local + CI           | required after §3 Phase 3 | validation/UI regressions in shared components                                          |
-| security/dependency scan          | CI on PR             | required after §3 Phase 5 | dependency vulnerabilities, injection (health-check.md already flagged this as missing) |
+| e2e on critical paths             | CI on PR             | required after §3 Phase 5 | broken key user flows                                                                   |
+| UI component tests (dialogs/list) | local + CI           | required after §3 Phase 2 | validation/UI regressions in shared components                                          |
+| security/dependency scan          | CI on PR             | required after §3 Phase 4 | dependency vulnerabilities, injection (health-check.md already flagged this as missing) |
 | pre-prod smoke                    | between merge & prod | optional                  | environment-specific failures                                                           |
 
 ## 6. Cookbook Patterns
@@ -136,16 +151,16 @@ matching rollout phase lands; until then it reads "TBD — see §3 Phase N."
 
 ### 6.3 Adding an e2e test
 
-- TBD — see §3 Phase 1 (key flow login→add→dashboard→edit/complete/delete).
+- TBD — see §3 Phase 5 (key flow login→add→dashboard→edit/complete/delete).
 
 ### 6.4 Adding a UI component test (dialog/list)
 
-- TBD — see §3 Phase 3 (validation regression and visual drift in shared
+- TBD — see §3 Phase 2 (validation regression and visual drift in shared
   dialogs/task list).
 
 ### 6.5 Extending status/date logic boundary tests
 
-- TBD — see §3 Phase 4 (guarding against logic duplication/drift across
+- TBD — see §3 Phase 3 (guarding against logic duplication/drift across
   parallel changes).
 
 ### 6.6 Per-phase rollout notes
@@ -166,7 +181,7 @@ matching rollout phase lands; until then it reads "TBD — see §3 Phase N."
 - **No clear negative space from the user (Q5)** — the user couldn't name an
   area to skip, and instead pointed out that even seemingly static views can
   suffer from shared components. Treat this as a signal to NOT exclude any
-  view a priori for seeming "static" — UI coverage (Phase 3) also covers
+  view a priori for seeming "static" — UI coverage (Phase 2) also covers
   pages that use the shared layout.
   (Source: Phase 2 interview Q5.)
 
