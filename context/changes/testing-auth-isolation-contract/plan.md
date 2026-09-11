@@ -415,23 +415,23 @@ touched.
 
 #### Automated
 
-- [x] 3.1 `npx supabase start` succeeds locally
-- [x] 3.2 `npx supabase db reset` applies `seed.sql` without error
-- [x] 3.3 Integration tests pass: `npm run test:integration`
-- [x] 3.4 `npm run test` (default/CI) still passes and does not attempt to reach Supabase
-- [x] 3.5 Type checking passes: `npx astro check`
-- [x] 3.6 Linting passes: `npm run lint`
+- [x] 3.1 `npx supabase start` succeeds locally — ffed8d3
+- [x] 3.2 `npx supabase db reset` applies `seed.sql` without error — ffed8d3
+- [x] 3.3 Integration tests pass: `npm run test:integration` — ffed8d3
+- [x] 3.4 `npm run test` (default/CI) still passes and does not attempt to reach Supabase — ffed8d3
+- [x] 3.5 Type checking passes: `npx astro check` — ffed8d3
+- [x] 3.6 Linting passes: `npm run lint` — ffed8d3
 
 #### Manual
 
-- [x] 3.7 `npm run test` passes with local Supabase stopped
+- [x] 3.7 `npm run test` passes with local Supabase stopped — ffed8d3
 
 ### Phase 4: Cookbook + lessons documentation
 
 #### Automated
 
-- [ ] 4.1 Linting passes: `npm run lint`
+- [x] 4.1 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 4.2 Reviewer confirms §6.2/§6.x read as concrete instructions, not restated plan prose
+- [x] 4.2 Reviewer confirms §6.2/§6.x read as concrete instructions, not restated plan prose

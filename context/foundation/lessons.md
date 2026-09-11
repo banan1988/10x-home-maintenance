@@ -81,7 +81,7 @@
 ## `roadmap.md` status must only be synced by the epilogue step, not a mid-phase commit
 
 - **Context**: `context/foundation/roadmap.md`, commit `ffac278` ("shared status & validation modules (p1)" —
-  S-02's *first* implementation phase). The commit message claims "Syncs roadmap.md S-02 status to in-progress",
+  S-02's _first_ implementation phase). The commit message claims "Syncs roadmap.md S-02 status to in-progress",
   but the actual diff set S-02 straight to `done` and also flipped S-01 from `in-progress` to `done`, skipping
   `in-progress` entirely — three-plus phases before either slice was actually finished. Neither slice's real
   epilogue commit (the one that closes out the plan and flips `change.md` to `implemented`/`impl_reviewed`) ever
@@ -101,3 +101,22 @@
 - **Applies to**: Any commit during a change's implementation phases that touches `roadmap.md`'s status
   fields; `/10x-impl-review` and plan/PR review should flag a phase-N commit that sets a roadmap item straight
   to `done`.
+
+## Every `/api/*` route must use the shared auth-check contract
+
+- **Context**: `context/changes/testing-auth-isolation-contract/plan.md` (test-plan.md §3 Phase 1) — before
+  this change, all 4 mutation routes under `src/pages/api/tasks/` independently repeated
+  `if (!context.locals.user) return context.redirect("/auth/signin");` inline, with no shared helper and no
+  test constructing two distinct users, despite ownership already being correctly deferred to RLS.
+- **Problem**: A documented-only convention ("self-check `locals.user` first, defer ownership to RLS") with
+  nothing enforcing it lets a new route (e.g. S-03's public CRUD API) silently ship without its own auth check,
+  or copy the inline pattern incorrectly, because nothing forces it through one importable implementation.
+- **Rule**: Every new `/api/*` route must call `requireUser(context)` (`src/lib/auth.ts`) for its auth check —
+  never repeat the inline `locals.user` check. Its test file must call `assertRequiresAuth` from
+  `@/test-utils/auth-contract` for the unauthenticated case, and add a cross-user case (another user's row
+  produces the identical generic not-found redirect as a nonexistent one) whenever the route defers ownership
+  to RLS, following the Phase 2 pattern in `src/pages/api/tasks/[id].test.ts`. Routes whose ownership check
+  matters for RLS correctness should also be covered by the Phase 3 real-RLS integration tier's pattern
+  (`src/pages/api/tasks/isolation.integration.test.ts`, `supabase/seed.sql`) — see test-plan.md §6.2/§6.7.
+- **Applies to**: Any future `/api/*` route, including S-03 (`maintenance-tasks-api`) and any route added after
+  it.
