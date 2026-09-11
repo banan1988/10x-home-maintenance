@@ -391,25 +391,25 @@ touched.
 
 #### Automated
 
-- [x] 1.1 Unit tests pass: `npm run test`
-- [x] 1.2 Type checking passes: `npx astro check`
-- [x] 1.3 Linting passes: `npm run lint`
+- [x] 1.1 Unit tests pass: `npm run test` — c7699bc
+- [x] 1.2 Type checking passes: `npx astro check` — c7699bc
+- [x] 1.3 Linting passes: `npm run lint` — c7699bc
 
 #### Manual
 
-- [x] 1.4 Signed-out curl to `/api/tasks` still redirects to `/auth/signin`
+- [x] 1.4 Signed-out curl to `/api/tasks` still redirects to `/auth/signin` — c7699bc
 
 ### Phase 2: Shared test-utility contract + expanded unit tests
 
 #### Automated
 
-- [ ] 2.1 Unit tests pass: `npm run test`
-- [ ] 2.2 Type checking passes: `npx astro check`
-- [ ] 2.3 Linting passes: `npm run lint`
+- [x] 2.1 Unit tests pass: `npm run test`
+- [x] 2.2 Type checking passes: `npx astro check`
+- [x] 2.3 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 2.4 Reviewer confirms cross-user vs. nonexistent-id cases are clearly distinguishable in test output
+- [x] 2.4 Reviewer confirms cross-user vs. nonexistent-id cases are clearly distinguishable in test output
 
 ### Phase 3: Real-RLS integration tier (local-only)
 
