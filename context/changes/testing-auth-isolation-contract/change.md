@@ -1,7 +1,7 @@
 ---
 change_id: testing-auth-isolation-contract
 title: Auth/isolation contract — generalized and required for S-03
-status: implementing
+status: implemented
 created: 2026-09-11
 updated: 2026-09-11
 archived_at:
