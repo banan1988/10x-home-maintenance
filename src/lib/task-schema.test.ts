@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { format } from "date-fns";
 
-import { addTaskSchema } from "@/lib/task-schema";
+import { addTaskSchema, createTaskJsonSchema, updateTaskJsonSchema } from "@/lib/task-schema";
 
 describe("addTaskSchema", () => {
   const validPayload = {
@@ -105,5 +105,63 @@ describe("addTaskSchema last_done_date timezone handling", () => {
     if (result.success) {
       expect(format(result.data.last_done_date, "yyyy-MM-dd")).toBe("2026-01-01");
     }
+  });
+});
+
+describe("createTaskJsonSchema", () => {
+  const validPayload = {
+    name: "Replace furnace filter",
+    category: "hvac",
+    importance: "medium",
+    frequency_value: 3,
+    frequency_unit: "month",
+    last_done_date: "2026-01-01",
+  };
+
+  it("should accept a fully valid payload with a real number for frequency_value", () => {
+    const result = createTaskJsonSchema.safeParse(validPayload);
+
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject a string frequency_value instead of silently coercing it", () => {
+    const result = createTaskJsonSchema.safeParse({ ...validPayload, frequency_value: "3" });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("should reject a non-positive frequency_value", () => {
+    const result = createTaskJsonSchema.safeParse({ ...validPayload, frequency_value: 0 });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("should reject a blank name", () => {
+    const result = createTaskJsonSchema.safeParse({ ...validPayload, name: "  " });
+
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("updateTaskJsonSchema", () => {
+  it("should reject an empty body", () => {
+    const result = updateTaskJsonSchema.safeParse({});
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe("At least one field must be provided");
+    }
+  });
+
+  it("should accept a single valid field", () => {
+    const result = updateTaskJsonSchema.safeParse({ name: "New name" });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject a single invalid field", () => {
+    const result = updateTaskJsonSchema.safeParse({ frequency_value: -1 });
+
+    expect(result.success).toBe(false);
   });
 });

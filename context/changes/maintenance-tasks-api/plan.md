@@ -380,9 +380,9 @@ None — no schema or data changes; the existing `maintenance_tasks` table and i
 
 #### Automated
 
-- [ ] 1.1 Unit tests pass: `npm run test -- src/lib/api-response.test.ts src/lib/api-auth.test.ts src/lib/task-schema.test.ts src/lib/task-dto.test.ts`
-- [ ] 1.2 Type checking passes: `npm run build`
-- [ ] 1.3 Linting passes: `npm run lint`
+- [x] 1.1 Unit tests pass: `npm run test -- src/lib/api-response.test.ts src/lib/api-auth.test.ts src/lib/task-schema.test.ts src/lib/task-dto.test.ts`
+- [x] 1.2 Type checking passes: `npm run build`
+- [x] 1.3 Linting passes: `npm run lint`
 
 ### Phase 2: List + Create endpoints
 
