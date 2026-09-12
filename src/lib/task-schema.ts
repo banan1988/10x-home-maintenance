@@ -20,3 +20,27 @@ export const addTaskSchema = z.object({
 });
 
 export type AddTaskInput = z.infer<typeof addTaskSchema>;
+
+// A JSON body carries a real number, unlike a form field — a strict JSON API rejects a string like "3"
+// rather than silently coercing it the way `addTaskSchema.frequency_value` does.
+export const createTaskJsonSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(200, "Name must be 200 characters or less"),
+  category: z.enum(Constants.public.Enums.maintenance_category, "Select a valid category"),
+  importance: z.enum(Constants.public.Enums.maintenance_importance, "Select a valid importance"),
+  frequency_value: z.number().int().positive("Frequency must be a positive number"),
+  frequency_unit: z.enum(Constants.public.Enums.maintenance_frequency_unit, "Select a valid frequency unit"),
+  last_done_date: z
+    .string("Pick a last-done date")
+    .transform((value) => parseISO(value))
+    .refine((date) => !isNaN(date.getTime()), "Invalid date")
+    // See addTaskSchema's last_done_date comment: same 1-day timezone grace window.
+    .refine((date) => date <= addDays(new Date(), 1), "Last done date cannot be in the future"),
+});
+
+export type CreateTaskJsonInput = z.infer<typeof createTaskJsonSchema>;
+
+export const updateTaskJsonSchema = createTaskJsonSchema
+  .partial()
+  .refine((obj) => Object.keys(obj).length > 0, "At least one field must be provided");
+
+export type UpdateTaskJsonInput = z.infer<typeof updateTaskJsonSchema>;
