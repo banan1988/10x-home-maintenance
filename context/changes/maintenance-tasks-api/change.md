@@ -1,9 +1,9 @@
 ---
 change_id: maintenance-tasks-api
 title: Expose maintenance task CRUD via the API
-status: implementing
+status: implemented
 created: 2026-09-11
-updated: 2026-09-12
+updated: 2026-09-13
 archived_at:
 ---
 
