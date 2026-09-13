@@ -388,29 +388,29 @@ None — no schema or data changes; the existing `maintenance_tasks` table and i
 
 #### Automated
 
-- [x] 2.1 Unit tests pass: `npm run test -- src/pages/api/v1/tasks/index.test.ts`
-- [x] 2.2 Type checking passes: `npm run build`
-- [x] 2.3 Linting passes: `npm run lint`
+- [x] 2.1 Unit tests pass: `npm run test -- src/pages/api/v1/tasks/index.test.ts` — 5604ef5
+- [x] 2.2 Type checking passes: `npm run build` — 5604ef5
+- [x] 2.3 Linting passes: `npm run lint` — 5604ef5
 
 #### Manual
 
-- [x] 2.4 POST /api/v1/tasks returns 201 with created task DTO
-- [x] 2.5 GET /api/v1/tasks returns 200 with the task list including computed status
-- [x] 2.6 Missing session cookie returns 401 on both verbs
+- [x] 2.4 POST /api/v1/tasks returns 201 with created task DTO — 5604ef5
+- [x] 2.5 GET /api/v1/tasks returns 200 with the task list including computed status — 5604ef5
+- [x] 2.6 Missing session cookie returns 401 on both verbs — 5604ef5
 
 ### Phase 3: Read/update/delete a single task
 
 #### Automated
 
-- [ ] 3.1 Unit tests pass: `npm run test -- src/pages/api/v1/tasks/[id].test.ts`
-- [ ] 3.2 Type checking passes: `npm run build`
-- [ ] 3.3 Linting passes: `npm run lint`
+- [x] 3.1 Unit tests pass: `npm run test -- src/pages/api/v1/tasks/[id].test.ts`
+- [x] 3.2 Type checking passes: `npm run build`
+- [x] 3.3 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 3.4 GET /api/v1/tasks/:id returns the task; nonexistent/other-user id returns 404
-- [ ] 3.5 PATCH /api/v1/tasks/:id updates only the sent field(s)
-- [ ] 3.6 DELETE /api/v1/tasks/:id returns 204; subsequent GET returns 404
+- [x] 3.4 GET /api/v1/tasks/:id returns the task; nonexistent/other-user id returns 404
+- [x] 3.5 PATCH /api/v1/tasks/:id updates only the sent field(s)
+- [x] 3.6 DELETE /api/v1/tasks/:id returns 204; subsequent GET returns 404
 
 ### Phase 4: Real-RLS integration coverage + documentation
 
