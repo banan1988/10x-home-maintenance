@@ -148,6 +148,60 @@ Users can then sign in immediately after sign-up without clicking a confirmation
 
 Route protection is handled in `src/middleware.ts`. Add paths to the `PROTECTED_ROUTES` array there to require authentication.
 
+## API
+
+A JSON CRUD API for maintenance tasks is available under `/api/v1/tasks`. It reuses the existing Supabase
+cookie session — there is no separate API key or bearer token. A caller signs in via `POST /api/auth/signin`
+(see [Auth routes](#auth-routes)) and sends the resulting session cookie on every subsequent request.
+
+Every response is JSON: `{ "data": ... }` on success, `{ "error": { "message": "...", "issues": [...] } }` on
+failure (`issues` only present for validation errors), and `204 No Content` on a successful delete.
+
+### Endpoints
+
+| Method   | Path                | Description                                  |
+| -------- | ------------------- | -------------------------------------------- |
+| `GET`    | `/api/v1/tasks`     | List the authenticated user's tasks          |
+| `POST`   | `/api/v1/tasks`     | Create a task                                |
+| `GET`    | `/api/v1/tasks/:id` | Read a single task                           |
+| `PATCH`  | `/api/v1/tasks/:id` | Partially update a task (at least one field) |
+| `DELETE` | `/api/v1/tasks/:id` | Delete a task                                |
+
+A task not owned by the caller returns the same `404` as a nonexistent id.
+
+> [!NOTE]
+> Astro's built-in CSRF protection (`security.checkOrigin`, on by default) rejects any non-`GET` request that
+> has no `Content-Type` header and no matching `Origin` header. A browser-based caller sends `Origin`
+> automatically; a script/CLI client issuing a bodyless request (e.g. `DELETE`) must set `Content-Type` or pass
+> a matching `Origin` header explicitly, as shown below.
+
+### Example: full CRUD cycle via curl
+
+```bash
+# 1. Sign in and capture the session cookie
+curl -i -c cookies.txt -X POST http://localhost:4321/api/auth/signin \
+  -H "Origin: http://localhost:4321" \
+  -d "email=you@example.com" \
+  -d "password=your-password"
+
+# 2. Create a task
+curl -i -b cookies.txt -X POST http://localhost:4321/api/v1/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Replace furnace filter","category":"hvac","importance":"medium","frequency_value":3,"frequency_unit":"month","last_done_date":"2026-08-01"}'
+
+# 3. List tasks
+curl -i -b cookies.txt http://localhost:4321/api/v1/tasks
+
+# 4. Update a task (replace <id> with the id returned in step 2)
+curl -i -b cookies.txt -X PATCH http://localhost:4321/api/v1/tasks/<id> \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Replace furnace filter (updated)"}'
+
+# 5. Delete a task
+curl -i -b cookies.txt -X DELETE http://localhost:4321/api/v1/tasks/<id> \
+  -H "Origin: http://localhost:4321"
+```
+
 ## Deployment
 
 This project deploys to [Cloudflare Workers](https://workers.cloudflare.com/) under the Worker name `10x-home-maintenance`.

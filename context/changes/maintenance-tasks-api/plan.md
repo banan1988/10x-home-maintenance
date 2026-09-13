@@ -402,26 +402,26 @@ None — no schema or data changes; the existing `maintenance_tasks` table and i
 
 #### Automated
 
-- [x] 3.1 Unit tests pass: `npm run test -- src/pages/api/v1/tasks/[id].test.ts`
-- [x] 3.2 Type checking passes: `npm run build`
-- [x] 3.3 Linting passes: `npm run lint`
+- [x] 3.1 Unit tests pass: `npm run test -- src/pages/api/v1/tasks/[id].test.ts` — e4d1280
+- [x] 3.2 Type checking passes: `npm run build` — e4d1280
+- [x] 3.3 Linting passes: `npm run lint` — e4d1280
 
 #### Manual
 
-- [x] 3.4 GET /api/v1/tasks/:id returns the task; nonexistent/other-user id returns 404
-- [x] 3.5 PATCH /api/v1/tasks/:id updates only the sent field(s)
-- [x] 3.6 DELETE /api/v1/tasks/:id returns 204; subsequent GET returns 404
+- [x] 3.4 GET /api/v1/tasks/:id returns the task; nonexistent/other-user id returns 404 — e4d1280
+- [x] 3.5 PATCH /api/v1/tasks/:id updates only the sent field(s) — e4d1280
+- [x] 3.6 DELETE /api/v1/tasks/:id returns 204; subsequent GET returns 404 — e4d1280
 
 ### Phase 4: Real-RLS integration coverage + documentation
 
 #### Automated
 
-- [ ] 4.1 Integration tests pass: `npx supabase start && npx supabase db reset && npm run test:integration`
-- [ ] 4.2 Full unit suite still passes: `npm run test`
-- [ ] 4.3 Type checking passes: `npm run build`
-- [ ] 4.4 Linting passes: `npm run lint`
+- [x] 4.1 Integration tests pass: `npx supabase start && npx supabase db reset && npm run test:integration`
+- [x] 4.2 Full unit suite still passes: `npm run test`
+- [x] 4.3 Type checking passes: `npm run build`
+- [x] 4.4 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 4.5 README curl walkthrough works step-by-step against the local dev server
+- [x] 4.5 README curl walkthrough works step-by-step against the local dev server
   </content>
