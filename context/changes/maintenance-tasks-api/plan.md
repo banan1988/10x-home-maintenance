@@ -380,23 +380,23 @@ None — no schema or data changes; the existing `maintenance_tasks` table and i
 
 #### Automated
 
-- [x] 1.1 Unit tests pass: `npm run test -- src/lib/api-response.test.ts src/lib/api-auth.test.ts src/lib/task-schema.test.ts src/lib/task-dto.test.ts`
-- [x] 1.2 Type checking passes: `npm run build`
-- [x] 1.3 Linting passes: `npm run lint`
+- [x] 1.1 Unit tests pass: `npm run test -- src/lib/api-response.test.ts src/lib/api-auth.test.ts src/lib/task-schema.test.ts src/lib/task-dto.test.ts` — 40c2d9f
+- [x] 1.2 Type checking passes: `npm run build` — 40c2d9f
+- [x] 1.3 Linting passes: `npm run lint` — 40c2d9f
 
 ### Phase 2: List + Create endpoints
 
 #### Automated
 
-- [ ] 2.1 Unit tests pass: `npm run test -- src/pages/api/v1/tasks/index.test.ts`
-- [ ] 2.2 Type checking passes: `npm run build`
-- [ ] 2.3 Linting passes: `npm run lint`
+- [x] 2.1 Unit tests pass: `npm run test -- src/pages/api/v1/tasks/index.test.ts`
+- [x] 2.2 Type checking passes: `npm run build`
+- [x] 2.3 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 2.4 POST /api/v1/tasks returns 201 with created task DTO
-- [ ] 2.5 GET /api/v1/tasks returns 200 with the task list including computed status
-- [ ] 2.6 Missing session cookie returns 401 on both verbs
+- [x] 2.4 POST /api/v1/tasks returns 201 with created task DTO
+- [x] 2.5 GET /api/v1/tasks returns 200 with the task list including computed status
+- [x] 2.6 Missing session cookie returns 401 on both verbs
 
 ### Phase 3: Read/update/delete a single task
 
