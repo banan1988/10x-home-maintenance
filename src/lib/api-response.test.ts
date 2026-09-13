@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { jsonData, jsonError } from "@/lib/api-response";
+import { jsonData, jsonError, parseJsonBody } from "@/lib/api-response";
 
 describe("jsonData", () => {
   it("should wrap the payload in a data envelope with the given status and JSON content type", async () => {
@@ -27,5 +27,30 @@ describe("jsonError", () => {
     await expect(response.json()).resolves.toEqual({
       error: { message: "Name is required", issues: ["Name is required"] },
     });
+  });
+});
+
+describe("parseJsonBody", () => {
+  it("should return the parsed body when the request contains valid JSON", async () => {
+    const request = new Request("http://localhost", {
+      method: "POST",
+      body: JSON.stringify({ name: "Task" }),
+    });
+
+    await expect(parseJsonBody(request)).resolves.toEqual({ name: "Task" });
+  });
+
+  it("should return a 400 JSON error response when the request body is not valid JSON", async () => {
+    const request = new Request("http://localhost", {
+      method: "POST",
+      body: "not json",
+    });
+
+    const result = await parseJsonBody(request);
+
+    expect(result).toBeInstanceOf(Response);
+    const response = result as Response;
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({ error: { message: "Invalid JSON body" } });
   });
 });

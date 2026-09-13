@@ -11,3 +11,11 @@ export function jsonError(status: number, message: string, issues?: string[]): R
     headers: { "Content-Type": "application/json" },
   });
 }
+
+export async function parseJsonBody(request: Request): Promise<unknown> {
+  try {
+    return await request.json();
+  } catch {
+    return jsonError(400, "Invalid JSON body");
+  }
+}
