@@ -416,12 +416,12 @@ None — no schema or data changes; the existing `maintenance_tasks` table and i
 
 #### Automated
 
-- [x] 4.1 Integration tests pass: `npx supabase start && npx supabase db reset && npm run test:integration`
-- [x] 4.2 Full unit suite still passes: `npm run test`
-- [x] 4.3 Type checking passes: `npm run build`
-- [x] 4.4 Linting passes: `npm run lint`
+- [x] 4.1 Integration tests pass: `npx supabase start && npx supabase db reset && npm run test:integration` — ef84618
+- [x] 4.2 Full unit suite still passes: `npm run test` — ef84618
+- [x] 4.3 Type checking passes: `npm run build` — ef84618
+- [x] 4.4 Linting passes: `npm run lint` — ef84618
 
 #### Manual
 
-- [x] 4.5 README curl walkthrough works step-by-step against the local dev server
+- [x] 4.5 README curl walkthrough works step-by-step against the local dev server — ef84618
   </content>
