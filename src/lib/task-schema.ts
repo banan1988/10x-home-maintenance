@@ -11,6 +11,7 @@ export const addTaskSchema = z.object({
   frequency_unit: z.enum(Constants.public.Enums.maintenance_frequency_unit, "Select a valid frequency unit"),
   last_done_date: z
     .string("Pick a last-done date")
+    .max(10, "Invalid date")
     .transform((value) => parseISO(value))
     .refine((date) => !isNaN(date.getTime()), "Invalid date")
     // A 1-day grace window absorbs timezone skew between the user's local "today" and the
@@ -31,6 +32,7 @@ export const createTaskJsonSchema = z.object({
   frequency_unit: z.enum(Constants.public.Enums.maintenance_frequency_unit, "Select a valid frequency unit"),
   last_done_date: z
     .string("Pick a last-done date")
+    .max(10, "Invalid date")
     .transform((value) => parseISO(value))
     .refine((date) => !isNaN(date.getTime()), "Invalid date")
     // See addTaskSchema's last_done_date comment: same 1-day timezone grace window.

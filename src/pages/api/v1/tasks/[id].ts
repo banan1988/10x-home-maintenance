@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import type { APIRoute } from "astro";
 
 import { requireApiClient, requireApiUser } from "@/lib/api-auth";
-import { jsonData, jsonError } from "@/lib/api-response";
+import { jsonData, jsonError, parseJsonBody } from "@/lib/api-response";
 import { updateTaskJsonSchema } from "@/lib/task-schema";
 import { toTaskDto } from "@/lib/task-dto";
 
@@ -37,7 +37,9 @@ export const PATCH: APIRoute = async (context) => {
   const supabase = requireApiClient(context);
   if (supabase instanceof Response) return supabase;
 
-  const body: unknown = await context.request.json();
+  const body = await parseJsonBody(context.request);
+  if (body instanceof Response) return body;
+
   const parsed = updateTaskJsonSchema.safeParse(body);
 
   if (!parsed.success) {

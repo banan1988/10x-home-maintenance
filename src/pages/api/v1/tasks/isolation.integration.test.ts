@@ -92,7 +92,7 @@ describe("/api/v1/tasks RLS isolation (real Supabase)", () => {
     createClientMock.mockReset();
   });
 
-  it("returns 404 when user A reads user B's task via GET /api/v1/tasks/:id", async () => {
+  it("should return 404 when user A reads user B's task via GET /api/v1/tasks/:id", async () => {
     createClientMock.mockReturnValue(clientA);
 
     const response = await itemGET(makeContext({ userId: userIdA, id: USER_B.taskId }));
@@ -100,7 +100,7 @@ describe("/api/v1/tasks RLS isolation (real Supabase)", () => {
     expect(response.status).toBe(404);
   });
 
-  it("returns 404 when user A updates user B's task via PATCH /api/v1/tasks/:id", async () => {
+  it("should return 404 when user A updates user B's task via PATCH /api/v1/tasks/:id", async () => {
     createClientMock.mockReturnValue(clientA);
 
     const response = await itemPATCH(
@@ -110,7 +110,7 @@ describe("/api/v1/tasks RLS isolation (real Supabase)", () => {
     expect(response.status).toBe(404);
   });
 
-  it("returns 404 when user A deletes user B's task via DELETE /api/v1/tasks/:id", async () => {
+  it("should return 404 when user A deletes user B's task via DELETE /api/v1/tasks/:id", async () => {
     createClientMock.mockReturnValue(clientA);
 
     const response = await itemDELETE(makeContext({ userId: userIdA, id: USER_B.taskId }));
@@ -118,7 +118,7 @@ describe("/api/v1/tasks RLS isolation (real Supabase)", () => {
     expect(response.status).toBe(404);
   });
 
-  it("stores a POST with a spoofed user_id under the real authenticated user's id", async () => {
+  it("should store a POST with a spoofed user_id under the real authenticated user's id", async () => {
     createClientMock.mockReturnValue(clientA);
 
     const response = await createPOST(

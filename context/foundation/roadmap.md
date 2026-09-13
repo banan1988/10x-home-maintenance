@@ -49,12 +49,12 @@ CRUD, automatic status computation, and an urgency-ordered dashboard.
 
 ## At a glance
 
-| ID   | Change ID                     | Outcome (user can …)                                                     | Prerequisites | PRD refs                                                      | Status      |
-| ---- | ----------------------------- | ------------------------------------------------------------------------ | ------------- | ------------------------------------------------------------- | ----------- |
-| F-01 | `maintenance-task-data-model` | (foundation) maintenance task schema with per-user RLS isolation lands   | —             | NFR (cross-user data isolation), Access Control               | done        |
-| S-01 | `first-task-on-dashboard`     | add a maintenance task and see it correctly prioritized on the dashboard | F-01          | US-01, FR-001, FR-002, FR-003, FR-004, FR-008, FR-009, FR-010 | done        |
-| S-02 | `manage-maintenance-tasks`    | view, edit (incl. mark-complete), and delete their maintenance tasks     | F-01          | FR-005, FR-006, FR-007                                        | done        |
-| S-03 | `maintenance-tasks-api`       | perform full CRUD on their maintenance tasks via the API                 | F-01          | FR-011                                                        | in-progress |
+| ID   | Change ID                     | Outcome (user can …)                                                     | Prerequisites | PRD refs                                                      | Status |
+| ---- | ----------------------------- | ------------------------------------------------------------------------ | ------------- | ------------------------------------------------------------- | ------ |
+| F-01 | `maintenance-task-data-model` | (foundation) maintenance task schema with per-user RLS isolation lands   | —             | NFR (cross-user data isolation), Access Control               | done   |
+| S-01 | `first-task-on-dashboard`     | add a maintenance task and see it correctly prioritized on the dashboard | F-01          | US-01, FR-001, FR-002, FR-003, FR-004, FR-008, FR-009, FR-010 | done   |
+| S-02 | `manage-maintenance-tasks`    | view, edit (incl. mark-complete), and delete their maintenance tasks     | F-01          | FR-005, FR-006, FR-007                                        | done   |
+| S-03 | `maintenance-tasks-api`       | perform full CRUD on their maintenance tasks via the API                 | F-01          | FR-011                                                        | done   |
 
 ## Streams
 
@@ -160,7 +160,7 @@ below assume these are present and do NOT re-scaffold them.
 - **Risk:** No external API consumer is confirmed yet (noted in the PRD itself), but it is a stated must-have.
   Because it depends only on F-01 and not on the other two slices, it is the easiest of the three to hand to a
   separate parallel agent run without risking the deadline.
-- **Status:** in-progress
+- **Status:** done
 
 ## Backlog Handoff
 

@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import type { APIRoute } from "astro";
 
 import { requireApiClient, requireApiUser } from "@/lib/api-auth";
-import { jsonData, jsonError } from "@/lib/api-response";
+import { jsonData, jsonError, parseJsonBody } from "@/lib/api-response";
 import { createTaskJsonSchema } from "@/lib/task-schema";
 import { toTaskDto } from "@/lib/task-dto";
 
@@ -20,7 +20,8 @@ export const GET: APIRoute = async (context) => {
   const { data: tasks, error } = await supabase.from("maintenance_tasks").select("*");
 
   if (error) {
-    return jsonError(500, error.message);
+    console.error("Failed to load maintenance tasks:", error);
+    return jsonError(500, "Failed to load tasks");
   }
 
   return jsonData(200, tasks.map(toTaskDto));
@@ -33,7 +34,9 @@ export const POST: APIRoute = async (context) => {
   const supabase = requireApiClient(context);
   if (supabase instanceof Response) return supabase;
 
-  const body: unknown = await context.request.json();
+  const body = await parseJsonBody(context.request);
+  if (body instanceof Response) return body;
+
   const parsed = createTaskJsonSchema.safeParse(body);
 
   if (!parsed.success) {
@@ -52,7 +55,8 @@ export const POST: APIRoute = async (context) => {
     .single();
 
   if (error) {
-    return jsonError(500, error.message);
+    console.error("Failed to create maintenance task:", error);
+    return jsonError(500, "Failed to create task");
   }
 
   return jsonData(201, toTaskDto(task));
