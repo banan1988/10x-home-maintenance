@@ -1,5 +1,5 @@
-import { addDays } from "date-fns";
-import { describe, expect, it } from "vitest";
+import { addDays, format, parseISO } from "date-fns";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { compareByUrgency, computeDueDate, computeStatus } from "@/lib/status";
 import type { MaintenanceFrequencyUnit, MaintenanceTaskWithStatus, TaskStatus } from "@/types";
@@ -201,6 +201,36 @@ describe("computeDueDate + computeStatus combined regression grid (FR-008/FR-009
 
     expect(dueDate).toEqual(new Date(2028, 1, 29));
     expect(computeStatus(dueDate, leapYearToday)).toBe("DUE_SOON");
+  });
+});
+
+describe("computeDueDate extreme-value documenting cases", () => {
+  const originalTz = process.env.TZ;
+
+  beforeAll(() => {
+    process.env.TZ = "UTC";
+  });
+
+  afterAll(() => {
+    process.env.TZ = originalTz;
+  });
+
+  it("should silently return an Invalid Date when frequency_value is large enough to overflow Date's range, rather than throwing", () => {
+    const dueDate = computeDueDate(new Date(2026, 0, 1), 100_000_000, "day");
+
+    expect(dueDate.getTime()).toBeNaN();
+  });
+
+  it("should crash a downstream format('yyyy-MM-dd') call on that overflowed due date — an unguarded crash risk, not a safe fallback", () => {
+    const dueDate = computeDueDate(new Date(2026, 0, 1), 100_000_000, "day");
+
+    expect(() => format(dueDate, "yyyy-MM-dd")).toThrow("Invalid time value");
+  });
+
+  it("should compute a valid (if implausibly old) due date for a schema-permitted very old last_done_date, without crashing", () => {
+    const dueDate = computeDueDate(parseISO("0001-01-01"), 3, "month");
+
+    expect(format(dueDate, "yyyy-MM-dd")).toBe("0001-04-01");
   });
 });
 

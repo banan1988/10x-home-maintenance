@@ -37,6 +37,18 @@ describe("addTaskSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("should reject a frequency_value above 1000, guarding computeDueDate against Date-range overflow", () => {
+    const result = addTaskSchema.safeParse({ ...validPayload, frequency_value: "1001" });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("should accept a frequency_value of exactly 1000 (the upper boundary)", () => {
+    const result = addTaskSchema.safeParse({ ...validPayload, frequency_value: "1000" });
+
+    expect(result.success).toBe(true);
+  });
+
   it("should reject an invalid enum value with a user-friendly message", () => {
     const result = addTaskSchema.safeParse({ ...validPayload, category: "landscaping" });
 
@@ -134,6 +146,18 @@ describe("createTaskJsonSchema", () => {
     const result = createTaskJsonSchema.safeParse({ ...validPayload, frequency_value: 0 });
 
     expect(result.success).toBe(false);
+  });
+
+  it("should reject a frequency_value above 1000, guarding computeDueDate against Date-range overflow", () => {
+    const result = createTaskJsonSchema.safeParse({ ...validPayload, frequency_value: 1001 });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("should accept a frequency_value of exactly 1000 (the upper boundary)", () => {
+    const result = createTaskJsonSchema.safeParse({ ...validPayload, frequency_value: 1000 });
+
+    expect(result.success).toBe(true);
   });
 
   it("should reject a blank name", () => {

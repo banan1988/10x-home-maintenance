@@ -7,7 +7,14 @@ export const addTaskSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(200, "Name must be 200 characters or less"),
   category: z.enum(Constants.public.Enums.maintenance_category, "Select a valid category"),
   importance: z.enum(Constants.public.Enums.maintenance_importance, "Select a valid importance"),
-  frequency_value: z.coerce.number().int().positive("Frequency must be a positive number"),
+  frequency_value: z.coerce
+    .number()
+    .int()
+    .positive("Frequency must be a positive number")
+    // Bounds frequency_value far below the ~100,000,000-day threshold where computeDueDate's addDays/
+    // addMonths/addYears silently overflow into an Invalid Date, which crashes downstream format() calls
+    // (TaskList.tsx, task-dto.ts) with "Invalid time value".
+    .max(1000, "Frequency must be 1000 or less"),
   frequency_unit: z.enum(Constants.public.Enums.maintenance_frequency_unit, "Select a valid frequency unit"),
   last_done_date: z
     .string("Pick a last-done date")
@@ -28,7 +35,12 @@ export const createTaskJsonSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(200, "Name must be 200 characters or less"),
   category: z.enum(Constants.public.Enums.maintenance_category, "Select a valid category"),
   importance: z.enum(Constants.public.Enums.maintenance_importance, "Select a valid importance"),
-  frequency_value: z.number().int().positive("Frequency must be a positive number"),
+  frequency_value: z
+    .number()
+    .int()
+    .positive("Frequency must be a positive number")
+    // See addTaskSchema's frequency_value comment: same Date-range overflow guard.
+    .max(1000, "Frequency must be 1000 or less"),
   frequency_unit: z.enum(Constants.public.Enums.maintenance_frequency_unit, "Select a valid frequency unit"),
   last_done_date: z
     .string("Pick a last-done date")
