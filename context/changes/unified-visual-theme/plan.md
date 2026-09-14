@@ -626,13 +626,13 @@ Not applicable — no data model or persisted-state changes.
 
 #### Automated
 
-- [x] 5.1 Type checking passes: `npx astro check`
-- [x] 5.2 Linting passes: `npm run lint`
-- [x] 5.3 Build succeeds: `npm run build`
-- [x] 5.4 No `bg-cosmic` in auth/account pages
-- [x] 5.5 No `bg-white/5`/`rounded-xl` in account pages
+- [x] 5.1 Type checking passes: `npx astro check` — 90cb7df
+- [x] 5.2 Linting passes: `npm run lint` — 90cb7df
+- [x] 5.3 Build succeeds: `npm run build` — 90cb7df
+- [x] 5.4 No `bg-cosmic` in auth/account pages — 90cb7df
+- [x] 5.5 No `bg-white/5`/`rounded-xl` in account pages — 90cb7df
 
 #### Manual
 
-- [x] 5.6 Auth pages render visually unchanged (pure refactor check)
-- [x] 5.7 Account pages now visually match the app-wide glass-card treatment with a gradient heading
+- [x] 5.6 Auth pages render visually unchanged (pure refactor check) — 90cb7df
+- [x] 5.7 Account pages now visually match the app-wide glass-card treatment with a gradient heading — 90cb7df

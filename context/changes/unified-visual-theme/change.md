@@ -1,7 +1,7 @@
 ---
 change_id: unified-visual-theme
 title: Unified visual theme
-status: implementing
+status: implemented
 created: 2026-09-14
 updated: 2026-09-14
 archived_at:
