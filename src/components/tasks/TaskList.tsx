@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type SubmitEvent } from "react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { EditTaskDialog } from "@/components/tasks/EditTaskDialog";
 import { DeleteTaskAlertDialog } from "@/components/tasks/DeleteTaskAlertDialog";
+import { ConfirmCompleteDialog } from "@/components/tasks/ConfirmCompleteDialog";
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { formatCompletionMessage, isFrequencyUnit } from "@/lib/format-completion-message";
+import { shouldConfirmCompletion } from "@/lib/status";
 import type { MaintenanceTaskWithStatus } from "@/types";
 
 const SUCCESS_MESSAGES: Record<string, string> = {
@@ -37,6 +39,7 @@ export default function TaskList({ tasks, success, error, editing, next, unit }:
   const [errorMessage] = useState(error ?? null);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(editing ?? null);
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
+  const [confirmingTaskId, setConfirmingTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     if (success) {
@@ -101,7 +104,17 @@ export default function TaskList({ tasks, success, error, editing, next, unit }:
                   >
                     Delete
                   </Button>
-                  <form method="POST" action={`/api/tasks/${task.id}/complete`} className="inline">
+                  <form
+                    method="POST"
+                    action={`/api/tasks/${task.id}/complete`}
+                    className="inline"
+                    onSubmit={(event: SubmitEvent<HTMLFormElement>) => {
+                      if (shouldConfirmCompletion(task.status)) {
+                        event.preventDefault();
+                        setConfirmingTaskId(task.id);
+                      }
+                    }}
+                  >
                     <Button type="submit" variant="secondary" size="sm">
                       Mark done
                     </Button>
@@ -122,6 +135,12 @@ export default function TaskList({ tasks, success, error, editing, next, unit }:
         task={tasks.find((task) => task.id === deletingTaskId) ?? null}
         onOpenChange={() => {
           setDeletingTaskId(null);
+        }}
+      />
+      <ConfirmCompleteDialog
+        task={tasks.find((task) => task.id === confirmingTaskId) ?? null}
+        onOpenChange={() => {
+          setConfirmingTaskId(null);
         }}
       />
     </div>
