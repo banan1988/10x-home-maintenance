@@ -162,15 +162,20 @@ failure (`issues` only present for validation errors), and `204 No Content` on a
 
 ### Endpoints
 
-| Method   | Path                | Description                                  |
-| -------- | ------------------- | -------------------------------------------- |
-| `GET`    | `/api/v1/tasks`     | List the authenticated user's tasks          |
-| `POST`   | `/api/v1/tasks`     | Create a task                                |
-| `GET`    | `/api/v1/tasks/:id` | Read a single task                           |
-| `PATCH`  | `/api/v1/tasks/:id` | Partially update a task (at least one field) |
-| `DELETE` | `/api/v1/tasks/:id` | Delete a task                                |
+| Method   | Path                | Description                                                                                                   |
+| -------- | ------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `GET`    | `/api/v1/tasks`     | List the authenticated user's tasks                                                                           |
+| `POST`   | `/api/v1/tasks`     | Create a task                                                                                                 |
+| `GET`    | `/api/v1/tasks/:id` | Read a single task                                                                                            |
+| `PATCH`  | `/api/v1/tasks/:id` | Partially update a task (at least one field)                                                                  |
+| `DELETE` | `/api/v1/tasks/:id` | Delete a task                                                                                                 |
+| `DELETE` | `/api/v1/account`   | Permanently delete the caller's own account and all their tasks (body: `{ "confirmEmail": "<their email>" }`) |
 
 A task not owned by the caller returns the same `404` as a nonexistent id.
+
+`DELETE /api/v1/account` requires the body's `confirmEmail` to match the caller's own signed-in email
+(case/whitespace-insensitive) and returns `400` on mismatch, `502` if the underlying account deletion fails,
+or `204` on success — which also clears the caller's session cookies.
 
 > [!NOTE]
 > Astro's built-in CSRF protection (`security.checkOrigin`, on by default) rejects any non-`GET` request that
