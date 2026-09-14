@@ -4,3 +4,46 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
+    ignore:
+      - dependency-name: "astro"
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+    groups:
+      astro-ecosystem:
+        patterns:
+          - "@astrojs/*"
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+          - "react-day-picker"
+      ui-styling:
+        patterns:
+          - "@radix-ui/*"
+          - "radix-ui"
+          - "lucide-react"
+          - "class-variance-authority"
+          - "clsx"
+          - "tailwind-merge"
+          - "tailwindcss"
+          - "@tailwindcss/vite"
+          - "tw-animate-css"
+      supabase:
+        patterns:
+          - "@supabase/*"
+          - "supabase"
+      lint-and-format:
+        patterns:
+          - "eslint"
+          - "eslint-*"
+          - "@eslint/*"
+          - "typescript-eslint"
+          - "prettier"
+          - "prettier-*"
+      testing-tools:
+        patterns:
+          - "vitest"
+          - "@stryker-mutator/*"
