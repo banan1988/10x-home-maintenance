@@ -175,8 +175,35 @@ matching rollout phase lands; until then it reads "TBD — see §3 Phase N."
 
 ### 6.5 Extending status/date logic boundary tests
 
-- TBD — see §3 Phase 3 (guarding against logic duplication/drift across
-  parallel changes).
+- **Combined frequency × boundary grid**: when adding coverage for `computeDueDate`/`computeStatus`, don't
+  test the frequency-unit axis (day/week/month/year) and the FR-009 status-boundary axis (-1/0/+7/+8 days)
+  separately — combine them in one `it.each` table so every unit is proven against every boundary. Derive
+  each row's `lastDoneDate`/`expectedDueDate` by hand from the oracle (FR-008/FR-009, `prd.md:110-119`), not
+  via `addDays`/`addMonths`/`addYears` — a fixture computed with the same helper the code under test uses
+  can't catch a bug in that helper. Also add at least one row combining a calendar-length edge (leap-year
+  Feb, or a Jan-31→Feb-28/29 clamp) with a status boundary — those two things are easy to test separately and
+  easy to forget testing together.
+  - Reference test: `src/lib/status.test.ts` (`computeDueDate + computeStatus combined regression grid (FR-008/FR-009)`).
+- **TZ-forced parsing-divergence regression**: a bare `YYYY-MM-DD` string parses differently depending on
+  which `date-fns` function reads it — `parseISO` treats it as local midnight, `new Date(string)` treats it
+  as UTC midnight. Two call sites parsing the same field with different functions will silently diverge at a
+  timezone edge. To pin this in a test, force `process.env.TZ` to a timezone with a non-zero UTC offset (e.g.
+  `America/New_York`) in `beforeAll`, and restore the original value in `afterAll` — `process.env.TZ` is
+  process-global, so an unrestored override leaks into whichever test file Vitest runs next in the same
+  worker.
+  - Reference tests: `src/lib/task-schema.test.ts:83-108` (`addTaskSchema last_done_date timezone handling`,
+    the original pattern); `src/lib/task-dto.test.ts` (`toTaskDto last_done_date timezone handling`, the same
+    pattern applied to a second call site).
+- **Caveat — this app's runtime doesn't honor `TZ` in dev or prod**: Cloudflare Workers (this app's actual
+  runtime, including local dev via `@astrojs/cloudflare`) hardcodes its clock to UTC regardless of host `TZ`
+  — verified empirically (`Intl.DateTimeFormat().resolvedOptions().timeZone` always reports `"UTC"` inside a
+  `wrangler dev` worker, even with `TZ` forced on the host shell). A parsing divergence that depends on the
+  runtime's local timezone is therefore only ever observable in Vitest/Node (which does honor
+  `process.env.TZ`), never in this app's actually served pages. That's exactly why the TZ-forcing pattern
+  above belongs in the test tier, and why a manual "force a non-UTC timezone and compare pages in the
+  browser" check cannot demonstrate anything either way on this platform — don't rely on one for this class
+  of bug.
+- **Run locally**: `npm run test`.
 
 ### 6.6 Per-phase rollout notes
 

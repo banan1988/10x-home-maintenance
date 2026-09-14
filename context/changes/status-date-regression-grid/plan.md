@@ -380,9 +380,9 @@ parser is called; no persisted data changes shape.
 
 #### Automated
 
-- [x] 3.1 Unit tests pass: `npm run test`
-- [x] 3.2 Type checking passes: `npm run check`
-- [x] 3.3 Linting passes: `npm run lint`
+- [x] 3.1 Unit tests pass: `npm run test` — 138526d
+- [x] 3.2 Type checking passes: `npm run check` — 138526d
+- [x] 3.3 Linting passes: `npm run lint` — 138526d
 
 #### Manual
 
@@ -397,15 +397,21 @@ parser is called; no persisted data changes shape.
   both `addTaskSchema` and `createTaskJsonSchema`, so the overflowing value can never be persisted in the
   first place. See Phase 3's "Changes Required" §2 for the full contract. The very-old-`last_done_date` case
   does **not** crash — `computeDueDate`/`format` handle it fine, just produces an implausibly old due date —
-  so no guard was added there, per the original contract.
+  so no guard was added there, per the original contract. — 138526d
 
 ### Phase 4: Cookbook update & close-out
 
 #### Automated
 
-- [ ] 4.1 `test-plan.md` §6.5 no longer contains `TBD`
-- [ ] 4.2 `change.md` status reads `implemented`
+- [x] 4.1 `test-plan.md` §6.5 no longer contains `TBD`
+- [x] 4.2 `change.md` status reads `implemented`
 
 #### Manual
 
-- [ ] 4.3 S-07 open-risk note reviewed for clarity
+- [x] 4.3 S-07 open-risk note reviewed for clarity — `plan-brief.md`'s Open Risks & Assumptions section
+  already names the two concrete files at risk (`dashboard.astro`/`tasks/index.astro`), the concern
+  (accidental status/date-logic drift during a pure restyle), and the confirmed decision (flagged only, no
+  `lessons.md` entry) — reads clearly on its own with no other planning context needed. Also added two
+  unrelated-to-S-07 `lessons.md` entries this session surfaced (Cloudflare Workers UTC-only clock; numeric
+  fields need `.max()` too) — a deliberate addition beyond Phase 4's literal contract, confirmed with the
+  user first.
