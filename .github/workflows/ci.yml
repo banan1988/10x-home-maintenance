@@ -26,6 +26,8 @@ jobs:
         run: npm ci
       - name: "Sync Astro types"
         run: npx astro sync
+      - name: "Type check"
+        run: npm run check
       - name: "Lint"
         run: npm run lint
       - name: "Test"
