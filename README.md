@@ -101,6 +101,7 @@ npx supabase start
 ```
 SUPABASE_URL=http://127.0.0.1:54321
 SUPABASE_KEY=<anon key from CLI output>
+SUPABASE_SERVICE_ROLE_KEY=<service_role key from CLI output>
 ```
 
 1. To stop the stack when done:
@@ -117,14 +118,16 @@ No database tables or migrations are required — this project uses Supabase Aut
 
 If you prefer to use a hosted Supabase project, add these variables to your `.env` and `.dev.vars` files:
 
-| Variable       | Description                                                |
-| -------------- | ---------------------------------------------------------- |
-| `SUPABASE_URL` | Project URL from Supabase dashboard → Settings → API       |
-| `SUPABASE_KEY` | `anon` public key from Supabase dashboard → Settings → API |
+| Variable                    | Description                                                                                   |
+| --------------------------- | --------------------------------------------------------------------------------------------- |
+| `SUPABASE_URL`              | Project URL from Supabase dashboard → Settings → API                                          |
+| `SUPABASE_KEY`              | `anon` public key from Supabase dashboard → Settings → API                                    |
+| `SUPABASE_SERVICE_ROLE_KEY` | `service_role` secret key from Supabase dashboard → Settings → API — never expose client-side |
 
 ```
 SUPABASE_URL=https://<project-ref>.supabase.co
 SUPABASE_KEY=<anon-key>
+SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
 ```
 
 ### Email confirmation in local development
@@ -215,7 +218,7 @@ npm run deploy
 
 This runs `astro build && wrangler deploy`, which promotes to 100% production traffic immediately (no gradual rollout).
 
-Set `SUPABASE_URL` and `SUPABASE_KEY` as secrets via `npx wrangler secret put` (or the Cloudflare dashboard) — these are runtime secrets, separate from `.env`/`.dev.vars`.
+Set `SUPABASE_URL`, `SUPABASE_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` as secrets via `npx wrangler secret put` (or the Cloudflare dashboard) — these are runtime secrets, separate from `.env`/`.dev.vars`.
 
 ## CI
 

@@ -1,6 +1,7 @@
 import type { APIContext } from "astro";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase";
+import { createAdminClient } from "@/lib/supabase-admin";
 import { jsonError } from "@/lib/api-response";
 
 export function requireApiUser(context: APIContext): User | Response {
@@ -12,6 +13,14 @@ export function requireApiUser(context: APIContext): User | Response {
 
 export function requireApiClient(context: APIContext): ReturnType<typeof createClient> | Response {
   const supabase = createClient(context.request.headers, context.cookies);
+  if (!supabase) {
+    return jsonError(503, "Supabase is not configured");
+  }
+  return supabase;
+}
+
+export function requireApiAdminClient(_context: APIContext): ReturnType<typeof createAdminClient> | Response {
+  const supabase = createAdminClient();
   if (!supabase) {
     return jsonError(503, "Supabase is not configured");
   }
