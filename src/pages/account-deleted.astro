@@ -1,15 +1,18 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import { Card } from "@/components/ui/card";
 ---
 
 <Layout title="Account deleted">
-  <div class="bg-cosmic flex min-h-screen items-center justify-center p-4">
-    <div class="max-w-md rounded-xl border border-white/10 bg-white/5 p-6 text-center">
-      <h1 class="mb-2 text-xl font-semibold text-white">Your account has been deleted</h1>
+  <div class="flex min-h-screen items-center justify-center p-4">
+    <Card className="max-w-md rounded-2xl border-white/10 bg-white/10 p-6 text-center">
+      <h1 class="mb-2 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-xl font-semibold text-transparent">
+        Your account has been deleted
+      </h1>
       <p class="mb-6 text-sm text-white/70">
         Your account and all of your maintenance tasks have been permanently deleted.
       </p>
       <a href="/" class="text-purple-300 transition-colors hover:text-purple-100 hover:underline">Back to home</a>
-    </div>
+    </Card>
   </div>
 </Layout>

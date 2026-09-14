@@ -1,20 +1,23 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { DeleteAccountForm } from "@/components/account/DeleteAccountForm";
+import { Card } from "@/components/ui/card";
 
 const { user } = Astro.locals;
 ---
 
 <Layout title="Delete account">
-  <div class="bg-cosmic min-h-screen p-4">
+  <div class="min-h-screen p-4">
     <div class="mx-auto max-w-2xl">
-      <div class="rounded-xl border border-white/10 bg-white/5 p-6">
-        <h1 class="mb-2 text-xl font-semibold text-white">Delete account</h1>
+      <Card className="rounded-2xl border-white/10 bg-white/10 p-6">
+        <h1 class="mb-2 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
+          Delete account
+        </h1>
         <p class="mb-6 text-sm text-white/70">
           This permanently deletes your account and all of your maintenance tasks. This cannot be undone.
         </p>
         {user && <DeleteAccountForm client:load email={user.email ?? ""} />}
-      </div>
+      </Card>
     </div>
   </div>
 </Layout>

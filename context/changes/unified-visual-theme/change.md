@@ -83,3 +83,50 @@ including the redirect-target fix.
 Tasks' (`text-2xl` per the plan's literal Phase 4 item 2 contract, which only asked to match the gradient
 treatment, not the size). User chose to equalize both to `text-3xl` rather than leave the size mismatch —
 applied to `tasks/index.astro`.
+
+### Phase 5 follow-up: account-delete button/heading tuning + header navigation
+
+Three more in-session requests while manually verifying Phase 5:
+
+1. **"Delete my account" button matching Tasks' "Delete" button**: `DeleteAccountForm.tsx`'s destructive
+   button already used the same shared `variant="destructive"` as `TaskList.tsx`'s "Delete" (so the *color*
+   already matched after Phase 1), but it visually stretched to fill its `flex flex-col` parent's full width
+   (default flexbox `align-items: stretch` on the cross axis), unlike Tasks' compact, content-width button
+   sitting in a table cell. Added `size="sm"` and `className="self-start"` so it renders as a compact,
+   non-stretched pill matching Tasks' Delete button exactly, instead of a full-width bar.
+1. **"Delete account" heading matching Dashboard's**: changed `account/delete.astro`'s `<h1>` from
+   `text-xl font-semibold` to `text-3xl font-bold` (same size/weight as `dashboard.astro`'s heading; both
+   already shared the gradient treatment since Phase 5's original contract).
+1. **Header navigation to `/account/delete`**: user requested that clicking their own email in
+   `Header.astro` (currently a plain `<span>`) navigate to `/account/delete`. This is new navigation
+   behavior, not a color/theme change, and technically outside "unified-visual-theme"'s scope — but it's a
+   single-element, zero-risk change (wrap the existing `<span>{user.email}</span>` in an `<a href="/account/delete">`),
+   so implemented directly rather than deferred, unlike the larger "Add task on /tasks" ask above which
+   needed an API behavior change.
+
+### Phase 5 follow-up: destructive Button white text vs. WCAG-contrast dark text
+
+User flagged that the "Delete" buttons' dark text (near-black, `text-destructive-foreground`) looked
+inconsistent next to every other button's white text, and asked for white text instead. This directly
+conflicts with the plan's own documented contrast reasoning (Critical Implementation Details: the merged
+`--destructive` is `oklch(0.704 0.191 22.216)`, a *light* coral — confirmed to be exactly Tailwind's
+`red-400` — which needs *dark* text for ~6.85:1 WCAG contrast; white text on that same light coral would
+likely fail AA).
+
+Resolved by decoupling the Button component's `destructive` *background* from the shared `--destructive`
+token rather than retinting the token globally: changed `button.tsx`'s destructive variant to
+`bg-red-600 text-white hover:bg-red-500` (Tailwind's own `red-600`/`red-500` — confirmed via
+`node_modules/tailwindcss/theme.css` that `red-600` is exactly the *original pre-Phase-1 light-mode*
+`--destructive` value, `oklch(0.577 0.245 27.325)`, which is darker/more saturated and was always meant to
+pair with white text — the plan's own original `button.tsx` used `bg-destructive text-white` in light mode.
+Further softened one step per follow-up feedback ("too bloody/intense") to `bg-red-500 text-white hover:bg-red-400` — still solid/saturated enough for white text, one shade gentler than `red-600`
+before Phase 1 swapped to the lighter dark-mode value). Left `--destructive`/`--destructive-foreground`
+untouched for its *other* uses (`ErrorBanner`, `Banner.astro`'s error variant, aria-invalid rings/borders)
+since those use it as translucent-background *text*, not a solid button background — the lighter red-400
+value reads better as text-on-dark-background than red-600 would. `AlertDialogAction variant="destructive"`
+(used in `DeleteTaskAlertDialog.tsx`, `DeleteAccountForm.tsx`'s confirm dialog) inherits this fix for free
+since it renders through the same `Button` component.
+
+Since `--destructive-foreground` (added in Phase 1) is no longer referenced by anything after this change,
+removed it from `global.css`'s `:root` and `@theme inline` blocks as dead code (confirmed via
+`grep -rn "destructive-foreground" src/` returning only the two definitions themselves).
