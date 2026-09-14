@@ -1,7 +1,7 @@
 ---
 change_id: injection-guard-ci-gates
 title: Injection guard ci gates
-status: implementing
+status: implemented
 created: 2026-09-14
 updated: 2026-09-14
 archived_at:
