@@ -147,3 +147,47 @@
   `it("should return X when Y", ...)`), matching the convention already used in `task-schema.test.ts`,
   `status.test.ts`, `supabase.test.ts`, and all `src/pages/api/tasks/*.test.ts` files.
 - **Applies to**: Any new or edited Vitest `it(...)` block in this repo.
+
+## Cloudflare Workers always run in UTC — forcing `TZ` on the host does nothing
+
+- **Context**: `context/changes/status-date-regression-grid/plan.md` Phase 1 — the plan's manual
+  verification step called for forcing a non-UTC host `TZ` and running `npm run dev` to observe a
+  `parseISO`/`new Date` parsing divergence between pages.
+- **Problem**: This app's actual runtime — Cloudflare Workers (`workerd`), used by both `npm run dev` (via
+  the `@astrojs/cloudflare` adapter) and every real deployment (preview and production) — hardcodes its
+  clock to UTC and ignores the host's `TZ` environment variable entirely. Verified empirically: a throwaway
+  `wrangler dev --local` worker reported `Intl.DateTimeFormat().resolvedOptions().timeZone === "UTC"` and
+  `getTimezoneOffset() === 0` even with `TZ=America/New_York` forced on the host shell. A timezone-dependent
+  bug (e.g. a bare-date-string parsing divergence) that only manifests under a non-UTC local timezone is
+  therefore **unobservable in this app's dev server, preview builds, or production** — only in Node-based
+  tooling (Vitest, scripts) that actually honors `process.env.TZ`.
+- **Rule**: Never rely on forcing a host `TZ` and running `npm run dev`/a Cloudflare preview to manually
+  verify timezone-dependent behavior in this app — it will show no difference either way, regardless of
+  whether the underlying bug is fixed. Pin timezone-dependent behavior with a Vitest `process.env.TZ`-forced
+  test instead (see §6.5 in `test-plan.md` for the pattern); treat that test, not a manual browser check, as
+  the real regression protection.
+- **Applies to**: Any future manual verification step that proposes forcing a system/host timezone to observe
+  behavior in this app's dev server, preview build, or production — and any code that assumes the deployed
+  runtime has a non-UTC local timezone.
+
+## Numeric input fields need an explicit upper bound too, not just strings
+
+- **Context**: `src/lib/task-schema.ts` (`addTaskSchema`/`createTaskJsonSchema`'s `frequency_value`),
+  discovered via Phase 3's extreme-value documenting tests in
+  `context/changes/status-date-regression-grid/plan.md`.
+- **Problem**: `frequency_value: z.coerce.number().int().positive(...)` had no `.max()` — schema-permitted an
+  arbitrarily large integer. A large enough value (e.g. `100_000_000` with `frequency_unit: "day"`) makes
+  `computeDueDate`'s `addDays`/`addMonths`/`addYears` silently overflow `Date`'s representable range into an
+  `Invalid Date` (no throw at that point), which then makes every unguarded downstream
+  `format(dueDate, "yyyy-MM-dd")` call (`src/components/tasks/TaskList.tsx:70`, `src/lib/task-dto.ts:11`)
+  throw `RangeError: Invalid time value` — an unhandled SSR crash reachable by any user who submits a large
+  enough number. This is the same root problem as the existing "string fields must always have a maximum
+  length" lesson, just for numbers instead of strings — an unbounded numeric field is as much an attack/crash
+  surface as an unbounded string one.
+- **Rule**: Every numeric zod field that feeds date arithmetic (or any other operation with a representable
+  range) must declare an explicit `.max()`, sized well below the point where downstream arithmetic could
+  overflow — e.g. `frequency_value.max(1000)`, comfortably below the ~100,000,000-day threshold where
+  `computeDueDate` overflows `Date`, while still far larger than any realistic input. Don't leave a numeric
+  field unbounded just because the "positive integer" validation already looks sufficient.
+- **Applies to**: Any new or edited zod schema for a numeric field, especially one that feeds date/time
+  arithmetic or any other operation with a hard representable range.
