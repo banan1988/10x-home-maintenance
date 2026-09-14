@@ -290,7 +290,10 @@ Not applicable — no data model or schema changes.
 #### Automated
 
 - [x] 1.1 Linting passes: `npm run lint` — 1a6eb56
-- [x] 1.2 Type checking passes: `npx astro check` — 1a6eb56
+- [ ] 1.2 Type checking passes: `npx astro check` — blocked by 9 pre-existing errors in
+  `src/pages/api/v1/tasks/index.ts`/`[id].ts`, unrelated to this change and inherited from the already-closed
+  `maintenance-tasks-api` change (confirmed present as of `1a6eb56` too); not gated by CI. See
+  `reviews/impl-review.md` F2.
 - [x] 1.3 Production build succeeds: `npm run build` — 1a6eb56
 - [x] 1.4 Existing unit test suite passes: `npm run test` — 1a6eb56
 
@@ -307,7 +310,8 @@ Not applicable — no data model or schema changes.
 #### Automated
 
 - [x] 2.1 Linting passes: `npm run lint` — ae903fd
-- [x] 2.2 Type checking passes: `npx astro check` — ae903fd
+- [ ] 2.2 Type checking passes: `npx astro check` — same pre-existing, unrelated failure as 1.2; not caused or
+  fixed by this change. See `reviews/impl-review.md` F2.
 - [x] 2.3 Production build succeeds: `npm run build` — ae903fd
 - [x] 2.4 Existing unit test suite passes: `npm run test` — ae903fd
 

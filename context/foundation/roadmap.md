@@ -63,39 +63,39 @@ CRUD, automatic status computation, and an urgency-ordered dashboard.
 
 ## At a glance
 
-| ID   | Change ID                       | Outcome (user can …)                                                                     | Prerequisites | PRD refs                                                      | Status      |
-| ---- | ------------------------------- | ---------------------------------------------------------------------------------------- | ------------- | ------------------------------------------------------------- | ----------- |
-| F-01 | `maintenance-task-data-model`   | (foundation) maintenance task schema with per-user RLS isolation lands                   | —             | NFR (cross-user data isolation), Access Control               | done        |
-| S-01 | `first-task-on-dashboard`       | add a maintenance task and see it correctly prioritized on the dashboard                 | F-01          | US-01, FR-001, FR-002, FR-003, FR-004, FR-008, FR-009, FR-010 | done        |
-| S-02 | `manage-maintenance-tasks`      | view, edit (incl. mark-complete), and delete their maintenance tasks                     | F-01          | FR-005, FR-006, FR-007                                        | done        |
-| S-03 | `maintenance-tasks-api`         | perform full CRUD on their maintenance tasks via the API                                 | F-01          | FR-011                                                        | done        |
-| S-04 | `home-maintenance-landing-page` | understand the product and sign up/in from a real landing page, not the starter template | S-05          | MS-01                                                         | proposed    |
-| S-05 | `shared-app-shell`              | navigate every page via one consistent header/nav + footer                               | S-07          | MS-02                                                         | in-progress |
-| S-06 | `account-deletion`              | permanently delete their own account and all of their data                               | —             | MS-03                                                         | ready       |
-| S-07 | `unified-visual-theme`          | see one consistent visual theme (colors, buttons, dialogs) across every page             | —             | MS-04                                                         | ready       |
+| ID   | Change ID                       | Outcome (user can …)                                                                     | Prerequisites | PRD refs                                                      | Status   |
+| ---- | ------------------------------- | ---------------------------------------------------------------------------------------- | ------------- | ------------------------------------------------------------- | -------- |
+| F-01 | `maintenance-task-data-model`   | (foundation) maintenance task schema with per-user RLS isolation lands                   | —             | NFR (cross-user data isolation), Access Control               | done     |
+| S-01 | `first-task-on-dashboard`       | add a maintenance task and see it correctly prioritized on the dashboard                 | F-01          | US-01, FR-001, FR-002, FR-003, FR-004, FR-008, FR-009, FR-010 | done     |
+| S-02 | `manage-maintenance-tasks`      | view, edit (incl. mark-complete), and delete their maintenance tasks                     | F-01          | FR-005, FR-006, FR-007                                        | done     |
+| S-03 | `maintenance-tasks-api`         | perform full CRUD on their maintenance tasks via the API                                 | F-01          | FR-011                                                        | done     |
+| S-04 | `home-maintenance-landing-page` | understand the product and sign up/in from a real landing page, not the starter template | S-05          | MS-01                                                         | proposed |
+| S-05 | `shared-app-shell`              | navigate every page via one consistent header/nav + footer                               | —             | MS-02                                                         | done     |
+| S-06 | `account-deletion`              | permanently delete their own account and all of their data                               | —             | MS-03                                                         | ready    |
+| S-07 | `unified-visual-theme`          | see one consistent visual theme (colors, buttons, dialogs) across every page             | —             | MS-04                                                         | ready    |
 
 (S-04/S-05/S-06/S-07 are listed here in ID order rather than strict dependency order, by request — S-04
-actually waits on S-05, and S-05 now waits on S-07 too. See each item's `Prerequisites` above, the `Risk`
-fields below, or the sequencing notes in `## Backlog Handoff` for the real build order.)
+actually waits on S-05. S-05 shipped 2026-09-14 without waiting on S-07 — see S-05's `Risk` for why that
+Prerequisite, added the same day by a separate roadmap update, never actually applied. See each item's
+`Prerequisites` above or the sequencing notes in `## Backlog Handoff` for the real build order.)
 
 ## Streams
 
 Navigation aid — groups items that share a Prerequisites chain. Canonical ordering still lives in the
 dependency graph below; this table is the proposed reading order across parallel tracks.
 
-| Stream | Theme                        | Chain                    | Note                                                                                                                                                                                                                      |
-| ------ | ---------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A      | Core capability (north star) | `F-01` → `S-01`          | Primary path — ships the capability that validates the product before anything else, per `main_goal: speed`.                                                                                                              |
-| B      | Task management              | `F-01` → `S-02`          | Independent of Stream A once `F-01` lands — a second agent run can build this in parallel.                                                                                                                                |
-| C      | API access                   | `F-01` → `S-03`          | Independent of Streams A/B once `F-01` lands — a third agent run can build this in parallel.                                                                                                                              |
-| D      | Consistent UI shell & theme  | `S-07` → `S-05` → `S-04` | `S-05` now waits on `S-07`, not just `S-04` on `S-05`: shared header/footer should be built against the final color palette, not redone after `S-07` lands. `S-07` itself has no Prerequisites and can start immediately. |
-| E      | Account lifecycle (RODO)     | `S-06`                   | Standalone — new API route + its own confirmation UI, no shared files with Streams A–D; safe to run fully in parallel with everything else, including `S-07`.                                                             |
+| Stream | Theme                        | Chain                               | Note                                                                                                                                                                                                                                                                                                                  |
+| ------ | ---------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A      | Core capability (north star) | `F-01` → `S-01`                     | Primary path — ships the capability that validates the product before anything else, per `main_goal: speed`.                                                                                                                                                                                                          |
+| B      | Task management              | `F-01` → `S-02`                     | Independent of Stream A once `F-01` lands — a second agent run can build this in parallel.                                                                                                                                                                                                                            |
+| C      | API access                   | `F-01` → `S-03`                     | Independent of Streams A/B once `F-01` lands — a third agent run can build this in parallel.                                                                                                                                                                                                                          |
+| D      | Consistent UI shell & theme  | `S-05` → `S-04`; `S-07` independent | `S-05` shipped 2026-09-14 before `S-07` existed, so it isn't styled against `S-07`'s final palette — expect a restyle pass on `Header.astro`/`Footer.astro` once `S-07` lands (see S-05/S-07 Risk). `S-04` still waits on `S-05`. `S-07` has no Prerequisites and can start immediately, in parallel with everything. |
+| E      | Account lifecycle (RODO)     | `S-06`                              | Standalone — new API route + its own confirmation UI, no shared files with Streams A–D; safe to run fully in parallel with everything else, including `S-07`.                                                                                                                                                         |
 
-(A/B/C share one foundation and remain parallel once `F-01` lands, as before. `S-06` (Stream E) and `S-07`
-(head of Stream D) have no dependency on anything and can start immediately, in parallel with each other and
-with any of A/B/C — `top_blocker: capacity` makes this the most actionable lever again. `S-05` and `S-04` are
-the exceptions: both wait their turn in Stream D's chain, to avoid rebuilding UI against a palette that's
-about to change.)
+(A/B/C share one foundation and remain parallel once `F-01` lands, as before. `S-05` is already `done`; `S-06`
+and `S-07` have no dependency on anything and can start immediately, in parallel with each other and with any
+of A/B/C — `top_blocker: capacity` makes this the most actionable lever again. `S-04` is the one exception: it
+still waits on `S-05`.)
 
 ## Baseline
 
@@ -213,19 +213,22 @@ below assume these are present and do NOT re-scaffold them.
   footer on every authenticated page, instead of each page hand-rolling its own ad-hoc chrome.
 - **Change ID:** `shared-app-shell`
 - **PRD refs:** MS-02
-- **Prerequisites:** S-07 — added 2026-09-14: the shared header/footer should be styled against the final,
-  unified color palette S-07 establishes, not the current mixed light/dark shadcn defaults, to avoid
-  restyling the new shell right after building it.
-- **Parallel with:** S-06; NOT parallel with S-04 (which waits on this slice) or S-07 (which this slice now
-  waits on) — see their Risk fields.
+- **Prerequisites:** — (was briefly set to S-07 by a same-day roadmap update made concurrently with this
+  slice's implementation; see Risk below — moot now that this slice already shipped without it).
+- **Parallel with:** S-06, S-07.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Found by direct audit (Playwright walkthrough): `src/components/Topbar.astro` is only wired into
   the landing page today; `dashboard.astro` hand-rolls its own inline sign-out form and `tasks/index.astro`
   hand-rolls its own "← Back to dashboard" link — three different ad-hoc navigation patterns across three
-  pages. Originally sequenced with no Prerequisites; now follows S-07 instead, so it touches every existing
-  page exactly once, with the final palette already decided.
-- **Status:** in-progress
+  pages. Sequenced early (no Prerequisites) because it touches every existing page and every later UI change
+  is cheaper once there is one shared chrome to change instead of three. A separate roadmap update (also
+  2026-09-14) briefly proposed sequencing this after S-07 (unified-visual-theme) instead, reasoning that the
+  new header/footer should be styled against the final palette — but that update landed on `main` while this
+  slice was already mid-implementation on its own branch, so the dependency never actually took effect;
+  `Header.astro`/`Footer.astro` were built against the current (not-yet-unified) palette and will likely need
+  a restyle pass once S-07 lands — see S-07's Risk.
+- **Status:** done
 
 ### S-06: User permanently deletes their own account and all of their data
 
@@ -271,22 +274,25 @@ below assume these are present and do NOT re-scaffold them.
   - `border` renders every task dialog as a plain white box, unrelated to the auth pages' hand-built
     purple/glassmorphic look. Turning on `.dark` alone fixes contrast but will not reproduce that specific
     purple/glass aesthetic automatically — the real work here is picking and applying one palette everywhere, not
-    just flipping a class. Sequenced before S-05 (and therefore before S-04) so the new shared header/footer is
-    built once, against the final palette, instead of needing a second pass.
+    just flipping a class. Originally intended to sequence before S-05 so the shared header/footer would be
+    built once against the final palette — but S-05 already shipped (2026-09-14) before this slice was
+    planned, so `Header.astro`/`Footer.astro` are still on the old mixed palette. This slice's scope now
+    includes a restyle pass on those two files, not just the auth/dashboard/tasks/dialog surfaces originally
+    scoped.
 - **Status:** ready
 
 ## Backlog Handoff
 
-| Roadmap ID | Change ID                       | Suggested issue title                                        | Ready for `/10x-plan` | Notes                                                                            |
-| ---------- | ------------------------------- | ------------------------------------------------------------ | --------------------- | -------------------------------------------------------------------------------- |
-| F-01       | `maintenance-task-data-model`   | Design maintenance_tasks schema with per-user RLS isolation  | yes                   | —                                                                                |
-| S-01       | `first-task-on-dashboard`       | Add maintenance task + urgency-sorted dashboard (north star) | no                    | Waiting on F-01                                                                  |
-| S-02       | `manage-maintenance-tasks`      | View, edit (mark-complete), and delete maintenance tasks     | no                    | Waiting on F-01; can run parallel to S-01/S-03 once unblocked                    |
-| S-03       | `maintenance-tasks-api`         | Expose maintenance task CRUD via the API (FR-011)            | no                    | Waiting on F-01; can run parallel to S-01/S-02 once unblocked                    |
-| S-04       | `home-maintenance-landing-page` | Write a real landing page, replacing the starter template    | no                    | Waiting on S-05 (and transitively S-07); can run parallel to S-06 once unblocked |
-| S-05       | `shared-app-shell`              | Build one shared header/nav/footer, retire per-page nav      | no                    | Waiting on S-07; can run parallel to S-06; unblocks S-04                         |
-| S-06       | `account-deletion`              | Add self-service account + data deletion (RODO/GDPR)         | yes                   | No prerequisites; can run parallel to S-04/S-05/S-07                             |
-| S-07       | `unified-visual-theme`          | Apply one consistent color palette across every page/dialog  | yes                   | No prerequisites; can run parallel to S-06; unblocks S-05                        |
+| Roadmap ID | Change ID                       | Suggested issue title                                        | Ready for `/10x-plan` | Notes                                                                               |
+| ---------- | ------------------------------- | ------------------------------------------------------------ | --------------------- | ----------------------------------------------------------------------------------- |
+| F-01       | `maintenance-task-data-model`   | Design maintenance_tasks schema with per-user RLS isolation  | yes                   | —                                                                                   |
+| S-01       | `first-task-on-dashboard`       | Add maintenance task + urgency-sorted dashboard (north star) | no                    | Waiting on F-01                                                                     |
+| S-02       | `manage-maintenance-tasks`      | View, edit (mark-complete), and delete maintenance tasks     | no                    | Waiting on F-01; can run parallel to S-01/S-03 once unblocked                       |
+| S-03       | `maintenance-tasks-api`         | Expose maintenance task CRUD via the API (FR-011)            | no                    | Waiting on F-01; can run parallel to S-01/S-02 once unblocked                       |
+| S-04       | `home-maintenance-landing-page` | Write a real landing page, replacing the starter template    | no                    | Waiting on S-05, which is done; unblocked. Can run parallel to S-06/S-07            |
+| S-05       | `shared-app-shell`              | Build one shared header/nav/footer, retire per-page nav      | —                     | Done — shipped 2026-09-14, without S-07 (see S-05 Risk)                             |
+| S-06       | `account-deletion`              | Add self-service account + data deletion (RODO/GDPR)         | yes                   | No prerequisites; can run parallel to S-04/S-07                                     |
+| S-07       | `unified-visual-theme`          | Apply one consistent color palette across every page/dialog  | yes                   | No prerequisites; can run parallel to S-04/S-06; will need to restyle S-05's output |
 
 ## Open Roadmap Questions
 
