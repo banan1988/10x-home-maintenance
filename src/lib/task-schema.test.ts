@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { format } from "date-fns";
 
 import { addTaskSchema, createTaskJsonSchema, updateTaskJsonSchema } from "@/lib/task-schema";
@@ -120,6 +120,37 @@ describe("addTaskSchema last_done_date timezone handling", () => {
   });
 });
 
+describe("addTaskSchema last_done_date future-date grace window (exact boundary)", () => {
+  const validPayload = {
+    name: "Replace furnace filter",
+    category: "hvac",
+    importance: "medium",
+    frequency_value: "3",
+    frequency_unit: "month",
+  };
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 5, 15, 0, 0, 0, 0));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("should accept a last_done_date exactly at the 1-day grace-window boundary", () => {
+    const result = addTaskSchema.safeParse({ ...validPayload, last_done_date: "2026-06-16" });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject a last_done_date one day beyond the grace-window boundary", () => {
+    const result = addTaskSchema.safeParse({ ...validPayload, last_done_date: "2026-06-17" });
+
+    expect(result.success).toBe(false);
+  });
+});
+
 describe("createTaskJsonSchema", () => {
   const validPayload = {
     name: "Replace furnace filter",
@@ -162,6 +193,37 @@ describe("createTaskJsonSchema", () => {
 
   it("should reject a blank name", () => {
     const result = createTaskJsonSchema.safeParse({ ...validPayload, name: "  " });
+
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("createTaskJsonSchema last_done_date future-date grace window (exact boundary)", () => {
+  const validPayload = {
+    name: "Replace furnace filter",
+    category: "hvac",
+    importance: "medium",
+    frequency_value: 3,
+    frequency_unit: "month",
+  };
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 5, 15, 0, 0, 0, 0));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("should accept a last_done_date exactly at the 1-day grace-window boundary", () => {
+    const result = createTaskJsonSchema.safeParse({ ...validPayload, last_done_date: "2026-06-16" });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject a last_done_date one day beyond the grace-window boundary", () => {
+    const result = createTaskJsonSchema.safeParse({ ...validPayload, last_done_date: "2026-06-17" });
 
     expect(result.success).toBe(false);
   });
