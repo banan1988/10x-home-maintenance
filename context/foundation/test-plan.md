@@ -85,7 +85,7 @@ orchestrator updates Status as artifacts appear on disk.
 | --- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ---------------------------------- | ----------- | --------------------------------- |
 | 1   | Auth/isolation contract — generalized and required for S-03 | Turn the existing auth-gate + cross-user isolation pattern into an explicit, testable convention required for S-03 too                    | #1, #2, #3          | unit + integration                 | complete    | `testing-auth-isolation-contract` |
 | 2   | Shared-component UI regression                              | Prove dialogs and shared views don't drift visually and that validation still blocks invalid input after a change                         | #4                  | component tests                    | not started | —                                 |
-| 3   | Status/date logic regression grid                           | Extend existing boundary tests to guard against future duplication/drift of the logic across parallel changes                             | #6                  | unit                               | not started | —                                 |
+| 3   | Status/date logic regression grid                           | Extend existing boundary tests to guard against future duplication/drift of the logic across parallel changes                             | #6                  | unit                               | complete    | `status-date-regression-grid`     |
 | 4   | Injection guard + missing CI gates                          | Confirm no raw SQL exists today, add a safeguard for the future, close the CI gates already flagged as missing (typecheck, security scan) | #7                  | static check/lint + CI gate wiring | not started | —                                 |
 | 5   | Key-path e2e                                                | Close the explicit PRD guardrail gap — prove the full login→add→dashboard→edit/complete/delete flow works as a coherent whole             | #5 (touches #1, #4) | e2e                                | not started | —                                 |
 
@@ -191,7 +191,7 @@ matching rollout phase lands; until then it reads "TBD — see §3 Phase N."
   `America/New_York`) in `beforeAll`, and restore the original value in `afterAll` — `process.env.TZ` is
   process-global, so an unrestored override leaks into whichever test file Vitest runs next in the same
   worker.
-  - Reference tests: `src/lib/task-schema.test.ts:83-108` (`addTaskSchema last_done_date timezone handling`,
+  - Reference tests: `src/lib/task-schema.test.ts:95-121` (`addTaskSchema last_done_date timezone handling`,
     the original pattern); `src/lib/task-dto.test.ts` (`toTaskDto last_done_date timezone handling`, the same
     pattern applied to a second call site).
 - **Caveat — this app's runtime doesn't honor `TZ` in dev or prod**: Cloudflare Workers (this app's actual

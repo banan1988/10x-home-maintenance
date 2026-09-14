@@ -371,10 +371,11 @@ parser is called; no persisted data changes shape.
 #### Manual
 
 - [x] 2.4 Hand-verified 3 sample grid rows against FR-008/FR-009 (`prd.md:110-119`): day/-1d→OVERDUE,
-  month/0d→DUE_SOON, and the leap-year Jan31→Feb29 clamp row/+7d→DUE_SOON — all match the oracle. All 29
-  `status.test.ts` assertions (16 grid rows + 1 leap-year-clamp row) passed on first run with no code change
-  needed; `computeDueDate`/`computeStatus` already handled the combined frequency×boundary space correctly —
-  this phase closes the "never tested together" gap with real coverage, not a bug fix. — 42e3b5d
+  month/0d→DUE_SOON, and the leap-year Jan31→Feb29 clamp row/+7d→DUE_SOON — all match the oracle. All 17
+  `status.test.ts` grid test cases (16 grid rows + 1 leap-year-clamp row, 34 assertions total) passed on first
+  run with no code change needed; `computeDueDate`/`computeStatus` already handled the combined
+  frequency×boundary space correctly — this phase closes the "never tested together" gap with real coverage,
+  not a bug fix. — 42e3b5d
 
 ### Phase 3: Extreme-value documenting cases
 
