@@ -171,6 +171,9 @@ below assume these are present and do NOT re-scaffold them.
   due cycle every time they act on it — a defect here breaks the core value loop just as surely as a broken add
   flow, so it must not be treated as lower-priority polish. It depends only on F-01, so it can be planned and
   built in parallel with S-01 rather than queued behind it.
+- **Post-ship note:** 2026-09-14 — the mark-complete flow was refined post-ship: the completion toast now
+  reports the task's actual next-due interval instead of a generic message, and a confirmation guardrail was
+  added for completing a task that isn't due yet. See `context/changes/toast-next-due-message/`.
 - **Status:** done
 
 ### S-03: User performs task CRUD via the API
