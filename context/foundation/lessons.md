@@ -191,3 +191,19 @@
   field unbounded just because the "positive integer" validation already looks sufficient.
 - **Applies to**: Any new or edited zod schema for a numeric field, especially one that feeds date/time
   arithmetic or any other operation with a hard representable range.
+
+## `stryker run --mutate` with multiple files needs one comma-separated string, not repeated flags
+
+- **Context**: Running Stryker scoped to `status-date-regression-grid`'s three changed production files
+  (`src/lib/status.ts`, `src/lib/task-dto.ts`, `src/lib/task-schema.ts`), per `test-plan.md`'s "Mutation
+  testing (Stryker) — selective quality gate" workflow (narrow scope to the changed module(s)).
+- **Problem**: `npx stryker run --mutate "a.ts" --mutate "b.ts" --mutate "c.ts"` (repeated `--mutate` flags)
+  silently keeps only the last value — Stryker prints no error or warning, runs to completion, and produces a
+  plausible-looking report that only covers `c.ts`. The first run here silently dropped `status.ts` and
+  `task-dto.ts` from scope entirely; this was only caught by noticing the report's per-file table listed a
+  single file instead of three.
+- **Rule**: To scope `stryker run --mutate` to more than one file, pass a single comma-separated string:
+  `--mutate "src/lib/a.ts,src/lib/b.ts,src/lib/c.ts"` — never repeated `--mutate` flags. After any scoped run,
+  check the report's per-file breakdown table actually lists every file intended to be in scope before trusting
+  the mutation score; a missing file is a silent scope-narrowing bug, not a "0 mutants found" signal.
+- **Applies to**: Any future `npx stryker run --mutate ...` invocation scoping to more than one file.
