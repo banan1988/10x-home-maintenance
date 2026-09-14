@@ -2,6 +2,8 @@
 import { parseISO } from "date-fns";
 import Layout from "@/layouts/Layout.astro";
 import AddTaskDialog from "@/components/tasks/AddTaskDialog";
+import { ErrorBanner } from "@/components/ErrorBanner";
+import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase";
 import { compareByUrgency, computeDueDate, computeStatus } from "@/lib/status";
 import type { MaintenanceTaskWithStatus } from "@/types";
@@ -34,8 +36,8 @@ const STATUS_LABEL: Record<MaintenanceTaskWithStatus["status"], string> = {
 ---
 
 <Layout title="Dashboard">
-  <div class="bg-cosmic min-h-screen p-4">
-    <div class="mx-auto max-w-2xl">
+  <div class="min-h-screen p-4">
+    <div class="mx-auto max-w-4xl">
       <div class="mb-6 flex items-center justify-between gap-4">
         <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
           Dashboard
@@ -45,24 +47,24 @@ const STATUS_LABEL: Record<MaintenanceTaskWithStatus["status"], string> = {
 
       {
         tasksError ? (
-          <p class="border-destructive/30 bg-destructive/10 text-destructive rounded-2xl border p-6 text-center">
-            We're having trouble loading your tasks right now. Please try refreshing the page.
-          </p>
+          <ErrorBanner message="We're having trouble loading your tasks right now. Please try refreshing the page." />
         ) : tasks.length === 0 ? (
-          <p class="rounded-2xl border border-white/10 bg-white/10 p-6 text-center text-blue-100/80">
+          <Card className="rounded-2xl border-white/10 bg-white/10 p-6 text-center text-blue-100/80">
             No maintenance tasks yet.
-          </p>
+          </Card>
         ) : (
           <ul class="space-y-3">
             {tasks.map((task) => (
-              <li class="rounded-xl border border-white/10 bg-white/10 p-4 text-white">
-                <div class="flex items-center justify-between">
-                  <span class="font-semibold">{task.name}</span>
-                  <span class="text-xs text-blue-100/60 uppercase">{STATUS_LABEL[task.status]}</span>
-                </div>
-                <p class="mt-1 text-sm text-blue-100/70">
-                  {task.category} · {task.importance} · due {task.dueDate.toDateString()}
-                </p>
+              <li>
+                <Card className="rounded-xl border-white/10 bg-white/10 p-4 text-white">
+                  <div class="flex items-center justify-between">
+                    <span class="font-semibold">{task.name}</span>
+                    <span class="text-xs text-blue-100/60 uppercase">{STATUS_LABEL[task.status]}</span>
+                  </div>
+                  <p class="mt-1 text-sm text-blue-100/70">
+                    {task.category} · {task.importance} · due {task.dueDate.toDateString()}
+                  </p>
+                </Card>
               </li>
             ))}
           </ul>

@@ -593,34 +593,34 @@ Not applicable — no data model or persisted-state changes.
 
 #### Automated
 
-- [x] 3.1 Type checking passes: `npx astro check`
-- [x] 3.2 Linting passes: `npm run lint`
-- [x] 3.3 Build succeeds: `npm run build`
-- [x] 3.4 No `bg-cosmic` in Header/Footer/Welcome
+- [x] 3.1 Type checking passes: `npx astro check` — a9a95c5
+- [x] 3.2 Linting passes: `npm run lint` — a9a95c5
+- [x] 3.3 Build succeeds: `npm run build` — a9a95c5
+- [x] 3.4 No `bg-cosmic` in Header/Footer/Welcome — a9a95c5
 
 #### Manual
 
-- [x] 3.5 `/` shows one consistent dark background across header/footer/hero
-- [x] 3.6 `Banner.astro` shows readable text in all 3 variants
+- [x] 3.5 `/` shows one consistent dark background across header/footer/hero — a9a95c5
+- [x] 3.6 `Banner.astro` shows readable text in all 3 variants — a9a95c5
 
 ### Phase 4: Dashboard & Tasks
 
 #### Automated
 
-- [ ] 4.1 Type checking passes: `npx astro check`
-- [ ] 4.2 Linting passes: `npm run lint`
-- [ ] 4.3 Unit tests pass: `npm run test`
-- [ ] 4.4 Build succeeds: `npm run build`
-- [ ] 4.5 No `bg-cosmic` in dashboard.astro/tasks/index.astro
-- [ ] 4.6 No `border-red-500` in TaskList.tsx
-- [ ] 4.7 No bare `<input className>` in AddTaskDialog.tsx/EditTaskDialog.tsx
+- [x] 4.1 Type checking passes: `npx astro check`
+- [x] 4.2 Linting passes: `npm run lint`
+- [x] 4.3 Unit tests pass: `npm run test`
+- [x] 4.4 Build succeeds: `npm run build`
+- [x] 4.5 No `bg-cosmic` in dashboard.astro/tasks/index.astro
+- [x] 4.6 No `border-red-500` in TaskList.tsx
+- [x] 4.7 No bare `<input className>` in AddTaskDialog.tsx/EditTaskDialog.tsx
 
 #### Manual
 
-- [ ] 4.8 Dashboard empty-state and list items render as readable Cards
-- [ ] 4.9 Tasks table header is fully visible; heading matches dashboard's gradient
-- [ ] 4.10 Add/Edit dialog inputs show a visible dark background/border
-- [ ] 4.11 Error states show the shared `ErrorBanner` on tasks page and dialogs
+- [x] 4.8 Dashboard empty-state and list items render as readable Cards
+- [x] 4.9 Tasks table header is fully visible; heading matches dashboard's gradient
+- [x] 4.10 Add/Edit dialog inputs show a visible dark background/border
+- [x] 4.11 Error states show the shared `ErrorBanner` on tasks page and dialogs
 
 ### Phase 5: Auth & Account
 

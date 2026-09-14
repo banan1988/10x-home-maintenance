@@ -1,7 +1,7 @@
 import { useState, type SyntheticEvent } from "react";
 import { useFormStatus } from "react-dom";
 import { format } from "date-fns";
-import { CalendarIcon, CircleAlert, Plus } from "lucide-react";
+import { CalendarIcon, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -14,10 +14,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Constants } from "@/db/database.types";
 import { addTaskSchema } from "@/lib/task-schema";
+import { ErrorBanner } from "@/components/ErrorBanner";
 
 interface Props {
   serverError?: string | null;
@@ -88,18 +90,13 @@ export default function AddTaskDialog({ serverError }: Props) {
           <DialogDescription>Track a task and let its status update automatically.</DialogDescription>
         </DialogHeader>
         <form method="POST" action="/api/tasks" className="space-y-4" onSubmit={handleSubmit} noValidate>
-          {serverError ? (
-            <p className="border-destructive/30 bg-destructive/10 text-destructive flex items-center gap-2 rounded-lg border px-3 py-2 text-sm">
-              <CircleAlert className="size-4 shrink-0" />
-              {serverError}
-            </p>
-          ) : null}
+          <ErrorBanner message={serverError} />
 
           <div>
             <label htmlFor="name" className="mb-1 block text-sm">
               Name
             </label>
-            <input
+            <Input
               id="name"
               name="name"
               value={name}
@@ -107,7 +104,6 @@ export default function AddTaskDialog({ serverError }: Props) {
                 setName(event.target.value);
                 clearError("name");
               }}
-              className="w-full rounded-md border px-3 py-2 text-sm"
             />
             {errors.name ? <p className="text-destructive mt-1 text-xs">{errors.name}</p> : null}
           </div>
@@ -169,7 +165,7 @@ export default function AddTaskDialog({ serverError }: Props) {
               <label htmlFor="frequency_value" className="mb-1 block text-sm">
                 Frequency
               </label>
-              <input
+              <Input
                 id="frequency_value"
                 name="frequency_value"
                 type="number"
@@ -179,7 +175,6 @@ export default function AddTaskDialog({ serverError }: Props) {
                   setFrequencyValue(event.target.value);
                   clearError("frequency_value");
                 }}
-                className="w-full rounded-md border px-3 py-2 text-sm"
               />
               {errors.frequency_value ? (
                 <p className="text-destructive mt-1 text-xs">{errors.frequency_value}</p>
