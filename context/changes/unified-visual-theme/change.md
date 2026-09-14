@@ -1,7 +1,7 @@
 ---
 change_id: unified-visual-theme
 title: Unified visual theme
-status: implemented
+status: impl_reviewed
 created: 2026-09-14
 updated: 2026-09-14
 archived_at:
@@ -130,3 +130,7 @@ since it renders through the same `Button` component.
 Since `--destructive-foreground` (added in Phase 1) is no longer referenced by anything after this change,
 removed it from `global.css`'s `:root` and `@theme inline` blocks as dead code (confirmed via
 `grep -rn "destructive-foreground" src/` returning only the two definitions themselves).
+
+Also added `focus-visible:ring-red-400/40` to the destructive variant alongside the background change above,
+so the focus ring color stays consistent with the new `red-500`/`red-400` background instead of keeping the
+old `--destructive`-derived ring color.
