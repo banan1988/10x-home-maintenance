@@ -11,7 +11,7 @@ export function requireApiUser(context: APIContext): User | Response {
   return context.locals.user;
 }
 
-export function requireApiClient(context: APIContext): ReturnType<typeof createClient> | Response {
+export function requireApiClient(context: APIContext): NonNullable<ReturnType<typeof createClient>> | Response {
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
     return jsonError(503, "Supabase is not configured");

@@ -12,6 +12,8 @@ export const GET: APIRoute = async (context) => {
   const user = requireApiUser(context);
   if (user instanceof Response) return user;
 
+  if (!context.params.id) return jsonError(400, "Missing task id");
+
   const supabase = requireApiClient(context);
   if (supabase instanceof Response) return supabase;
 
@@ -34,6 +36,8 @@ export const PATCH: APIRoute = async (context) => {
   const user = requireApiUser(context);
   if (user instanceof Response) return user;
 
+  if (!context.params.id) return jsonError(400, "Missing task id");
+
   const supabase = requireApiClient(context);
   if (supabase instanceof Response) return supabase;
 
@@ -47,9 +51,10 @@ export const PATCH: APIRoute = async (context) => {
     return jsonError(400, issues[0], issues);
   }
 
+  const { last_done_date, ...rest } = parsed.data;
   const update = {
-    ...parsed.data,
-    ...(parsed.data.last_done_date ? { last_done_date: format(parsed.data.last_done_date, "yyyy-MM-dd") } : {}),
+    ...rest,
+    ...(last_done_date ? { last_done_date: format(last_done_date, "yyyy-MM-dd") } : {}),
   };
 
   // Ownership enforced by RLS, not this filter — see
@@ -71,6 +76,8 @@ export const PATCH: APIRoute = async (context) => {
 export const DELETE: APIRoute = async (context) => {
   const user = requireApiUser(context);
   if (user instanceof Response) return user;
+
+  if (!context.params.id) return jsonError(400, "Missing task id");
 
   const supabase = requireApiClient(context);
   if (supabase instanceof Response) return supabase;

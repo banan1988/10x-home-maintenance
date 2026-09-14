@@ -4,7 +4,7 @@ import type { AstroCookies } from "astro";
 const { createClientMock, signUpMock } = vi.hoisted(() => {
   const signUpMock = vi.fn();
   return {
-    createClientMock: vi.fn(() => ({ auth: { signUp: signUpMock } })),
+    createClientMock: vi.fn((): { auth: { signUp: typeof signUpMock } } | null => ({ auth: { signUp: signUpMock } })),
     signUpMock,
   };
 });
