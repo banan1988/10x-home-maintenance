@@ -58,3 +58,28 @@ indistinguishable in hue — `outline` relied on the achromatic `--input` token 
 (`border-primary/40 bg-primary/15`, `hover:bg-primary/25`) so it reads as a lighter/subtler purple action
 next to `secondary`'s solid indigo-navy and `default`'s solid full-strength purple — three distinguishable
 brand-purple/blue treatments instead of purple/indigo/gray.
+
+### Phase 4 follow-up: deferred — "Add task" button missing on `/tasks`
+
+During Phase 4 manual verification, user flagged that `/tasks` has no "Add task" entry point (only
+`/dashboard` does) and asked for the two pages' content width to match (Dashboard `max-w-2xl` vs. Tasks
+`max-w-4xl`).
+
+**Width mismatch**: fixed in this phase — widened `dashboard.astro`'s wrapper to `max-w-4xl` to match
+`tasks/index.astro` (kept the wider value since Tasks' table needs the room; narrowing Tasks to `max-w-2xl`
+would cramp its columns).
+
+**Missing Add-task entry point on `/tasks`**: investigated and deferred, per user's choice
+(AskUserQuestion: "Pomiń w tej zmianie"). Root cause: `src/pages/api/tasks/index.ts`'s `POST` handler
+hardcodes `context.redirect("/dashboard?...")` on every path (success and all 3 error branches) with no
+"return to originating page" mechanism — so wiring `AddTaskDialog` into `/tasks` isn't a pure styling
+change, it needs either a UX compromise (redirect away from `/tasks` back to `/dashboard` after adding,
+which would feel broken) or an API behavior change (a return-to param) that falls outside
+"unified-visual-theme"'s scope (color/component consistency, not new navigation flows/API changes).
+**Follow-up**: worth its own roadmap item / change to add feature parity for task creation from `/tasks`,
+including the redirect-target fix.
+
+**Heading size**: user also noted (lightheartedly) that Dashboard's heading (`text-3xl`) is bigger than
+Tasks' (`text-2xl` per the plan's literal Phase 4 item 2 contract, which only asked to match the gradient
+treatment, not the size). User chose to equalize both to `text-3xl` rather than leave the size mismatch —
+applied to `tasks/index.astro`.

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { EditTaskDialog } from "@/components/tasks/EditTaskDialog";
 import { DeleteTaskAlertDialog } from "@/components/tasks/DeleteTaskAlertDialog";
+import { ErrorBanner } from "@/components/ErrorBanner";
 import type { MaintenanceTaskWithStatus } from "@/types";
 
 const SUCCESS_MESSAGES: Record<string, string> = {
@@ -40,11 +41,7 @@ export default function TaskList({ tasks, success, error, editing }: TaskListPro
 
   return (
     <div className="space-y-4">
-      {errorMessage && (
-        <p className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">
-          {errorMessage}
-        </p>
-      )}
+      <ErrorBanner message={errorMessage} />
       {tasks.length === 0 ? (
         <p className="text-blue-100/80">No maintenance tasks yet.</p>
       ) : (

@@ -4,6 +4,7 @@ import { CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Constants } from "@/db/database.types";
@@ -75,14 +76,13 @@ export function EditTaskDialog({ task, onOpenChange }: EditTaskDialogProps) {
             <label htmlFor="edit-name" className="mb-1 block text-sm font-medium">
               Name
             </label>
-            <input
+            <Input
               id="edit-name"
               name="name"
               value={name}
               onChange={(event) => {
                 setName(event.target.value);
               }}
-              className="w-full rounded-md border px-3 py-2 text-sm"
             />
             {errors.name && <p className="text-destructive mt-1 text-xs">{errors.name}</p>}
           </div>
@@ -128,7 +128,7 @@ export function EditTaskDialog({ task, onOpenChange }: EditTaskDialogProps) {
               <label htmlFor="edit-frequency-value" className="mb-1 block text-sm font-medium">
                 Frequency value
               </label>
-              <input
+              <Input
                 id="edit-frequency-value"
                 name="frequency_value"
                 type="number"
@@ -137,7 +137,6 @@ export function EditTaskDialog({ task, onOpenChange }: EditTaskDialogProps) {
                 onChange={(event) => {
                   setFrequencyValue(event.target.value);
                 }}
-                className="w-full rounded-md border px-3 py-2 text-sm"
               />
               {errors.frequency_value && <p className="text-destructive mt-1 text-xs">{errors.frequency_value}</p>}
             </div>
