@@ -563,17 +563,17 @@ Not applicable — no data model or persisted-state changes.
 
 #### Automated
 
-- [ ] 1.1 Type checking passes: `npx astro check`
-- [ ] 1.2 Linting passes: `npm run lint`
-- [ ] 1.3 Unit tests pass: `npm run test`
-- [ ] 1.4 Build succeeds: `npm run build`
-- [ ] 1.5 No remaining `dark:` references
-- [ ] 1.6 No remaining `@custom-variant dark` or `.dark {` in `global.css`
+- [x] 1.1 Type checking passes: `npx astro check`
+- [x] 1.2 Linting passes: `npm run lint`
+- [x] 1.3 Unit tests pass: `npm run test`
+- [x] 1.4 Build succeeds: `npm run build`
+- [x] 1.5 No remaining `dark:` references
+- [x] 1.6 No remaining `@custom-variant dark` or `.dark {` in `global.css`
 
 #### Manual
 
-- [ ] 1.7 Every shadcn primitive renders with correct dark contrast in isolation
-- [ ] 1.8 Toast rendering is dark-themed regardless of OS preference
+- [x] 1.7 Every shadcn primitive renders with correct dark contrast in isolation
+- [x] 1.8 Toast rendering is dark-themed regardless of OS preference
 
 ### Phase 2: Shared Components & Dead-Code Removal
 
