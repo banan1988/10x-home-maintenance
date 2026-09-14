@@ -410,25 +410,25 @@ row is the only database action this feature performs directly.
 
 #### Automated
 
-- [x] 1.1 Unit tests pass: `npm run test`
-- [x] 1.2 Linting passes: `npm run lint`
-- [x] 1.3 Build succeeds: `npm run build`
+- [x] 1.1 Unit tests pass: `npm run test` — 3d6a688
+- [x] 1.2 Linting passes: `npm run lint` — 3d6a688
+- [x] 1.3 Build succeeds: `npm run build` — 3d6a688
 
 #### Manual
 
-- [x] 1.4 Local `.env`/`.dev.vars` service_role key added; `npm run dev` starts cleanly after `npx astro sync`
+- [x] 1.4 Local `.env`/`.dev.vars` service_role key added; `npm run dev` starts cleanly after `npx astro sync` — 3d6a688
 
 ### Phase 2: `DELETE /api/v1/account` route
 
 #### Automated
 
-- [ ] 2.1 Unit tests pass: `npm run test`
-- [ ] 2.2 Linting passes: `npm run lint`
-- [ ] 2.3 Build succeeds: `npm run build`
+- [x] 2.1 Unit tests pass: `npm run test`
+- [x] 2.2 Linting passes: `npm run lint`
+- [x] 2.3 Build succeeds: `npm run build`
 
 #### Manual
 
-- [ ] 2.4 Manual curl walkthrough (400 on mismatch, 204 + row/user gone on success) against local Supabase
+- [x] 2.4 Manual curl walkthrough (400 on mismatch, 204 + row/user gone on success) against local Supabase
 
 ### Phase 3: Confirmation UI
 
