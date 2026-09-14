@@ -3,7 +3,7 @@ import type { APIRoute } from "astro";
 
 import { requireApiClient, requireApiUser } from "@/lib/api-auth";
 import { jsonData, jsonError, parseJsonBody } from "@/lib/api-response";
-import { updateTaskJsonSchema } from "@/lib/task-schema";
+import { taskIdSchema, updateTaskJsonSchema } from "@/lib/task-schema";
 import { toTaskDto } from "@/lib/task-dto";
 
 export const prerender = false;
@@ -13,6 +13,7 @@ export const GET: APIRoute = async (context) => {
   if (user instanceof Response) return user;
 
   if (!context.params.id) return jsonError(400, "Missing task id");
+  if (!taskIdSchema.safeParse(context.params.id).success) return jsonError(404, "Task not found");
 
   const supabase = requireApiClient(context);
   if (supabase instanceof Response) return supabase;
@@ -37,6 +38,7 @@ export const PATCH: APIRoute = async (context) => {
   if (user instanceof Response) return user;
 
   if (!context.params.id) return jsonError(400, "Missing task id");
+  if (!taskIdSchema.safeParse(context.params.id).success) return jsonError(404, "Task not found");
 
   const supabase = requireApiClient(context);
   if (supabase instanceof Response) return supabase;
@@ -78,6 +80,7 @@ export const DELETE: APIRoute = async (context) => {
   if (user instanceof Response) return user;
 
   if (!context.params.id) return jsonError(400, "Missing task id");
+  if (!taskIdSchema.safeParse(context.params.id).success) return jsonError(404, "Task not found");
 
   const supabase = requireApiClient(context);
   if (supabase instanceof Response) return supabase;

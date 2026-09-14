@@ -58,3 +58,5 @@ export const updateTaskJsonSchema = createTaskJsonSchema
   .refine((obj) => Object.keys(obj).length > 0, "At least one field must be provided");
 
 export type UpdateTaskJsonInput = z.infer<typeof updateTaskJsonSchema>;
+
+export const taskIdSchema = z.uuid();

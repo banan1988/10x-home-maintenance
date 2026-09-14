@@ -1,7 +1,7 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { format } from "date-fns";
 
-import { addTaskSchema, createTaskJsonSchema, updateTaskJsonSchema } from "@/lib/task-schema";
+import { addTaskSchema, createTaskJsonSchema, taskIdSchema, updateTaskJsonSchema } from "@/lib/task-schema";
 
 describe("addTaskSchema", () => {
   const validPayload = {
@@ -224,6 +224,20 @@ describe("createTaskJsonSchema last_done_date future-date grace window (exact bo
 
   it("should reject a last_done_date one day beyond the grace-window boundary", () => {
     const result = createTaskJsonSchema.safeParse({ ...validPayload, last_done_date: "2026-06-17" });
+
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("taskIdSchema", () => {
+  it("should accept a well-formed UUID", () => {
+    const result = taskIdSchema.safeParse("11111111-1111-4111-8111-111111111111");
+
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject a non-UUID string", () => {
+    const result = taskIdSchema.safeParse("not-a-uuid");
 
     expect(result.success).toBe(false);
   });

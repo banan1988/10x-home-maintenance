@@ -478,13 +478,13 @@ Not applicable — no data migration; all changes are code, CI config, and docs.
 
 #### Automated
 
-- [ ] 1.1 Unit tests pass, including new malformed-id cases in all 5 route test files: `npm run test`
-- [ ] 1.2 Type checking passes: `npm run check`
-- [ ] 1.3 Linting passes: `npm run lint`
+- [x] 1.1 Unit tests pass, including new malformed-id cases in all 5 route test files: `npm run test`
+- [x] 1.2 Type checking passes: `npm run check`
+- [x] 1.3 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 1.4 Malformed id on `POST /api/tasks/[id]/complete` and `GET /api/v1/tasks/[id]` returns the same not-found response as a nonexistent id, with no 500
+- [x] 1.4 Malformed id on `POST /api/tasks/[id]/complete` and `GET /api/v1/tasks/[id]` returns the same not-found response as a nonexistent id, with no 500
 
 ### Phase 2: Injection-guard static check
 
