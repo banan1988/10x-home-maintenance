@@ -340,23 +340,23 @@ No schema migrations in this plan. Phase 3's audit query is intentionally kept o
 
 #### Automated
 
-- [x] 2.1 `shouldConfirmCompletion` unit tests pass: `npm run test`
-- [x] 2.2 Full suite still passes (no regression in `complete.test.ts`): `npm run test`
-- [x] 2.3 Lint passes: `npm run lint`
-- [x] 2.4 Type checking passes: `npx tsc --noEmit`
+- [x] 2.1 `shouldConfirmCompletion` unit tests pass: `npm run test` — c9d731f
+- [x] 2.2 Full suite still passes (no regression in `complete.test.ts`): `npm run test` — c9d731f
+- [x] 2.3 Lint passes: `npm run lint` — c9d731f
+- [x] 2.4 Type checking passes: `npx tsc --noEmit` — c9d731f
 
 #### Manual
 
-- [x] 2.5 `OVERDUE` task completes immediately, no dialog
-- [x] 2.6 `DUE_SOON` task completes immediately, no dialog
-- [x] 2.7 `OK` task shows confirmation dialog with its due date
-- [x] 2.8 Cancel/Esc/overlay-click closes dialog with no effect
-- [x] 2.9 Confirm completes the task and shows the next-due toast
+- [x] 2.5 `OVERDUE` task completes immediately, no dialog — c9d731f
+- [x] 2.6 `DUE_SOON` task completes immediately, no dialog — c9d731f
+- [x] 2.7 `OK` task shows confirmation dialog with its due date — c9d731f
+- [x] 2.8 Cancel/Esc/overlay-click closes dialog with no effect — c9d731f
+- [x] 2.9 Confirm completes the task and shows the next-due toast — c9d731f
 
 ### Phase 3: One-off audit of legacy `frequency_value` rows
 
 #### Manual
 
-- [ ] 3.1 Run the audit query against local/dev Supabase and record the result
-- [ ] 3.2 Triage any returned rows manually (no auto-correction)
-- [ ] 3.3 Repeat against staging/production if accessible, and record the result
+- [x] 3.1 Run the audit query against local/dev Supabase and record the result
+- [x] 3.2 Triage any returned rows manually (no auto-correction) — n/a, 0 rows returned locally
+- [x] 3.3 Repeat against staging/production if accessible, and record the result
