@@ -63,16 +63,16 @@ CRUD, automatic status computation, and an urgency-ordered dashboard.
 
 ## At a glance
 
-| ID   | Change ID                       | Outcome (user can …)                                                                     | Prerequisites | PRD refs                                                      | Status   |
-| ---- | ------------------------------- | ---------------------------------------------------------------------------------------- | ------------- | ------------------------------------------------------------- | -------- |
-| F-01 | `maintenance-task-data-model`   | (foundation) maintenance task schema with per-user RLS isolation lands                   | —             | NFR (cross-user data isolation), Access Control               | done     |
-| S-01 | `first-task-on-dashboard`       | add a maintenance task and see it correctly prioritized on the dashboard                 | F-01          | US-01, FR-001, FR-002, FR-003, FR-004, FR-008, FR-009, FR-010 | done     |
-| S-02 | `manage-maintenance-tasks`      | view, edit (incl. mark-complete), and delete their maintenance tasks                     | F-01          | FR-005, FR-006, FR-007                                        | done     |
-| S-03 | `maintenance-tasks-api`         | perform full CRUD on their maintenance tasks via the API                                 | F-01          | FR-011                                                        | done     |
-| S-04 | `home-maintenance-landing-page` | understand the product and sign up/in from a real landing page, not the starter template | S-05          | MS-01                                                         | proposed |
-| S-05 | `shared-app-shell`              | navigate every page via one consistent header/nav + footer                               | S-07          | MS-02                                                         | proposed |
-| S-06 | `account-deletion`              | permanently delete their own account and all of their data                               | —             | MS-03                                                         | ready    |
-| S-07 | `unified-visual-theme`          | see one consistent visual theme (colors, buttons, dialogs) across every page             | —             | MS-04                                                         | ready    |
+| ID   | Change ID                       | Outcome (user can …)                                                                     | Prerequisites | PRD refs                                                      | Status      |
+| ---- | ------------------------------- | ---------------------------------------------------------------------------------------- | ------------- | ------------------------------------------------------------- | ----------- |
+| F-01 | `maintenance-task-data-model`   | (foundation) maintenance task schema with per-user RLS isolation lands                   | —             | NFR (cross-user data isolation), Access Control               | done        |
+| S-01 | `first-task-on-dashboard`       | add a maintenance task and see it correctly prioritized on the dashboard                 | F-01          | US-01, FR-001, FR-002, FR-003, FR-004, FR-008, FR-009, FR-010 | done        |
+| S-02 | `manage-maintenance-tasks`      | view, edit (incl. mark-complete), and delete their maintenance tasks                     | F-01          | FR-005, FR-006, FR-007                                        | done        |
+| S-03 | `maintenance-tasks-api`         | perform full CRUD on their maintenance tasks via the API                                 | F-01          | FR-011                                                        | done        |
+| S-04 | `home-maintenance-landing-page` | understand the product and sign up/in from a real landing page, not the starter template | S-05          | MS-01                                                         | proposed    |
+| S-05 | `shared-app-shell`              | navigate every page via one consistent header/nav + footer                               | S-07          | MS-02                                                         | in-progress |
+| S-06 | `account-deletion`              | permanently delete their own account and all of their data                               | —             | MS-03                                                         | ready       |
+| S-07 | `unified-visual-theme`          | see one consistent visual theme (colors, buttons, dialogs) across every page             | —             | MS-04                                                         | ready       |
 
 (S-04/S-05/S-06/S-07 are listed here in ID order rather than strict dependency order, by request — S-04
 actually waits on S-05, and S-05 now waits on S-07 too. See each item's `Prerequisites` above, the `Risk`
@@ -225,7 +225,7 @@ below assume these are present and do NOT re-scaffold them.
   hand-rolls its own "← Back to dashboard" link — three different ad-hoc navigation patterns across three
   pages. Originally sequenced with no Prerequisites; now follows S-07 instead, so it touches every existing
   page exactly once, with the final palette already decided.
-- **Status:** proposed
+- **Status:** in-progress
 
 ### S-06: User permanently deletes their own account and all of their data
 
