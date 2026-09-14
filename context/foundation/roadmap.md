@@ -3,7 +3,7 @@ project: Home Maintenance
 version: 1
 status: draft
 created: 2026-08-25
-updated: 2026-09-12
+updated: 2026-09-14
 prd_version: 1
 main_goal: speed
 top_blocker: capacity
@@ -27,7 +27,18 @@ milestone_status: open
 - **Source materials:** `context/foundation/prd.md` (v1)
 - **Done when:** every F-NN and S-NN below is `done`, and the app has been deployed and demoed as a working
   application (PRD Success Criteria, Secondary).
-- **Scope anchors:** FR-001–FR-011, US-01 — this milestone is the entire MVP scope of PRD v1.
+- **Scope anchors:** FR-001–FR-011, US-01 — this milestone is the entire MVP scope of PRD v1. Extended
+  2026-09-14 with three audit-sourced scope anchors (found via a Playwright + code walkthrough of the running
+  app, not derived from the PRD text) that the user explicitly authorized as in-scope for this milestone:
+  - MS-01: Replace the untouched 10x-Astro-Starter landing page with real product content — a demoable MVP
+    (Success Criteria, Secondary: "deployed and demoed as a working application") should not greet a
+    first-time visitor with generic starter copy about "cosmic developer experience."
+  - MS-02: Give every authenticated page one consistent header/nav/footer instead of each page hand-rolling
+    its own ad-hoc navigation — same Secondary Success Criterion: a demoable app needs its screens to read as
+    one product, not disconnected fragments.
+  - MS-03: Let a user delete their own account and all associated data (RODO/GDPR right to erasure). This item
+    was previously logged in `## Parked` as *"not in PRD scope (no FR; not in Non-Goals either — a real
+    gap)"*; promoted to in-scope here by explicit user decision on 2026-09-14.
 
 ## Vision recap
 
@@ -49,27 +60,38 @@ CRUD, automatic status computation, and an urgency-ordered dashboard.
 
 ## At a glance
 
-| ID   | Change ID                     | Outcome (user can …)                                                     | Prerequisites | PRD refs                                                      | Status |
-| ---- | ----------------------------- | ------------------------------------------------------------------------ | ------------- | ------------------------------------------------------------- | ------ |
-| F-01 | `maintenance-task-data-model` | (foundation) maintenance task schema with per-user RLS isolation lands   | —             | NFR (cross-user data isolation), Access Control               | done   |
-| S-01 | `first-task-on-dashboard`     | add a maintenance task and see it correctly prioritized on the dashboard | F-01          | US-01, FR-001, FR-002, FR-003, FR-004, FR-008, FR-009, FR-010 | done   |
-| S-02 | `manage-maintenance-tasks`    | view, edit (incl. mark-complete), and delete their maintenance tasks     | F-01          | FR-005, FR-006, FR-007                                        | done   |
-| S-03 | `maintenance-tasks-api`       | perform full CRUD on their maintenance tasks via the API                 | F-01          | FR-011                                                        | done   |
+| ID   | Change ID                       | Outcome (user can …)                                                                     | Prerequisites | PRD refs                                                      | Status   |
+| ---- | ------------------------------- | ---------------------------------------------------------------------------------------- | ------------- | ------------------------------------------------------------- | -------- |
+| F-01 | `maintenance-task-data-model`   | (foundation) maintenance task schema with per-user RLS isolation lands                   | —             | NFR (cross-user data isolation), Access Control               | done     |
+| S-01 | `first-task-on-dashboard`       | add a maintenance task and see it correctly prioritized on the dashboard                 | F-01          | US-01, FR-001, FR-002, FR-003, FR-004, FR-008, FR-009, FR-010 | done     |
+| S-02 | `manage-maintenance-tasks`      | view, edit (incl. mark-complete), and delete their maintenance tasks                     | F-01          | FR-005, FR-006, FR-007                                        | done     |
+| S-03 | `maintenance-tasks-api`         | perform full CRUD on their maintenance tasks via the API                                 | F-01          | FR-011                                                        | done     |
+| S-04 | `home-maintenance-landing-page` | understand the product and sign up/in from a real landing page, not the starter template | S-05          | MS-01                                                         | proposed |
+| S-05 | `shared-app-shell`              | navigate every page via one consistent header/nav + footer                               | —             | MS-02                                                         | ready    |
+| S-06 | `account-deletion`              | permanently delete their own account and all of their data                               | —             | MS-03                                                         | ready    |
+
+(S-04/S-05/S-06 are listed here in ID order rather than strict dependency order, by request — S-04 actually
+waits on S-05. See its `Prerequisites` above, S-05's `Risk` below, or the sequencing notes in
+`## Backlog Handoff` for the real build order.)
 
 ## Streams
 
 Navigation aid — groups items that share a Prerequisites chain. Canonical ordering still lives in the
 dependency graph below; this table is the proposed reading order across parallel tracks.
 
-| Stream | Theme                        | Chain           | Note                                                                                                         |
-| ------ | ---------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------ |
-| A      | Core capability (north star) | `F-01` → `S-01` | Primary path — ships the capability that validates the product before anything else, per `main_goal: speed`. |
-| B      | Task management              | `F-01` → `S-02` | Independent of Stream A once `F-01` lands — a second agent run can build this in parallel.                   |
-| C      | API access                   | `F-01` → `S-03` | Independent of Streams A/B once `F-01` lands — a third agent run can build this in parallel.                 |
+| Stream | Theme                        | Chain           | Note                                                                                                                                                                                   |
+| ------ | ---------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A      | Core capability (north star) | `F-01` → `S-01` | Primary path — ships the capability that validates the product before anything else, per `main_goal: speed`.                                                                           |
+| B      | Task management              | `F-01` → `S-02` | Independent of Stream A once `F-01` lands — a second agent run can build this in parallel.                                                                                             |
+| C      | API access                   | `F-01` → `S-03` | Independent of Streams A/B once `F-01` lands — a third agent run can build this in parallel.                                                                                           |
+| D      | Consistent UI shell          | `S-05` → `S-04` | `S-04` waits on `S-05` — both touch how `Layout.astro`/`index.astro` compose page chrome; building the landing hero after the shared header/footer exists avoids redesigning it twice. |
+| E      | Account lifecycle (RODO)     | `S-06`          | Standalone — new API route + its own confirmation UI, no shared files with Streams A–D; safe to run fully in parallel with everything else.                                            |
 
-(All three tracks share one foundation; with a solo operator plus an AI agent as the stated `top_blocker`, this
-fan-out is the most actionable lever — once F-01 lands, S-01/S-02/S-03 can each be planned and built without
-waiting on one another.)
+(All three of A/B/C share one foundation and remain parallel once `F-01` lands, as before. Streams D and E are
+new: `S-05` and `S-06` have no dependency on anything and can start immediately, in parallel with each other
+and with any of A/B/C — `top_blocker: capacity` makes this the most actionable lever again. `S-04` is the one
+exception: sequence it after `S-05` rather than in parallel, to avoid two agents reworking the same
+landing-page composition.)
 
 ## Baseline
 
@@ -162,19 +184,84 @@ below assume these are present and do NOT re-scaffold them.
   separate parallel agent run without risking the deadline.
 - **Status:** done
 
+### S-04: User understands the product and can sign up/in from a real landing page
+
+- **Outcome:** a first-time visitor sees actual product content (problem statement, value proposition, CTA
+  to sign up/sign in) instead of the untouched 10x-Astro-Starter template.
+- **Change ID:** `home-maintenance-landing-page`
+- **PRD refs:** MS-01
+- **Prerequisites:** S-05 — not a technical blocker (the landing page could be rewritten today without it),
+  but both slices compose the same `Layout.astro` → `index.astro` render path; designing the new hero before
+  the shared header/footer exists risks a rework pass once S-05 wraps every page (including this one) in
+  persistent chrome.
+- **Parallel with:** S-06
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Found by direct audit: page title is literally "10x Astro Starter", copy reads "a production-ready
+  starter with authentication, modern tooling, and a cosmic developer experience" — nothing about home
+  maintenance. Sequenced right after S-05 so the new hero is designed to sit under the shared header rather
+  than fighting it later.
+- **Status:** proposed
+
+### S-05: User navigates every page through one consistent header, nav, and footer
+
+- **Outcome:** user sees the same header (app name, nav: Dashboard / Tasks, user menu with sign-out) and
+  footer on every authenticated page, instead of each page hand-rolling its own ad-hoc chrome.
+- **Change ID:** `shared-app-shell`
+- **PRD refs:** MS-02
+- **Prerequisites:** —
+- **Parallel with:** S-06 (and any of S-01/S-02/S-03's follow-on work); NOT parallel with S-04, which waits on
+  this slice — see S-04's Risk.
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Found by direct audit (Playwright walkthrough): `src/components/Topbar.astro` is only wired into
+  the landing page today; `dashboard.astro` hand-rolls its own inline sign-out form and `tasks/index.astro`
+  hand-rolls its own "← Back to dashboard" link — three different ad-hoc navigation patterns across three
+  pages. Sequenced early (no Prerequisites) because it touches every existing page and every later UI change
+  is cheaper once there is one shared chrome to change instead of three.
+- **Status:** ready
+
+### S-06: User permanently deletes their own account and all of their data
+
+- **Outcome:** an authenticated user can, from a strongly-confirmed UI action, trigger immediate deletion of
+  their Supabase auth account; all of their `maintenance_tasks` rows are removed as a consequence (RODO/GDPR
+  right to erasure).
+- **Change ID:** `account-deletion`
+- **PRD refs:** MS-03
+- **Prerequisites:** —
+- **Parallel with:** S-04, S-05
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Requires a new server-only secret/service-role Supabase client (never exposed to the client
+  bundle) calling `auth.admin.deleteUser(user.id)` — an immediate, hard delete; a 30-day soft-delete-then-cron
+  approach was explicitly considered and rejected (GoTrue's native soft-delete revokes credentials instantly
+  anyway, so it wouldn't give a genuine change-your-mind window, and it would add pg_cron/Vault infrastructure
+  outside this app for no real benefit). `maintenance_tasks` cascade-deletes automatically via the existing
+  `on delete cascade` FK in `supabase/migrations/20260827194321_create_maintenance_tasks.sql` — no new
+  migration needed. To stay genuinely parallel-safe with S-05 (which also touches `dashboard.astro`), give
+  the delete action its own page/entry point rather than bolting it onto the dashboard. The UI confirmation
+  must be stronger than the existing single-click `DeleteTaskAlertDialog.tsx` pattern (e.g. type your email or
+  a confirmation phrase before the button activates) — this is irreversible for a whole account, not one
+  task.
+- **Status:** ready
+
 ## Backlog Handoff
 
-| Roadmap ID | Change ID                     | Suggested issue title                                        | Ready for `/10x-plan` | Notes                                                         |
-| ---------- | ----------------------------- | ------------------------------------------------------------ | --------------------- | ------------------------------------------------------------- |
-| F-01       | `maintenance-task-data-model` | Design maintenance_tasks schema with per-user RLS isolation  | yes                   | —                                                             |
-| S-01       | `first-task-on-dashboard`     | Add maintenance task + urgency-sorted dashboard (north star) | no                    | Waiting on F-01                                               |
-| S-02       | `manage-maintenance-tasks`    | View, edit (mark-complete), and delete maintenance tasks     | no                    | Waiting on F-01; can run parallel to S-01/S-03 once unblocked |
-| S-03       | `maintenance-tasks-api`       | Expose maintenance task CRUD via the API (FR-011)            | no                    | Waiting on F-01; can run parallel to S-01/S-02 once unblocked |
+| Roadmap ID | Change ID                       | Suggested issue title                                        | Ready for `/10x-plan` | Notes                                                         |
+| ---------- | ------------------------------- | ------------------------------------------------------------ | --------------------- | ------------------------------------------------------------- |
+| F-01       | `maintenance-task-data-model`   | Design maintenance_tasks schema with per-user RLS isolation  | yes                   | —                                                             |
+| S-01       | `first-task-on-dashboard`       | Add maintenance task + urgency-sorted dashboard (north star) | no                    | Waiting on F-01                                               |
+| S-02       | `manage-maintenance-tasks`      | View, edit (mark-complete), and delete maintenance tasks     | no                    | Waiting on F-01; can run parallel to S-01/S-03 once unblocked |
+| S-03       | `maintenance-tasks-api`         | Expose maintenance task CRUD via the API (FR-011)            | no                    | Waiting on F-01; can run parallel to S-01/S-02 once unblocked |
+| S-04       | `home-maintenance-landing-page` | Write a real landing page, replacing the starter template    | no                    | Waiting on S-05; can run parallel to S-06 once unblocked      |
+| S-05       | `shared-app-shell`              | Build one shared header/nav/footer, retire per-page nav      | yes                   | No prerequisites; can run parallel to S-06; unblocks S-04     |
+| S-06       | `account-deletion`              | Add self-service account + data deletion (RODO/GDPR)         | yes                   | No prerequisites; can run parallel to S-04/S-05               |
 
 ## Open Roadmap Questions
 
 None currently. The PRD scored 4/4 on the roadmap-readiness heuristic with zero open questions, and no
-cross-cutting sequencing question emerged during the interview.
+cross-cutting sequencing question emerged during the interview. MS-01/MS-02/MS-03 (added 2026-09-14) carry no
+blocking unknowns either — all three were fully specified during the audit conversation with the user.
 
 ## Parked
 
@@ -192,11 +279,11 @@ cross-cutting sequencing question emerged during the interview.
   decision logic; no adaptive scheduling in MVP.
 - **Category filtering / custom categories / category-specific logic** — Why parked: PRD Non-Goals — categories
   are predefined and organizational only.
-- **Account deletion (delete own account and data)** — Why parked: not in PRD scope (no FR; not in Non-Goals
-  either — a real gap, not a stated exclusion). User decision: fast-follow after the main implementation rather
-  than must-have for the 2026-09-10 deadline.
 - **Password reset** — Why parked: not in PRD scope (no FR; not in Non-Goals either — a real gap). User
   decision: fast-follow after the main implementation, nice-to-have.
+
+> Account deletion was parked here until 2026-09-14, when the user promoted it to `S-06` (MS-03) after a
+> UI/code audit surfaced it as a genuine RODO/GDPR gap. See `## Slices` → S-06.
 
 ## Milestone History
 
