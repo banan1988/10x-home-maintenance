@@ -19,7 +19,9 @@ export function requireApiClient(context: APIContext): NonNullable<ReturnType<ty
   return supabase;
 }
 
-export function requireApiAdminClient(_context: APIContext): ReturnType<typeof createAdminClient> | Response {
+export function requireApiAdminClient(
+  _context: APIContext,
+): NonNullable<ReturnType<typeof createAdminClient>> | Response {
   const supabase = createAdminClient();
   if (!supabase) {
     return jsonError(503, "Supabase is not configured");
