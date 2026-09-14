@@ -509,15 +509,15 @@ Not applicable — no data migration; all changes are code, CI config, and docs.
 
 #### Manual
 
-- [x] 3.4 GitHub Insights → Dependency graph → Dependabot tab shows the config was picked up after a push to the remote
+- [x] 3.4 GitHub Insights → Dependency graph → Dependabot tab shows the config was picked up after a push to the remote — c16dcb1
 
 ### Phase 4: Rollout-doc sync
 
 #### Automated
 
-- [x] 4.1 No stale claim remains: `grep -n "not configured" context/foundation/health-check.md` matches nothing for the typecheck/security rows
-- [x] 4.2 No stale claim remains: `grep -n "only runs locally" context/foundation/test-plan.md` returns no match
+- [x] 4.1 No stale claim remains: `grep -n "not configured" context/foundation/health-check.md` matches nothing for the typecheck/security rows — c16dcb1
+- [x] 4.2 No stale claim remains: `grep -n "only runs locally" context/foundation/test-plan.md` returns no match — c16dcb1
 
 #### Manual
 
-- [x] 4.3 Human review of updated `test-plan.md`, `health-check.md`, and `lessons.md` prose
+- [x] 4.3 Human review of updated `test-plan.md`, `health-check.md`, and `lessons.md` prose — c16dcb1
