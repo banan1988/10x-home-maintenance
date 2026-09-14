@@ -490,21 +490,21 @@ Not applicable — no data migration; all changes are code, CI config, and docs.
 
 #### Automated
 
-- [x] 2.1 Script passes against the current codebase: `node scripts/check-no-raw-sql.mjs`
-- [x] 2.2 Script's own tests pass: `npm run test`
-- [x] 2.3 Linting passes with no type-aware crash on `scripts/**`: `npm run lint`
-- [x] 2.4 Type checking passes: `npm run check`
+- [x] 2.1 Script passes against the current codebase: `node scripts/check-no-raw-sql.mjs` — e206d28
+- [x] 2.2 Script's own tests pass: `npm run test` — e206d28
+- [x] 2.3 Linting passes with no type-aware crash on `scripts/**`: `npm run lint` — e206d28
+- [x] 2.4 Type checking passes: `npm run check` — e206d28
 
 #### Manual
 
-- [x] 2.5 Throwaway raw-SQL fixtures are caught by the script with a clear file:line message, then reverted
+- [x] 2.5 Throwaway raw-SQL fixtures are caught by the script with a clear file:line message, then reverted — e206d28
 
 ### Phase 3: Dependency-scan CI gate
 
 #### Automated
 
-- [ ] 3.1 Gate passes locally with today's findings allowlisted: `npx audit-ci --config audit-ci.jsonc`
-- [ ] 3.2 Temporarily removing one allowlisted id causes the gate to fail locally, confirming it blocks new/unlisted findings, then reverted
+- [x] 3.1 Gate passes locally with today's findings allowlisted: `npx audit-ci --config audit-ci.jsonc`
+- [x] 3.2 Temporarily removing one allowlisted id causes the gate to fail locally, confirming it blocks new/unlisted findings, then reverted
 - [ ] 3.3 CI run on the branch shows the new step green
 
 #### Manual
