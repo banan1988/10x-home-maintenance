@@ -306,15 +306,15 @@ Not applicable — no data model or schema changes.
 
 #### Automated
 
-- [x] 2.1 Linting passes: `npm run lint`
-- [x] 2.2 Type checking passes: `npx astro check`
-- [x] 2.3 Production build succeeds: `npm run build`
-- [x] 2.4 Existing unit test suite passes: `npm run test`
+- [x] 2.1 Linting passes: `npm run lint` — ae903fd
+- [x] 2.2 Type checking passes: `npx astro check` — ae903fd
+- [x] 2.3 Production build succeeds: `npm run build` — ae903fd
+- [x] 2.4 Existing unit test suite passes: `npm run test` — ae903fd
 
 #### Manual
 
-- [x] 2.5 Dashboard page has no duplicate welcome text, "Manage tasks" link, or second sign-out form
-- [x] 2.6 Tasks page has no "← Back to dashboard" link
-- [x] 2.7 Adding a task via `AddTaskDialog` still succeeds with success toast
-- [x] 2.8 Existing task edit/complete/delete actions still succeed
-- [x] 2.9 Full nav walkthrough between `/dashboard` and `/tasks` using only the shared header
+- [x] 2.5 Dashboard page has no duplicate welcome text, "Manage tasks" link, or second sign-out form — ae903fd
+- [x] 2.6 Tasks page has no "← Back to dashboard" link — ae903fd
+- [x] 2.7 Adding a task via `AddTaskDialog` still succeeds with success toast — ae903fd
+- [x] 2.8 Existing task edit/complete/delete actions still succeed — ae903fd
+- [x] 2.9 Full nav walkthrough between `/dashboard` and `/tasks` using only the shared header — ae903fd
