@@ -289,18 +289,18 @@ Not applicable — no data model or schema changes.
 
 #### Automated
 
-- [ ] 1.1 Linting passes: `npm run lint`
-- [ ] 1.2 Type checking passes: `npx astro check`
-- [ ] 1.3 Production build succeeds: `npm run build`
-- [ ] 1.4 Existing unit test suite passes: `npm run test`
+- [x] 1.1 Linting passes: `npm run lint`
+- [x] 1.2 Type checking passes: `npx astro check`
+- [x] 1.3 Production build succeeds: `npm run build`
+- [x] 1.4 Existing unit test suite passes: `npm run test`
 
 #### Manual
 
-- [ ] 1.5 Signed-out `/` shows app name, "Not signed in", Sign in/Sign up, footer; no double header
-- [ ] 1.6 Signed-out auth pages (`/auth/signin`, `/auth/signup`, `/auth/confirm-email`) show header/footer
-- [ ] 1.7 Signed-in `/dashboard` shows app name, email, active Dashboard nav, inactive Tasks nav, sign-out, footer
-- [ ] 1.8 `/tasks` shows active Tasks nav, inactive Dashboard nav
-- [ ] 1.9 Sign-out from shared header works, redirect unchanged
+- [x] 1.5 Signed-out `/` shows app name, "Not signed in", Sign in/Sign up, footer; no double header
+- [x] 1.6 Signed-out auth pages (`/auth/signin`, `/auth/signup`, `/auth/confirm-email`) show header/footer
+- [x] 1.7 Signed-in `/dashboard` shows app name, email, active Dashboard nav, inactive Tasks nav, sign-out, footer
+- [x] 1.8 `/tasks` shows active Tasks nav, inactive Dashboard nav
+- [x] 1.9 Sign-out from shared header works, redirect unchanged
 
 ### Phase 2: Remove duplicated per-page chrome
 

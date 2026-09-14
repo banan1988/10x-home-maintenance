@@ -1,6 +1,8 @@
 ---
 import "../styles/global.css";
 import Banner from "@/components/Banner.astro";
+import Header from "@/components/layout/Header.astro";
+import Footer from "@/components/layout/Footer.astro";
 import { Toaster } from "@/components/ui/sonner";
 import { missingConfigs } from "@/lib/config-status";
 
@@ -36,7 +38,9 @@ const { title = "10x Astro Starter" } = Astro.props;
         </Banner>
       ))
     }
+    <Header />
     <slot />
+    <Footer />
     <Toaster client:load />
   </body>
 </html>
