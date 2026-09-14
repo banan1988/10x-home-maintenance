@@ -21,9 +21,14 @@ beforeEach(() => {
   createClientMock.mockClear();
 });
 
+const TASK_ID = "11111111-1111-4111-8111-111111111111";
+const OTHER_TASK_ID = "22222222-2222-4222-8222-222222222222";
+const NONEXISTENT_TASK_ID = "33333333-3333-4333-8333-333333333333";
+const MALFORMED_ID = "not-a-uuid";
+
 function makeTaskRow(overrides: Record<string, unknown> = {}) {
   return {
-    id: "task-1",
+    id: TASK_ID,
     user_id: "user-1",
     name: "Replace furnace filter",
     category: "hvac",
@@ -45,7 +50,7 @@ function makeContext(overrides: { user: { id: string } | null; id?: string; body
       json: () => Promise.resolve(overrides.body),
     },
     cookies: {},
-    params: { id: "id" in overrides ? overrides.id : "task-1" },
+    params: { id: "id" in overrides ? overrides.id : TASK_ID },
   } as unknown as APIContext;
 }
 
@@ -64,8 +69,8 @@ describe("GET /api/v1/tasks/[id]", () => {
     const body = (await response.json()) as { data: { id: string; due_date: string } };
 
     expect(response.status).toBe(200);
-    expect(eqMock).toHaveBeenCalledWith("id", "task-1");
-    expect(body.data).toMatchObject({ id: "task-1", due_date: "2026-04-01" });
+    expect(eqMock).toHaveBeenCalledWith("id", TASK_ID);
+    expect(body.data).toMatchObject({ id: TASK_ID, due_date: "2026-04-01" });
   });
 
   it("should return 404 when the task does not exist", async () => {
@@ -74,7 +79,7 @@ describe("GET /api/v1/tasks/[id]", () => {
     const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
     createClientMock.mockReturnValue({ from: vi.fn().mockReturnValue({ select: selectMock }) });
 
-    const response = await GET(makeContext({ user: { id: "user-1" }, id: "nonexistent" }));
+    const response = await GET(makeContext({ user: { id: "user-1" }, id: NONEXISTENT_TASK_ID }));
 
     expect(response.status).toBe(404);
   });
@@ -85,16 +90,23 @@ describe("GET /api/v1/tasks/[id]", () => {
     const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
     createClientMock.mockReturnValue({ from: vi.fn().mockReturnValue({ select: selectMock }) });
 
-    const response = await GET(makeContext({ user: { id: "user-1" }, id: "other-users-task" }));
+    const response = await GET(makeContext({ user: { id: "user-1" }, id: OTHER_TASK_ID }));
 
     expect(response.status).toBe(404);
-    expect(eqMock).toHaveBeenCalledWith("id", "other-users-task");
+    expect(eqMock).toHaveBeenCalledWith("id", OTHER_TASK_ID);
   });
 
   it("should return 400 when params.id is missing", async () => {
     const response = await GET(makeContext({ user: { id: "user-1" }, id: undefined }));
 
     expect(response.status).toBe(400);
+  });
+
+  it("should return the same 404 for a malformed id as a nonexistent one, without calling Supabase", async () => {
+    const response = await GET(makeContext({ user: { id: "user-1" }, id: MALFORMED_ID }));
+
+    expect(response.status).toBe(404);
+    expect(createClientMock).not.toHaveBeenCalled();
   });
 });
 
@@ -154,7 +166,7 @@ describe("PATCH /api/v1/tasks/[id]", () => {
     createClientMock.mockReturnValue({ from: vi.fn().mockReturnValue({ update: updateMock }) });
 
     const response = await PATCH(
-      makeContext({ user: { id: "user-1" }, id: "other-users-task", body: { name: "New name" } }),
+      makeContext({ user: { id: "user-1" }, id: OTHER_TASK_ID, body: { name: "New name" } }),
     );
 
     expect(response.status).toBe(404);
@@ -164,6 +176,13 @@ describe("PATCH /api/v1/tasks/[id]", () => {
     const response = await PATCH(makeContext({ user: { id: "user-1" }, id: undefined, body: { name: "New name" } }));
 
     expect(response.status).toBe(400);
+  });
+
+  it("should return the same 404 for a malformed id as a nonexistent one, without calling Supabase", async () => {
+    const response = await PATCH(makeContext({ user: { id: "user-1" }, id: MALFORMED_ID, body: { name: "New name" } }));
+
+    expect(response.status).toBe(404);
+    expect(createClientMock).not.toHaveBeenCalled();
   });
 });
 
@@ -191,15 +210,22 @@ describe("DELETE /api/v1/tasks/[id]", () => {
     const deleteMock = vi.fn().mockReturnValue({ eq: eqMock });
     createClientMock.mockReturnValue({ from: vi.fn().mockReturnValue({ delete: deleteMock }) });
 
-    const response = await DELETE(makeContext({ user: { id: "user-1" }, id: "other-users-task" }));
+    const response = await DELETE(makeContext({ user: { id: "user-1" }, id: OTHER_TASK_ID }));
 
     expect(response.status).toBe(404);
-    expect(eqMock).toHaveBeenCalledWith("id", "other-users-task");
+    expect(eqMock).toHaveBeenCalledWith("id", OTHER_TASK_ID);
   });
 
   it("should return 400 when params.id is missing", async () => {
     const response = await DELETE(makeContext({ user: { id: "user-1" }, id: undefined }));
 
     expect(response.status).toBe(400);
+  });
+
+  it("should return the same 404 for a malformed id as a nonexistent one, without calling Supabase", async () => {
+    const response = await DELETE(makeContext({ user: { id: "user-1" }, id: MALFORMED_ID }));
+
+    expect(response.status).toBe(404);
+    expect(createClientMock).not.toHaveBeenCalled();
   });
 });

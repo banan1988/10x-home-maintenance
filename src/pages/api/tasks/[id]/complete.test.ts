@@ -12,7 +12,11 @@ vi.mock("@/lib/supabase", () => ({
 
 const { POST } = await import("./complete");
 
-function makeContext(user: { id: string } | null, id = "task-1") {
+const TASK_ID = "11111111-1111-4111-8111-111111111111";
+const OTHER_TASK_ID = "22222222-2222-4222-8222-222222222222";
+const MALFORMED_ID = "not-a-uuid";
+
+function makeContext(user: { id: string } | null, id = TASK_ID) {
   return {
     locals: { user },
     request: {},
@@ -35,7 +39,7 @@ describe("POST /api/tasks/[id]/complete", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-03-01T12:00:00Z"));
 
-    const selectMock = vi.fn().mockResolvedValue({ data: [{ id: "task-1" }], error: null });
+    const selectMock = vi.fn().mockResolvedValue({ data: [{ id: TASK_ID }], error: null });
     const eqMock = vi.fn().mockReturnValue({ select: selectMock });
     const updateMock = vi.fn().mockReturnValue({ eq: eqMock });
     createClientMock.mockReturnValue({ from: vi.fn().mockReturnValue({ update: updateMock }) });
@@ -46,14 +50,14 @@ describe("POST /api/tasks/[id]/complete", () => {
 
     expect(response.headers.get("Location")).toBe("/tasks?success=task-completed");
     expect(updateMock).toHaveBeenCalledWith({ last_done_date: "2026-03-01" });
-    expect(eqMock).toHaveBeenCalledWith("id", "task-1");
+    expect(eqMock).toHaveBeenCalledWith("id", TASK_ID);
   });
 
   it("should compute the date fresh on each call rather than capturing it once", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2027-07-15T12:00:00Z"));
 
-    const selectMock = vi.fn().mockResolvedValue({ data: [{ id: "task-1" }], error: null });
+    const selectMock = vi.fn().mockResolvedValue({ data: [{ id: TASK_ID }], error: null });
     const eqMock = vi.fn().mockReturnValue({ select: selectMock });
     const updateMock = vi.fn().mockReturnValue({ eq: eqMock });
     createClientMock.mockReturnValue({ from: vi.fn().mockReturnValue({ update: updateMock }) });
@@ -84,11 +88,22 @@ describe("POST /api/tasks/[id]/complete", () => {
     const updateMock = vi.fn().mockReturnValue({ eq: eqMock });
     createClientMock.mockReturnValue({ from: vi.fn().mockReturnValue({ update: updateMock }) });
 
-    const context = makeContext({ id: "user-1" }, "other-users-task");
+    const context = makeContext({ id: "user-1" }, OTHER_TASK_ID);
 
     const response = await POST(context);
 
     expect(response.headers.get("Location")).toBe(`/tasks?error=${encodeURIComponent("Task not found")}`);
-    expect(eqMock).toHaveBeenCalledWith("id", "other-users-task");
+    expect(eqMock).toHaveBeenCalledWith("id", OTHER_TASK_ID);
+  });
+
+  it("should redirect with the same generic not-found error for a malformed id, without calling Supabase", async () => {
+    createClientMock.mockClear();
+
+    const context = makeContext({ id: "user-1" }, MALFORMED_ID);
+
+    const response = await POST(context);
+
+    expect(response.headers.get("Location")).toBe(`/tasks?error=${encodeURIComponent("Task not found")}`);
+    expect(createClientMock).not.toHaveBeenCalled();
   });
 });

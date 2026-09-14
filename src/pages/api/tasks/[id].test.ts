@@ -31,12 +31,16 @@ function validFormFields() {
   };
 }
 
+const TASK_ID = "11111111-1111-4111-8111-111111111111";
+const OTHER_TASK_ID = "22222222-2222-4222-8222-222222222222";
+const MALFORMED_ID = "not-a-uuid";
+
 function makeContext(overrides: { user: { id: string } | null; formFields: Record<string, string>; id?: string }) {
   return {
     locals: { user: overrides.user },
     request: { formData: () => Promise.resolve(makeFormData(overrides.formFields)) },
     cookies: {},
-    params: { id: overrides.id ?? "task-1" },
+    params: { id: overrides.id ?? TASK_ID },
     redirect: (path: string) => new Response(null, { status: 302, headers: { Location: path } }),
   } as unknown as APIContext;
 }
@@ -58,7 +62,7 @@ describe("POST /api/tasks/[id]", () => {
 
     expect(response.headers.get("Location")).toBe("/tasks?success=task-updated");
     expect(updateMock).toHaveBeenCalled();
-    expect(eqMock).toHaveBeenCalledWith("id", "task-1");
+    expect(eqMock).toHaveBeenCalledWith("id", TASK_ID);
   });
 
   it("should redirect with a generic not-found error when the update affects no row", async () => {
@@ -83,12 +87,27 @@ describe("POST /api/tasks/[id]", () => {
     const context = makeContext({
       user: { id: "user-1" },
       formFields: validFormFields(),
-      id: "other-users-task",
+      id: OTHER_TASK_ID,
     });
 
     const response = await POST(context);
 
     expect(response.headers.get("Location")).toBe(`/tasks?error=${encodeURIComponent("Task not found")}`);
-    expect(eqMock).toHaveBeenCalledWith("id", "other-users-task");
+    expect(eqMock).toHaveBeenCalledWith("id", OTHER_TASK_ID);
+  });
+
+  it("should redirect with the same generic not-found error for a malformed id, without calling Supabase", async () => {
+    createClientMock.mockClear();
+
+    const context = makeContext({
+      user: { id: "user-1" },
+      formFields: validFormFields(),
+      id: MALFORMED_ID,
+    });
+
+    const response = await POST(context);
+
+    expect(response.headers.get("Location")).toBe(`/tasks?error=${encodeURIComponent("Task not found")}`);
+    expect(createClientMock).not.toHaveBeenCalled();
   });
 });

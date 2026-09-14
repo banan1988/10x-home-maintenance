@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
 import { requireUser } from "@/lib/auth";
+import { taskIdSchema } from "@/lib/task-schema";
 
 export const prerender = false;
 
@@ -11,6 +12,10 @@ export const POST: APIRoute = async (context) => {
   if (user instanceof Response) return user;
 
   if (!context.params.id) {
+    return context.redirect(NOT_FOUND_REDIRECT);
+  }
+
+  if (!taskIdSchema.safeParse(context.params.id).success) {
     return context.redirect(NOT_FOUND_REDIRECT);
   }
 
