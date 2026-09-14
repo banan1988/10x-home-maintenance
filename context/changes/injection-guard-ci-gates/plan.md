@@ -503,21 +503,21 @@ Not applicable — no data migration; all changes are code, CI config, and docs.
 
 #### Automated
 
-- [x] 3.1 Gate passes locally with today's findings allowlisted: `npx audit-ci --config audit-ci.jsonc`
-- [x] 3.2 Temporarily removing one allowlisted id causes the gate to fail locally, confirming it blocks new/unlisted findings, then reverted
-- [ ] 3.3 CI run on the branch shows the new step green
+- [x] 3.1 Gate passes locally with today's findings allowlisted: `npx audit-ci --config audit-ci.jsonc` — 0b76e7b
+- [x] 3.2 Temporarily removing one allowlisted id causes the gate to fail locally, confirming it blocks new/unlisted findings, then reverted — 0b76e7b
+- [x] 3.3 CI run on the branch shows the new step green — 0b76e7b
 
 #### Manual
 
-- [ ] 3.4 GitHub Insights → Dependency graph → Dependabot tab shows the config was picked up after a push to the remote
+- [x] 3.4 GitHub Insights → Dependency graph → Dependabot tab shows the config was picked up after a push to the remote
 
 ### Phase 4: Rollout-doc sync
 
 #### Automated
 
-- [ ] 4.1 No stale claim remains: `grep -n "not configured" context/foundation/health-check.md` matches nothing for the typecheck/security rows
-- [ ] 4.2 No stale claim remains: `grep -n "only runs locally" context/foundation/test-plan.md` returns no match
+- [x] 4.1 No stale claim remains: `grep -n "not configured" context/foundation/health-check.md` matches nothing for the typecheck/security rows
+- [x] 4.2 No stale claim remains: `grep -n "only runs locally" context/foundation/test-plan.md` returns no match
 
 #### Manual
 
-- [ ] 4.3 Human review of updated `test-plan.md`, `health-check.md`, and `lessons.md` prose
+- [x] 4.3 Human review of updated `test-plan.md`, `health-check.md`, and `lessons.md` prose

@@ -77,13 +77,13 @@ Provider: GitHub Actions
 Configuration: .github/workflows/ci.yml
 ```
 
-| Stage      | Status | Notes                                                                  |
-| ---------- | ------ | ---------------------------------------------------------------------- |
-| Lint       | ✓      | `npm run lint` (ESLint)                                                |
-| Test       | ✓      | `npm run test` (Vitest)                                                |
-| Build      | ✓      | `npm run build` (Astro build)                                          |
-| Type check | ✗      | not configured — `npx astro sync` runs but no `tsc`/`astro check` step |
-| Security   | ✗      | not configured — no `npm audit` / Dependabot / CodeQL step             |
+| Stage      | Status | Notes                                                                                                                                                                       |
+| ---------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Lint       | ✓      | `npm run lint` (ESLint)                                                                                                                                                     |
+| Test       | ✓      | `npm run test` (Vitest)                                                                                                                                                     |
+| Build      | ✓      | `npm run build` (Astro build)                                                                                                                                               |
+| Type check | ✓      | `npm run check` (`astro check`) runs in CI, `.github/workflows/ci.yml`                                                                                                      |
+| Security   | ✓      | `npx audit-ci --config audit-ci.jsonc` (allowlists today's known findings) + `node scripts/check-no-raw-sql.mjs` in CI; `.github/dependabot.yaml` for background monitoring |
 
 `actions/checkout` and `actions/setup-node` were bumped from `@v4` to `@v7` this cycle (changelogs reviewed — no breaking changes apply to this workflow's usage), and the runner/local Node version was bumped from 22.14.0 to 26.7.0 (`.nvmrc`, `ci.yml` `node-version`) to match the actual local dev environment. `cloudflare/wrangler-action@v4` was already current.
 

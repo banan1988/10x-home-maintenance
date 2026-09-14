@@ -207,3 +207,46 @@
   check the report's per-file breakdown table actually lists every file intended to be in scope before trusting
   the mutation score; a missing file is a silent scope-narrowing bug, not a "0 mutants found" signal.
 - **Applies to**: Any future `npx stryker run --mutate ...` invocation scoping to more than one file.
+
+## Dynamic route identifiers must be format-validated before hitting Supabase
+
+- **Context**: `src/lib/task-schema.ts` (`taskIdSchema = z.uuid()`), wired into all 5 `[id]` route handlers
+  (`context/changes/injection-guard-ci-gates/plan.md` Phase 1) — before this change, no route validated
+  `context.params.id`'s format before passing it to a Supabase query.
+- **Problem**: Not exploitable today (Supabase parameterizes the value regardless), but it was the one concrete
+  gap against test-plan.md risk #7's "every dynamic route identifier is validated server-side" bar — a malformed
+  id reached the database layer instead of being rejected up front.
+- **Rule**: Every `/api/*` route taking a dynamic id from `context.params` must validate its format (e.g.
+  `taskIdSchema` / `z.uuid()`) before passing it to a query, returning the same not-found response as a genuine
+  miss.
+- **Applies to**: Any future `/api/*` route with a dynamic route identifier.
+
+## New raw-SQL/dependency vectors are guarded by CI, not convention alone
+
+- **Context**: `scripts/check-no-raw-sql.mjs` (static scan of `supabase/migrations/*.sql` and `src/**/*.ts` for
+  raw/string-built SQL) and `audit-ci.jsonc` (`npx audit-ci --config audit-ci.jsonc`, allowlisting today's
+  already-known advisories), both wired into `.github/workflows/ci.yml`
+  (`context/changes/injection-guard-ci-gates/plan.md` Phases 2–3).
+- **Problem**: A documented-only convention ("we don't build raw SQL, Supabase's query builder is safe") has
+  nothing enforcing it against a future change — the same failure mode as risk #7 in test-plan.md, and the same
+  pattern the auth-check-contract lesson already identified for auth checks.
+- **Rule**: Any code path that introduces raw SQL, string-built queries, or a new `.rpc()` call must be checked
+  against `scripts/check-no-raw-sql.mjs`'s patterns (extend the script if it introduces a new vector), and any
+  new dependency is subject to the `audit-ci` CI gate — a newly introduced advisory must be fixed or explicitly
+  added to `audit-ci.jsonc`'s allowlist, not silently ignored.
+- **Applies to**: Any future SQL/query-building code, `.rpc()` call, or new dependency added to this repo.
+
+## Dependabot must not propose major-version bumps, and must never propose bumping `astro` at all
+
+- **Context**: `.github/dependabot.yaml` (`context/changes/injection-guard-ci-gates/plan.md` Phase 3) — after
+  enabling Dependabot, its first scan opened PRs including a major-version bump for `astro`.
+- **Problem**: A prior manual attempt to upgrade the `astro` dependency chain (to resolve its known
+  RCE/XSS advisories, see `audit-ci.jsonc`'s allowlist) broke the build and had to be reverted — the upgrade
+  path for this specific dependency is known-unsafe today. Major-version bumps in general also carry a higher
+  breaking-change risk than this repo wants opened automatically as unreviewed PRs.
+- **Rule**: `.github/dependabot.yaml` must keep `ignore: - dependency-name: "astro"` (blocks every `astro`
+  update, any version) and `- dependency-name: "*", update-types: ["version-update:semver-major"]` (blocks
+  major-version bumps for every other package, leaving minor/patch auto-proposed). Don't remove either entry
+  without first confirming the underlying risk (a clean `astro` upgrade path, or an intentional major-bump
+  review process) actually exists.
+- **Applies to**: Any future edit to `.github/dependabot.yaml`'s `ignore` list.

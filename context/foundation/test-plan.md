@@ -86,7 +86,7 @@ orchestrator updates Status as artifacts appear on disk.
 | 1   | Auth/isolation contract — generalized and required for S-03 | Turn the existing auth-gate + cross-user isolation pattern into an explicit, testable convention required for S-03 too                    | #1, #2, #3          | unit + integration                 | complete    | `testing-auth-isolation-contract` |
 | 2   | Shared-component UI regression                              | Prove dialogs and shared views don't drift visually and that validation still blocks invalid input after a change                         | #4                  | component tests                    | not started | —                                 |
 | 3   | Status/date logic regression grid                           | Extend existing boundary tests to guard against future duplication/drift of the logic across parallel changes                             | #6                  | unit                               | complete    | `status-date-regression-grid`     |
-| 4   | Injection guard + missing CI gates                          | Confirm no raw SQL exists today, add a safeguard for the future, close the CI gates already flagged as missing (typecheck, security scan) | #7                  | static check/lint + CI gate wiring | not started | —                                 |
+| 4   | Injection guard + missing CI gates                          | Confirm no raw SQL exists today, add a safeguard for the future, close the CI gates already flagged as missing (typecheck, security scan) | #7                  | static check/lint + CI gate wiring | complete    | `injection-guard-ci-gates`        |
 | 5   | Key-path e2e                                                | Close the explicit PRD guardrail gap — prove the full login→add→dashboard→edit/complete/delete flow works as a coherent whole             | #5 (touches #1, #4) | e2e                                | not started | —                                 |
 
 **Status vocabulary** (fixed — parser literals): `not started` → `change opened` → `researched` → `planned` → `implementing` → `complete`.
@@ -118,15 +118,15 @@ The full set of gates that must pass before a change reaches production.
 "Required after §3 Phase N" means the gate starts applying once that
 rollout phase lands; before that, the gate is `planned`.
 
-| Gate                              | Where                | Required?                 | What it catches                                                                         |
-| --------------------------------- | -------------------- | ------------------------- | --------------------------------------------------------------------------------------- |
-| lint                              | local + CI           | required (already wired)  | syntactic drift                                                                         |
-| typecheck                         | local + CI           | required after §3 Phase 4 | type drift (today `npx astro check` only runs locally, not in CI — health-check.md)     |
-| unit + integration                | local + CI           | required (already wired)  | logic regressions                                                                       |
-| e2e on critical paths             | CI on PR             | required after §3 Phase 5 | broken key user flows                                                                   |
-| UI component tests (dialogs/list) | local + CI           | required after §3 Phase 2 | validation/UI regressions in shared components                                          |
-| security/dependency scan          | CI on PR             | required after §3 Phase 4 | dependency vulnerabilities, injection (health-check.md already flagged this as missing) |
-| pre-prod smoke                    | between merge & prod | optional                  | environment-specific failures                                                           |
+| Gate                              | Where                | Required?                 | What it catches                                                                                                                       |
+| --------------------------------- | -------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| lint                              | local + CI           | required (already wired)  | syntactic drift                                                                                                                       |
+| typecheck                         | local + CI           | required (already wired)  | type drift (`npm run check` runs in CI via `.github/workflows/ci.yml`)                                                                |
+| unit + integration                | local + CI           | required (already wired)  | logic regressions                                                                                                                     |
+| e2e on critical paths             | CI on PR             | required after §3 Phase 5 | broken key user flows                                                                                                                 |
+| UI component tests (dialogs/list) | local + CI           | required after §3 Phase 2 | validation/UI regressions in shared components                                                                                        |
+| security/dependency scan          | CI on PR             | required (already wired)  | dependency vulnerabilities via `npx audit-ci --config audit-ci.jsonc` + Dependabot; injection via `node scripts/check-no-raw-sql.mjs` |
+| pre-prod smoke                    | between merge & prod | optional                  | environment-specific failures                                                                                                         |
 
 ## 6. Cookbook Patterns
 
@@ -207,7 +207,12 @@ matching rollout phase lands; until then it reads "TBD — see §3 Phase N."
 
 ### 6.6 Per-phase rollout notes
 
-(Empty for now — fills in once the first phase closes.)
+- **Phase 4 (injection guard + missing CI gates)**: `taskIdSchema` (`src/lib/task-schema.ts`, `z.uuid()`) validates
+  every `[id]` route's dynamic identifier before it reaches Supabase. `scripts/check-no-raw-sql.mjs` statically
+  scans `supabase/migrations/*.sql` and `src/**/*.ts` for raw/string-built SQL patterns — run locally via
+  `node scripts/check-no-raw-sql.mjs`. Two new CI steps in `.github/workflows/ci.yml`: `"Security: raw SQL check"`
+  and `"Security: dependency audit"` (`npx audit-ci --config audit-ci.jsonc`, allowlisting today's already-known
+  findings), plus `.github/dependabot.yaml` for background dependency monitoring.
 
 ### 6.7 Adding a real-RLS integration test
 
