@@ -1,7 +1,7 @@
 ---
 change_id: home-maintenance-landing-page
 title: Home maintenance landing page
-status: implemented
+status: impl_reviewed
 created: 2026-09-14
 updated: 2026-09-14
 archived_at:
