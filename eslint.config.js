@@ -81,6 +81,19 @@ const astroConfig = tseslint.config({
   },
 });
 
+// scripts/**/*.mjs is plain JS, not part of the TS program (tsconfig.json has no `allowJs`), so
+// type-aware ESLint rules can't resolve it via projectService.
+const scriptsConfig = tseslint.config({
+  files: ["scripts/**/*.mjs"],
+  extends: [tseslint.configs.disableTypeChecked],
+  languageOptions: {
+    globals: {
+      console: true,
+      process: true,
+    },
+  },
+});
+
 export default tseslint.config(
   includeIgnoreFile(gitignorePath),
   { ignores: [".claude/worktrees/**"] },
@@ -90,5 +103,6 @@ export default tseslint.config(
   ...eslintPluginAstro.configs["flat/jsx-a11y-recommended"],
   astroConfig,
   generatedTypesConfig,
+  scriptsConfig,
   eslintPluginPrettier,
 );

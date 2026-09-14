@@ -30,6 +30,8 @@ jobs:
         run: npm run check
       - name: "Lint"
         run: npm run lint
+      - name: "Security: raw SQL check"
+        run: node scripts/check-no-raw-sql.mjs
       - name: "Test"
         run: npm run test
       - name: "Build"
