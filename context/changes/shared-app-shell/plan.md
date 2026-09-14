@@ -289,32 +289,32 @@ Not applicable — no data model or schema changes.
 
 #### Automated
 
-- [x] 1.1 Linting passes: `npm run lint`
-- [x] 1.2 Type checking passes: `npx astro check`
-- [x] 1.3 Production build succeeds: `npm run build`
-- [x] 1.4 Existing unit test suite passes: `npm run test`
+- [x] 1.1 Linting passes: `npm run lint` — 1a6eb56
+- [x] 1.2 Type checking passes: `npx astro check` — 1a6eb56
+- [x] 1.3 Production build succeeds: `npm run build` — 1a6eb56
+- [x] 1.4 Existing unit test suite passes: `npm run test` — 1a6eb56
 
 #### Manual
 
-- [x] 1.5 Signed-out `/` shows app name, "Not signed in", Sign in/Sign up, footer; no double header
-- [x] 1.6 Signed-out auth pages (`/auth/signin`, `/auth/signup`, `/auth/confirm-email`) show header/footer
-- [x] 1.7 Signed-in `/dashboard` shows app name, email, active Dashboard nav, inactive Tasks nav, sign-out, footer
-- [x] 1.8 `/tasks` shows active Tasks nav, inactive Dashboard nav
-- [x] 1.9 Sign-out from shared header works, redirect unchanged
+- [x] 1.5 Signed-out `/` shows app name, "Not signed in", Sign in/Sign up, footer; no double header — 1a6eb56
+- [x] 1.6 Signed-out auth pages (`/auth/signin`, `/auth/signup`, `/auth/confirm-email`) show header/footer — 1a6eb56
+- [x] 1.7 Signed-in `/dashboard` shows app name, email, active Dashboard nav, inactive Tasks nav, sign-out, footer — 1a6eb56
+- [x] 1.8 `/tasks` shows active Tasks nav, inactive Dashboard nav — 1a6eb56
+- [x] 1.9 Sign-out from shared header works, redirect unchanged — 1a6eb56
 
 ### Phase 2: Remove duplicated per-page chrome
 
 #### Automated
 
-- [ ] 2.1 Linting passes: `npm run lint`
-- [ ] 2.2 Type checking passes: `npx astro check`
-- [ ] 2.3 Production build succeeds: `npm run build`
-- [ ] 2.4 Existing unit test suite passes: `npm run test`
+- [x] 2.1 Linting passes: `npm run lint`
+- [x] 2.2 Type checking passes: `npx astro check`
+- [x] 2.3 Production build succeeds: `npm run build`
+- [x] 2.4 Existing unit test suite passes: `npm run test`
 
 #### Manual
 
-- [ ] 2.5 Dashboard page has no duplicate welcome text, "Manage tasks" link, or second sign-out form
-- [ ] 2.6 Tasks page has no "← Back to dashboard" link
-- [ ] 2.7 Adding a task via `AddTaskDialog` still succeeds with success toast
-- [ ] 2.8 Existing task edit/complete/delete actions still succeed
-- [ ] 2.9 Full nav walkthrough between `/dashboard` and `/tasks` using only the shared header
+- [x] 2.5 Dashboard page has no duplicate welcome text, "Manage tasks" link, or second sign-out form
+- [x] 2.6 Tasks page has no "← Back to dashboard" link
+- [x] 2.7 Adding a task via `AddTaskDialog` still succeeds with success toast
+- [x] 2.8 Existing task edit/complete/delete actions still succeed
+- [x] 2.9 Full nav walkthrough between `/dashboard` and `/tasks` using only the shared header

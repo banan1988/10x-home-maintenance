@@ -6,7 +6,6 @@ import { createClient } from "@/lib/supabase";
 import { compareByUrgency, computeDueDate, computeStatus } from "@/lib/status";
 import type { MaintenanceTaskWithStatus } from "@/types";
 
-const { user } = Astro.locals;
 const error = Astro.url.searchParams.get("error");
 
 const supabase = createClient(Astro.request.headers, Astro.cookies);
@@ -38,17 +37,9 @@ const STATUS_LABEL: Record<MaintenanceTaskWithStatus["status"], string> = {
   <div class="bg-cosmic min-h-screen p-4">
     <div class="mx-auto max-w-2xl">
       <div class="mb-6 flex items-center justify-between gap-4">
-        <div>
-          <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
-            Dashboard
-          </h1>
-          <p class="text-blue-100/80">
-            Welcome, <span class="font-semibold text-white">{user?.email}</span>
-          </p>
-          <p class="mt-1">
-            <a href="/tasks" class="text-sm text-blue-100/80 underline hover:text-white">Manage tasks</a>
-          </p>
-        </div>
+        <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
+          Dashboard
+        </h1>
         <AddTaskDialog client:load serverError={error} />
       </div>
 
@@ -77,15 +68,6 @@ const STATUS_LABEL: Record<MaintenanceTaskWithStatus["status"], string> = {
           </ul>
         )
       }
-
-      <form method="POST" action="/api/auth/signout" class="mt-6">
-        <button
-          type="submit"
-          class="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm text-white transition-colors hover:bg-white/20"
-        >
-          Sign out
-        </button>
-      </form>
     </div>
   </div>
 </Layout>
