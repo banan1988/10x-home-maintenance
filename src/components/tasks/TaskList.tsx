@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { EditTaskDialog } from "@/components/tasks/EditTaskDialog";
 import { DeleteTaskAlertDialog } from "@/components/tasks/DeleteTaskAlertDialog";
 import { ErrorBanner } from "@/components/ErrorBanner";
+import { formatCompletionMessage, isFrequencyUnit } from "@/lib/format-completion-message";
 import type { MaintenanceTaskWithStatus } from "@/types";
 
 const SUCCESS_MESSAGES: Record<string, string> = {
@@ -19,25 +20,38 @@ interface TaskListProps {
   success?: string | null;
   error?: string | null;
   editing?: string | null;
+  next?: string | null;
+  unit?: string | null;
 }
 
-export default function TaskList({ tasks, success, error, editing }: TaskListProps) {
+function resolveSuccessMessage(success: string, next?: string | null, unit?: string | null): string {
+  const frequencyValue = next ? Number(next) : NaN;
+  const normalizedUnit = unit ?? null;
+  if (success === "task-completed" && !Number.isNaN(frequencyValue) && isFrequencyUnit(normalizedUnit)) {
+    return formatCompletionMessage(frequencyValue, normalizedUnit);
+  }
+  return SUCCESS_MESSAGES[success] ?? "Success";
+}
+
+export default function TaskList({ tasks, success, error, editing, next, unit }: TaskListProps) {
   const [errorMessage] = useState(error ?? null);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(editing ?? null);
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     if (success) {
-      toast.success(SUCCESS_MESSAGES[success] ?? "Success");
+      toast.success(resolveSuccessMessage(success, next, unit));
     }
     if (success || error || editing) {
       const url = new URL(window.location.href);
       url.searchParams.delete("success");
       url.searchParams.delete("error");
       url.searchParams.delete("editing");
+      url.searchParams.delete("next");
+      url.searchParams.delete("unit");
       window.history.replaceState({}, "", url);
     }
-  }, [success, error, editing]);
+  }, [success, error, editing, next, unit]);
 
   return (
     <div className="space-y-4">

@@ -39,5 +39,6 @@ export const POST: APIRoute = async (context) => {
     return context.redirect(NOT_FOUND_REDIRECT);
   }
 
-  return context.redirect("/tasks?success=task-completed");
+  const { frequency_value, frequency_unit } = data[0];
+  return context.redirect(`/tasks?success=task-completed&next=${frequency_value}&unit=${frequency_unit}`);
 };

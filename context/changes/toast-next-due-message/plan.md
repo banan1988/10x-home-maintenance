@@ -332,8 +332,8 @@ No schema migrations in this plan. Phase 3's audit query is intentionally kept o
 
 #### Manual
 
-- [ ] 1.4 Toast shows next-due message and appears top-right, clearing the header
-- [ ] 1.5 Query params (`next`/`unit`/`success`) are stripped from the URL after the toast appears
+- [x] 1.4 Toast shows next-due message and appears top-right, clearing the header
+- [x] 1.5 Query params (`next`/`unit`/`success`) are stripped from the URL after the toast appears
 - [ ] 1.6 Phase 1 code changes committed to git
 
 ### Phase 2: Confirmation guardrail for completing not-yet-due tasks
