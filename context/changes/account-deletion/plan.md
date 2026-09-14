@@ -410,13 +410,13 @@ row is the only database action this feature performs directly.
 
 #### Automated
 
-- [ ] 1.1 Unit tests pass: `npm run test`
-- [ ] 1.2 Linting passes: `npm run lint`
-- [ ] 1.3 Build succeeds: `npm run build`
+- [x] 1.1 Unit tests pass: `npm run test`
+- [x] 1.2 Linting passes: `npm run lint`
+- [x] 1.3 Build succeeds: `npm run build`
 
 #### Manual
 
-- [ ] 1.4 Local `.env`/`.dev.vars` service_role key added; `npm run dev` starts cleanly after `npx astro sync`
+- [x] 1.4 Local `.env`/`.dev.vars` service_role key added; `npm run dev` starts cleanly after `npx astro sync`
 
 ### Phase 2: `DELETE /api/v1/account` route
 

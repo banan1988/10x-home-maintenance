@@ -11,6 +11,10 @@ vi.mock("@/lib/supabase", () => ({
   createClient: createClientMock,
 }));
 
+vi.mock("@/lib/supabase-admin", () => ({
+  createAdminClient: vi.fn(),
+}));
+
 const { GET, POST } = await import("@/pages/api/v1/tasks/index");
 
 beforeEach(() => {
