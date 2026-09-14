@@ -45,7 +45,7 @@ function makeContext(overrides: { user: { id: string } | null; id?: string; body
       json: () => Promise.resolve(overrides.body),
     },
     cookies: {},
-    params: { id: overrides.id ?? "task-1" },
+    params: { id: "id" in overrides ? overrides.id : "task-1" },
   } as unknown as APIContext;
 }
 
@@ -89,6 +89,12 @@ describe("GET /api/v1/tasks/[id]", () => {
 
     expect(response.status).toBe(404);
     expect(eqMock).toHaveBeenCalledWith("id", "other-users-task");
+  });
+
+  it("should return 400 when params.id is missing", async () => {
+    const response = await GET(makeContext({ user: { id: "user-1" }, id: undefined }));
+
+    expect(response.status).toBe(400);
   });
 });
 
@@ -153,6 +159,12 @@ describe("PATCH /api/v1/tasks/[id]", () => {
 
     expect(response.status).toBe(404);
   });
+
+  it("should return 400 when params.id is missing", async () => {
+    const response = await PATCH(makeContext({ user: { id: "user-1" }, id: undefined, body: { name: "New name" } }));
+
+    expect(response.status).toBe(400);
+  });
 });
 
 describe("DELETE /api/v1/tasks/[id]", () => {
@@ -183,5 +195,11 @@ describe("DELETE /api/v1/tasks/[id]", () => {
 
     expect(response.status).toBe(404);
     expect(eqMock).toHaveBeenCalledWith("id", "other-users-task");
+  });
+
+  it("should return 400 when params.id is missing", async () => {
+    const response = await DELETE(makeContext({ user: { id: "user-1" }, id: undefined }));
+
+    expect(response.status).toBe(400);
   });
 });

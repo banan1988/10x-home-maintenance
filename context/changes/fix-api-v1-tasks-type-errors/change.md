@@ -1,7 +1,7 @@
 ---
 change_id: fix-api-v1-tasks-type-errors
 title: Fix pre-existing astro check type errors in the v1 tasks API
-status: plan_reviewed
+status: implementing
 created: 2026-09-14
 updated: 2026-09-14
 archived_at:

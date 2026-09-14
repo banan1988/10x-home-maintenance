@@ -183,15 +183,15 @@ Not applicable — no data model, schema, or API contract changes.
 
 #### Automated
 
-- [ ] 1.1 Type checking passes with 0 errors: `npx astro check`
-- [ ] 1.2 Unit tests pass: `npm run test`
-- [ ] 1.3 Linting passes: `npm run lint`
-- [ ] 1.4 Build succeeds: `npm run build`
+- [x] 1.1 Type checking passes with 0 errors: `npx astro check`
+- [x] 1.2 Unit tests pass: `npm run test`
+- [x] 1.3 Linting passes: `npm run lint`
+- [x] 1.4 Build succeeds: `npm run build`
 
 #### Manual
 
-- [ ] 1.5 Manually hit `GET /api/v1/tasks/` (or a task by id) in dev to confirm normal task retrieval still works unchanged.
-- [ ] 1.6 Manually hit `PATCH /api/v1/tasks/<id>` with a `last_done_date` field to confirm the update still persists the formatted date correctly.
+- [x] 1.5 Manually hit `GET /api/v1/tasks/` (or a task by id) in dev to confirm normal task retrieval still works unchanged.
+- [x] 1.6 Manually hit `PATCH /api/v1/tasks/<id>` with a `last_done_date` field to confirm the update still persists the formatted date correctly.
 
 ### Phase 2: Wire astro check into CI
 
