@@ -403,8 +403,8 @@ parser is called; no persisted data changes shape.
 
 #### Automated
 
-- [x] 4.1 `test-plan.md` §6.5 no longer contains `TBD`
-- [x] 4.2 `change.md` status reads `implemented`
+- [x] 4.1 `test-plan.md` §6.5 no longer contains `TBD` — 3f8fa2b
+- [x] 4.2 `change.md` status reads `implemented` — 3f8fa2b
 
 #### Manual
 
@@ -414,4 +414,4 @@ parser is called; no persisted data changes shape.
   `lessons.md` entry) — reads clearly on its own with no other planning context needed. Also added two
   unrelated-to-S-07 `lessons.md` entries this session surfaced (Cloudflare Workers UTC-only clock; numeric
   fields need `.max()` too) — a deliberate addition beyond Phase 4's literal contract, confirmed with the
-  user first.
+  user first. — 3f8fa2b
