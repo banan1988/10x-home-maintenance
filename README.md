@@ -1,5 +1,7 @@
 # 10x Home Maintenance
 
+![10x Home Maintenance logo](./public/logo.jpeg)
+
 A web app for tracking cyclical home maintenance tasks — filter changes, inspections, battery swaps, and other
 recurring chores — for a single homeowner or renter managing one property. Instead of relying on memory, notes, or
 a generic calendar, the app automatically computes each task's next due date and status (**OK** / **DUE SOON** /
