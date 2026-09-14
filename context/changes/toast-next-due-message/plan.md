@@ -147,10 +147,16 @@ tie it to Success Criteria below.
   weeks" and appears top-right, clearing the header, not overlapping it
 - [ ] Click "Mark done" on a task and confirm the toast's `next`/`unit`/`success` query params are stripped
   from the URL after the toast appears (no stale params on refresh/back)
+- [ ] `git commit` the Phase 1 code changes (`src/lib/format-completion-message.ts`,
+  `src/lib/format-completion-message.test.ts`, `src/pages/api/tasks/[id]/complete.ts`,
+  `src/pages/api/tasks/[id]/complete.test.ts`, `src/components/tasks/TaskList.tsx`,
+  `src/pages/tasks/index.astro`, `src/layouts/Layout.astro`) — Desired End State requires this code to be
+  committed, not just present in the working tree
 
 **Implementation Note**: Automated checks already passed prior to this plan being written. The manual browser
-pass is still outstanding — pause here and get human confirmation of the manual steps before proceeding to
-Phase 2 (Phase 2 builds directly on this same "Mark done" form).
+pass and the commit are still outstanding — pause here and get human confirmation of the manual steps, and
+commit the Phase 1 changes, before proceeding to Phase 2 (Phase 2 builds directly on this same "Mark done"
+form).
 
 ______________________________________________________________________
 
@@ -328,6 +334,7 @@ No schema migrations in this plan. Phase 3's audit query is intentionally kept o
 
 - [ ] 1.4 Toast shows next-due message and appears top-right, clearing the header
 - [ ] 1.5 Query params (`next`/`unit`/`success`) are stripped from the URL after the toast appears
+- [ ] 1.6 Phase 1 code changes committed to git
 
 ### Phase 2: Confirmation guardrail for completing not-yet-due tasks
 
