@@ -71,7 +71,7 @@ CRUD, automatic status computation, and an urgency-ordered dashboard.
 | S-03 | `maintenance-tasks-api`         | perform full CRUD on their maintenance tasks via the API                                 | F-01          | FR-011                                                        | done     |
 | S-04 | `home-maintenance-landing-page` | understand the product and sign up/in from a real landing page, not the starter template | S-05          | MS-01                                                         | proposed |
 | S-05 | `shared-app-shell`              | navigate every page via one consistent header/nav + footer                               | —             | MS-02                                                         | done     |
-| S-06 | `account-deletion`              | permanently delete their own account and all of their data                               | —             | MS-03                                                         | ready    |
+| S-06 | `account-deletion`              | permanently delete their own account and all of their data                               | —             | MS-03                                                         | planning |
 | S-07 | `unified-visual-theme`          | see one consistent visual theme (colors, buttons, dialogs) across every page             | —             | MS-04                                                         | ready    |
 
 (S-04/S-05/S-06/S-07 are listed here in ID order rather than strict dependency order, by request — S-04
@@ -252,7 +252,7 @@ below assume these are present and do NOT re-scaffold them.
   must be stronger than the existing single-click `DeleteTaskAlertDialog.tsx` pattern (e.g. type your email or
   a confirmation phrase before the button activates) — this is irreversible for a whole account, not one
   task.
-- **Status:** ready
+- **Status:** planning
 
 ### S-07: User sees one consistent visual theme across every page and dialog
 
