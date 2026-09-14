@@ -53,6 +53,8 @@ const { createClientMock } = vi.hoisted(() => ({ createClientMock: vi.fn() }));
 
 vi.mock("@/lib/supabase", () => ({ createClient: createClientMock }));
 
+vi.mock("@/lib/supabase-admin", () => ({ createAdminClient: vi.fn() }));
+
 const { POST: createPOST } = await import("@/pages/api/v1/tasks/index");
 const { GET: itemGET, PATCH: itemPATCH, DELETE: itemDELETE } = await import("./[id]");
 

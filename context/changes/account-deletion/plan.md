@@ -434,23 +434,23 @@ row is the only database action this feature performs directly.
 
 #### Automated
 
-- [x] 3.1 Linting passes: `npm run lint`
-- [x] 3.2 Build succeeds: `npm run build`
-- [x] 3.3 Unit tests pass: `npm run test`
+- [x] 3.1 Linting passes: `npm run lint` — 62476b6
+- [x] 3.2 Build succeeds: `npm run build` — 62476b6
+- [x] 3.3 Unit tests pass: `npm run test` — 62476b6
 
 #### Manual
 
-- [x] 3.4 Unauthenticated `/account/delete` redirects; `/account-deleted` reachable without a session
-- [x] 3.5 Disabled-until-match button behavior verified in browser
-- [x] 3.6 "Are you sure?" dialog Cancel/Confirm behavior verified in browser
-- [x] 3.7 Full delete → redirect → subsequent `/dashboard` redirect-to-signin verified in browser
+- [x] 3.4 Unauthenticated `/account/delete` redirects; `/account-deleted` reachable without a session — 62476b6
+- [x] 3.5 Disabled-until-match button behavior verified in browser — 62476b6
+- [x] 3.6 "Are you sure?" dialog Cancel/Confirm behavior verified in browser — 62476b6
+- [x] 3.7 Full delete → redirect → subsequent `/dashboard` redirect-to-signin verified in browser — 62476b6
 
 ### Phase 4: Real-Supabase integration test
 
 #### Automated
 
-- [ ] 4.1 Integration tests pass: `npm run test:integration`
+- [x] 4.1 Integration tests pass: `npm run test:integration`
 
 #### Manual
 
-- [ ] 4.2 No leftover disposable users/tasks in Supabase Studio after a full run, including after a failed run
+- [x] 4.2 No leftover disposable users/tasks in Supabase Studio after a full run, including after a failed run
