@@ -326,15 +326,15 @@ No schema migrations in this plan. Phase 3's audit query is intentionally kept o
 
 #### Automated
 
-- [x] 1.1 Full suite passes: `npm run test`
-- [x] 1.2 Lint passes: `npm run lint`
-- [x] 1.3 Type checking passes: `npx tsc --noEmit`
+- [x] 1.1 Full suite passes: `npm run test` — a06c02e
+- [x] 1.2 Lint passes: `npm run lint` — a06c02e
+- [x] 1.3 Type checking passes: `npx tsc --noEmit` — a06c02e
 
 #### Manual
 
-- [x] 1.4 Toast shows next-due message and appears top-right, clearing the header
-- [x] 1.5 Query params (`next`/`unit`/`success`) are stripped from the URL after the toast appears
-- [ ] 1.6 Phase 1 code changes committed to git
+- [x] 1.4 Toast shows next-due message and appears top-right, clearing the header — a06c02e
+- [x] 1.5 Query params (`next`/`unit`/`success`) are stripped from the URL after the toast appears — a06c02e
+- [x] 1.6 Phase 1 code changes committed to git — a06c02e
 
 ### Phase 2: Confirmation guardrail for completing not-yet-due tasks
 
