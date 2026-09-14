@@ -43,7 +43,7 @@ const { title = "10x Astro Starter", description } = Astro.props;
     <Header />
     <slot />
     <Footer />
-    <Toaster client:load />
+    <Toaster position="top-right" offset={{ top: 64 }} client:load />
   </body>
 </html>
 

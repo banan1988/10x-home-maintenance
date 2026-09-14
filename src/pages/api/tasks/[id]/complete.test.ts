@@ -39,7 +39,9 @@ describe("POST /api/tasks/[id]/complete", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-03-01T12:00:00Z"));
 
-    const selectMock = vi.fn().mockResolvedValue({ data: [{ id: TASK_ID }], error: null });
+    const selectMock = vi
+      .fn()
+      .mockResolvedValue({ data: [{ id: TASK_ID, frequency_value: 2, frequency_unit: "week" }], error: null });
     const eqMock = vi.fn().mockReturnValue({ select: selectMock });
     const updateMock = vi.fn().mockReturnValue({ eq: eqMock });
     createClientMock.mockReturnValue({ from: vi.fn().mockReturnValue({ update: updateMock }) });
@@ -48,9 +50,24 @@ describe("POST /api/tasks/[id]/complete", () => {
 
     const response = await POST(context);
 
-    expect(response.headers.get("Location")).toBe("/tasks?success=task-completed");
+    expect(response.headers.get("Location")).toBe("/tasks?success=task-completed&next=2&unit=week");
     expect(updateMock).toHaveBeenCalledWith({ last_done_date: "2026-03-01" });
     expect(eqMock).toHaveBeenCalledWith("id", TASK_ID);
+  });
+
+  it("should forward the updated row's frequency value and unit in the redirect", async () => {
+    const selectMock = vi
+      .fn()
+      .mockResolvedValue({ data: [{ id: "task-1", frequency_value: 1, frequency_unit: "year" }], error: null });
+    const eqMock = vi.fn().mockReturnValue({ select: selectMock });
+    const updateMock = vi.fn().mockReturnValue({ eq: eqMock });
+    createClientMock.mockReturnValue({ from: vi.fn().mockReturnValue({ update: updateMock }) });
+
+    const context = makeContext({ id: "user-1" });
+
+    const response = await POST(context);
+
+    expect(response.headers.get("Location")).toBe("/tasks?success=task-completed&next=1&unit=year");
   });
 
   it("should compute the date fresh on each call rather than capturing it once", async () => {

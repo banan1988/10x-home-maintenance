@@ -9,6 +9,8 @@ import type { MaintenanceTaskWithStatus } from "@/types";
 const success = Astro.url.searchParams.get("success");
 const error = Astro.url.searchParams.get("error");
 const editing = Astro.url.searchParams.get("editing");
+const next = Astro.url.searchParams.get("next");
+const unit = Astro.url.searchParams.get("unit");
 
 const supabase = createClient(Astro.request.headers, Astro.cookies);
 
@@ -33,7 +35,7 @@ if (supabase) {
           Manage tasks
         </h1>
       </div>
-      <TaskList tasks={tasks} success={success} error={error} editing={editing} client:load />
+      <TaskList tasks={tasks} success={success} error={error} editing={editing} next={next} unit={unit} client:load />
     </div>
   </div>
 </Layout>
