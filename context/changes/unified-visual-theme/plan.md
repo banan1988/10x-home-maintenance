@@ -607,32 +607,32 @@ Not applicable — no data model or persisted-state changes.
 
 #### Automated
 
-- [x] 4.1 Type checking passes: `npx astro check`
-- [x] 4.2 Linting passes: `npm run lint`
-- [x] 4.3 Unit tests pass: `npm run test`
-- [x] 4.4 Build succeeds: `npm run build`
-- [x] 4.5 No `bg-cosmic` in dashboard.astro/tasks/index.astro
-- [x] 4.6 No `border-red-500` in TaskList.tsx
-- [x] 4.7 No bare `<input className>` in AddTaskDialog.tsx/EditTaskDialog.tsx
+- [x] 4.1 Type checking passes: `npx astro check` — 49a8784
+- [x] 4.2 Linting passes: `npm run lint` — 49a8784
+- [x] 4.3 Unit tests pass: `npm run test` — 49a8784
+- [x] 4.4 Build succeeds: `npm run build` — 49a8784
+- [x] 4.5 No `bg-cosmic` in dashboard.astro/tasks/index.astro — 49a8784
+- [x] 4.6 No `border-red-500` in TaskList.tsx — 49a8784
+- [x] 4.7 No bare `<input className>` in AddTaskDialog.tsx/EditTaskDialog.tsx — 49a8784
 
 #### Manual
 
-- [x] 4.8 Dashboard empty-state and list items render as readable Cards
-- [x] 4.9 Tasks table header is fully visible; heading matches dashboard's gradient
-- [x] 4.10 Add/Edit dialog inputs show a visible dark background/border
-- [x] 4.11 Error states show the shared `ErrorBanner` on tasks page and dialogs
+- [x] 4.8 Dashboard empty-state and list items render as readable Cards — 49a8784
+- [x] 4.9 Tasks table header is fully visible; heading matches dashboard's gradient — 49a8784
+- [x] 4.10 Add/Edit dialog inputs show a visible dark background/border — 49a8784
+- [x] 4.11 Error states show the shared `ErrorBanner` on tasks page and dialogs — 49a8784
 
 ### Phase 5: Auth & Account
 
 #### Automated
 
-- [ ] 5.1 Type checking passes: `npx astro check`
-- [ ] 5.2 Linting passes: `npm run lint`
-- [ ] 5.3 Build succeeds: `npm run build`
-- [ ] 5.4 No `bg-cosmic` in auth/account pages
-- [ ] 5.5 No `bg-white/5`/`rounded-xl` in account pages
+- [x] 5.1 Type checking passes: `npx astro check`
+- [x] 5.2 Linting passes: `npm run lint`
+- [x] 5.3 Build succeeds: `npm run build`
+- [x] 5.4 No `bg-cosmic` in auth/account pages
+- [x] 5.5 No `bg-white/5`/`rounded-xl` in account pages
 
 #### Manual
 
-- [ ] 5.6 Auth pages render visually unchanged (pure refactor check)
-- [ ] 5.7 Account pages now visually match the app-wide glass-card treatment with a gradient heading
+- [x] 5.6 Auth pages render visually unchanged (pure refactor check)
+- [x] 5.7 Account pages now visually match the app-wide glass-card treatment with a gradient heading

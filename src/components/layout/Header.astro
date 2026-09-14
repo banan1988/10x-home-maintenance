@@ -39,7 +39,9 @@ const isTasksActive = pathname.startsWith("/tasks");
   {
     user ? (
       <div class="flex items-center gap-4">
-        <span class="text-blue-100/70">{user.email}</span>
+        <a href="/account/delete" class="text-blue-100/70 transition-colors hover:text-white hover:underline">
+          {user.email}
+        </a>
         <form method="POST" action="/api/auth/signout">
           <button type="submit" class="text-purple-300 transition-colors hover:text-purple-100 hover:underline">
             Sign out

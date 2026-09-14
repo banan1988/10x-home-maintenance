@@ -72,6 +72,8 @@ export function DeleteAccountForm({ email }: DeleteAccountFormProps) {
 
       <Button
         variant="destructive"
+        size="sm"
+        className="self-start"
         disabled={!isMatch || submitting}
         onClick={() => {
           setDialogOpen(true);
