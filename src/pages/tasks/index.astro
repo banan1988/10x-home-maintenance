@@ -1,4 +1,5 @@
 ---
+import { parseISO } from "date-fns";
 import Layout from "@/layouts/Layout.astro";
 import TaskList from "@/components/tasks/TaskList";
 import { createClient } from "@/lib/supabase";
@@ -17,7 +18,7 @@ if (supabase) {
   const today = new Date();
   tasks = (data ?? [])
     .map((task) => {
-      const dueDate = computeDueDate(new Date(task.last_done_date), task.frequency_value, task.frequency_unit);
+      const dueDate = computeDueDate(parseISO(task.last_done_date), task.frequency_value, task.frequency_unit);
       return { ...task, dueDate, status: computeStatus(dueDate, today) };
     })
     .sort(compareByUrgency);

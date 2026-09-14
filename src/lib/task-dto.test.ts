@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { toTaskDto } from "@/lib/task-dto";
 import type { MaintenanceTask } from "@/types";
@@ -38,5 +38,23 @@ describe("toTaskDto", () => {
     const dto = toTaskDto(task);
 
     expect(dto).toMatchObject(task);
+  });
+});
+
+describe("toTaskDto last_done_date timezone handling", () => {
+  const originalTz = process.env.TZ;
+
+  beforeAll(() => {
+    process.env.TZ = "America/New_York";
+  });
+
+  afterAll(() => {
+    process.env.TZ = originalTz;
+  });
+
+  it("should compute due_date from last_done_date's local calendar day, matching dashboard.astro's parseISO parsing, not a UTC-shifted day", () => {
+    const dto = toTaskDto(makeTask({ last_done_date: "2026-01-01", frequency_value: 3, frequency_unit: "month" }));
+
+    expect(dto.due_date).toBe("2026-04-01");
   });
 });
