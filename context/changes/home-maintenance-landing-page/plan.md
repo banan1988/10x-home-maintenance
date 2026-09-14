@@ -212,15 +212,15 @@ placeholder page.
 
 #### Automated
 
-- [ ] 1.1 Linting passes: `npm run lint`
-- [ ] 1.2 Type checking passes: `npx astro check`
-- [ ] 1.3 Production build succeeds: `npm run build`
-- [ ] 1.4 Existing unit test suite passes (no regressions): `npm run test`
+- [x] 1.1 Linting passes: `npm run lint`
+- [x] 1.2 Type checking passes: `npx astro check`
+- [x] 1.3 Production build succeeds: `npm run build`
+- [x] 1.4 Existing unit test suite passes (no regressions): `npm run test`
 
 #### Manual
 
-- [ ] 1.5 Signed-out `/`: title, meta description, hero copy, how-it-works steps, and Sign up/Sign in CTA hrefs
+- [x] 1.5 Signed-out `/`: title, meta description, hero copy, how-it-works steps, and Sign up/Sign in CTA hrefs
   are correct
-- [ ] 1.6 Signed-in `/`: hero/how-it-works unchanged, CTA shows Go to Dashboard → `/dashboard`
-- [ ] 1.7 Header/footer render unchanged in both auth states
-- [ ] 1.8 No console errors on page load in either auth state
+- [x] 1.6 Signed-in `/`: hero/how-it-works unchanged, CTA shows Go to Dashboard → `/dashboard`
+- [x] 1.7 Header/footer render unchanged in both auth states
+- [x] 1.8 No console errors on page load in either auth state
