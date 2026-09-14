@@ -31,7 +31,9 @@ status-boundary regression grid the phase name calls for, plus a couple of extre
 - `src/lib/status.test.ts` contains a parameterized grid proving all 4 frequency units correctly cross each
   FR-009 boundary (-1/0/+7/+8 days), using literal `Date` construction rather than date-fns-derived fixtures.
 - `task-dto.ts` and `tasks/index.astro` parse `last_done_date` identically to `dashboard.astro` (via
-  `parseISO`), verified by a TZ-forced regression test in `task-dto.test.ts`.
+  `parseISO`). `task-dto.ts`'s call site is verified by a TZ-forced regression test in `task-dto.test.ts`;
+  `tasks/index.astro`'s identical fix is verified manually only (no `.astro` unit-test tier exists in this
+  repo).
 - A couple of schema-permitted extreme inputs (very large `frequency_value`, very old `last_done_date`) have
   documented — not necessarily changed — behavior in `status.test.ts`.
 - `test-plan.md` §6.5 describes the grid/TZ-forcing pattern for future contributors; the S-07 drift risk is
@@ -127,13 +129,13 @@ the previous local calendar day versus `parseISO`'s same-day result — e.g. `la
 
 #### Automated Verification
 
-- [ ] Unit tests pass: `npm run test`
-- [ ] Type checking passes: `npm run check`
-- [ ] Linting passes: `npm run lint`
+- Unit tests pass: `npm run test`
+- Type checking passes: `npm run check`
+- Linting passes: `npm run lint`
 
 #### Manual Verification
 
-- [ ] Run the app with a non-UTC system timezone forced (e.g. `TZ=America/New_York npm run dev`) and confirm
+- Run the app with a non-UTC system timezone forced (e.g. `TZ=America/New_York npm run dev`) and confirm
   the dashboard and the tasks list page show the same due date/status for the same task whose
   `last_done_date` sits near a local-midnight/UTC-midnight divergence.
 
@@ -175,13 +177,13 @@ Each row should assert both `computeDueDate`'s literal result (catches a wrong f
 
 #### Automated Verification
 
-- [ ] Unit tests pass: `npm run test`
-- [ ] Type checking passes: `npm run check`
-- [ ] Linting passes: `npm run lint`
+- Unit tests pass: `npm run test`
+- Type checking passes: `npm run check`
+- Linting passes: `npm run lint`
 
 #### Manual Verification
 
-- [ ] Hand-verify 2-3 grid rows against the literal FR-008/FR-009 boundary table (`prd.md:110-119`) to confirm
+- Hand-verify 2-3 grid rows against the literal FR-008/FR-009 boundary table (`prd.md:110-119`) to confirm
   the fixtures are correct against the oracle, not just internally consistent.
 
 ______________________________________________________________________
@@ -214,12 +216,13 @@ be) — do not invent an expected value the code doesn't actually produce.
 
 #### Automated Verification
 
-- [ ] Unit tests pass: `npm run test`
-- [ ] Type checking passes: `npm run check`
+- Unit tests pass: `npm run test`
+- Type checking passes: `npm run check`
+- Linting passes: `npm run lint`
 
 #### Manual Verification
 
-- [ ] Confirm the documented extreme-value behavior doesn't itself indicate an unhandled crash risk in a real
+- Confirm the documented extreme-value behavior doesn't itself indicate an unhandled crash risk in a real
   code path (e.g. `task-dto.ts`'s `format(dueDate, "yyyy-MM-dd")` call on an `Invalid Date`); if it does,
   flag it as a new risk rather than silently shipping it.
 
@@ -229,7 +232,9 @@ ______________________________________________________________________
 
 ### Overview
 
-Fill in `test-plan.md` §6.5, record the S-07 open risk, and close out this change's tracking artifacts.
+Fill in `test-plan.md` §6.5 and close out this change's tracking artifacts. The S-07 open-risk note already
+exists in `plan-brief.md`'s Open Risks & Assumptions section (written during planning) — this phase reviews
+it for clarity, it does not author it.
 
 ### Changes Required
 
@@ -257,12 +262,12 @@ case as examples.
 
 #### Automated Verification
 
-- [ ] `test-plan.md` §6.5 no longer contains the literal string `TBD`
-- [ ] `change.md`'s `status` field reads `implemented`
+- `test-plan.md` §6.5 no longer contains the literal string `TBD`
+- `change.md`'s `status` field reads `implemented`
 
 #### Manual Verification
 
-- [ ] The S-07 open-risk note (see this plan's brief) reads clearly to someone who wasn't part of this
+- The S-07 open-risk note (see this plan's brief) reads clearly to someone who wasn't part of this
   planning conversation.
 
 ______________________________________________________________________
@@ -340,10 +345,11 @@ parser is called; no persisted data changes shape.
 
 - [ ] 3.1 Unit tests pass: `npm run test`
 - [ ] 3.2 Type checking passes: `npm run check`
+- [ ] 3.3 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 3.3 Extreme-value output reviewed for crash-risk implications
+- [ ] 3.4 Extreme-value output reviewed for crash-risk implications
 
 ### Phase 4: Cookbook update & close-out
 
