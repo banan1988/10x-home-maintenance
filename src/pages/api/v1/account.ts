@@ -31,13 +31,14 @@ export const DELETE: APIRoute = async (context) => {
     return jsonError(400, "Email confirmation does not match");
   }
 
-  console.log(`Deleting account ${user.id} (${user.email}) at ${new Date().toISOString()}`);
+  console.log(`Deleting account ${user.id} at ${new Date().toISOString()}`);
 
   const adminClient = requireApiAdminClient(context);
   if (adminClient instanceof Response) return adminClient;
 
   const { error } = await adminClient.auth.admin.deleteUser(user.id);
   if (error) {
+    console.error("Failed to delete account:", error);
     return jsonError(502, "Failed to delete account");
   }
 

@@ -355,6 +355,19 @@ straggler in the local database.
 - Supabase Studio shows no leftover disposable users/tasks after a full local `test:integration` run,
   including after an intentionally-failed run (to confirm cleanup logic actually runs).
 
+### Addendum: verification method changed during implementation (post-impl-review)
+
+The contract above says to verify the cascade "using the admin client... assert a `maintenance_tasks`
+select ... returns zero rows." The shipped test does not do this — `supabase/migrations/20260827194321_create_maintenance_tasks.sql`
+grants `select/insert/update/delete` on `maintenance_tasks` only to the `authenticated` role, never to
+`service_role`, so `adminClient.from("maintenance_tasks").select()` fails with a Postgres permission error
+regardless of RLS (RLS bypass and table `GRANT`s are separate mechanisms) — the plan's literal approach was
+not viable. The shipped test instead adds a new `pg`/`@types/pg` devDependency and connects directly to
+Postgres as the superuser (bypassing PostgREST/RLS/grants entirely) to count `maintenance_tasks` rows for
+the disposable test user. See `src/pages/api/v1/account.integration.test.ts:11-16` for the in-file
+rationale. Flagged and accepted via `/10x-impl-review` (F3, 2026-09-14) rather than adding a `service_role`
+grant migration solely for this test's benefit.
+
 ______________________________________________________________________
 
 ## Testing Strategy

@@ -29,6 +29,7 @@
 - **Location**: context/foundation/roadmap.md (At-a-glance table + S-06 detail "Status:" line); root cause in commits 3d6a688 and 8218043
 - **Detail**: Phase-1 commit `3d6a688` flipped S-06's roadmap status to `in-progress` mid-implementation — violating the already-documented lesson "`roadmap.md` status must only be synced by the epilogue step, not a mid-phase commit." The epilogue commit `8218043` then never touched `roadmap.md` at all — violating the separate already-documented lesson "Closing out a plan must also update roadmap.md." Result: `change.md` reads `implemented` and all 4 phases' Progress checkboxes are `[x]`, but `roadmap.md` still shows S-06 as `in-progress`, inconsistent with the `done` convention already used for F-01/S-01/S-02/S-03.
 - **Fix**: Update roadmap.md's At-a-glance table Status cell and S-06's detail-section "Status:" line from `in-progress` to `done`.
+- **Decision**: FIXED
 
 ### F2 — `.env.example` never got its documented placeholder line
 
@@ -38,6 +39,7 @@
 - **Location**: `.env.example` (Phase 1 item 4's contract); Progress item 1.4
 - **Detail**: Plan Phase 1 item 4 explicitly required a `SUPABASE_SERVICE_ROLE_KEY=` placeholder line in `.env.example` alongside the README updates. README got all three documented locations correctly (local-setup step, cloud-project table, deployment secrets list), but `.env.example` was never touched by any commit in this feature's range — confirmed via `git diff --name-only 3ce1746^..8218043`, which excludes the file entirely — even though Progress item 1.4 is checked `[x]`.
 - **Fix**: Add a `SUPABASE_SERVICE_ROLE_KEY=` placeholder line to `.env.example`, matching the existing two lines' style (fake placeholder, no real value).
+- **Decision**: FIXED (manually, by user — Claude is denied file access to `.env*` paths by permission policy)
 
 ### F3 — Unplanned `pg`/`@types/pg` dependency added for Phase 4 verification
 
@@ -56,7 +58,7 @@
   - Tradeoff: Grants `service_role` a standing table privilege it doesn't otherwise need, for the sole benefit of one test.
   - Confidence: MEDIUM — introduces a new migration for a narrow purpose; unverified whether the team wants to avoid giving `service_role` even unused RLS-bypass-capable access to user data as a defense-in-depth principle.
   - Blind spot: Whether this migration would have any other interaction with existing RLS policies.
-- **Decision**: PENDING
+- **Decision**: FIXED via Fix A — addendum added to plan.md's Phase 4 section
 
 ### F4 — PII (email) logged in the account-deletion audit line, even on non-actionable attempts
 
@@ -66,6 +68,7 @@
 - **Location**: `src/pages/api/v1/account.ts:34`
 - **Detail**: The audit line logs `user.email` and fires before the admin-client-configured guard (line 36), so a request that later 503s (misconfigured server) still logs the requester's raw email into Cloudflare Workers logs. Logging PII in a GDPR-erasure code path, beyond what's needed for the audit trail, is avoidable.
 - **Fix**: Drop the email from the log line — log `user.id` and the timestamp only.
+- **Decision**: FIXED
 
 ### F5 — `deleteUser` failure isn't logged, breaking the sibling-route error-logging convention
 
@@ -75,6 +78,7 @@
 - **Location**: `src/pages/api/v1/account.ts:39-42`
 - **Detail**: Every sibling `/api/v1/tasks/*` route logs the underlying Supabase error via `console.error` before returning its error response (e.g. `tasks/index.ts:23,58`). `account.ts`'s 502 branch returns silently, losing the only audit trail the plan explicitly designed for this destructive action's failure path (the plan's own "No dedicated audit table" section relies solely on console logging for observability).
 - **Fix**: Add `console.error("Failed to delete account:", error);` before the `502` return.
+- **Decision**: FIXED
 
 ### F6 — New `DELETE /api/v1/account` endpoint undocumented in README
 
@@ -84,6 +88,7 @@
 - **Location**: `README.md:163-171` (Endpoints table)
 - **Detail**: CLAUDE.md's repo-wide rule requires documenting new features' usage; the Phase 1 env var got documented in all three required README locations, but the new `DELETE /api/v1/account` endpoint itself was never added to the existing Endpoints table alongside the `/api/v1/tasks*` rows.
 - **Fix**: Add a `| DELETE | /api/v1/account | Permanently delete the authenticated user's account (body:`{"confirmEmail": "<their email>"}`) |` row to the Endpoints table.
+- **Decision**: FIXED
 
 ## Clean areas (verified, no findings)
 
