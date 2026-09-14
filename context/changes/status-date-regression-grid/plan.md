@@ -319,9 +319,9 @@ parser is called; no persisted data changes shape.
 
 #### Automated
 
-- [x] 1.1 Unit tests pass: `npm run test`
-- [x] 1.2 Type checking passes: `npm run check`
-- [x] 1.3 Linting passes: `npm run lint`
+- [x] 1.1 Unit tests pass: `npm run test` — 1d0830a
+- [x] 1.2 Type checking passes: `npm run check` — 1d0830a
+- [x] 1.3 Linting passes: `npm run lint` — 1d0830a
 
 #### Manual
 
@@ -334,19 +334,23 @@ parser is called; no persisted data changes shape.
   was only ever observable in Node/Vitest (which does honor `process.env.TZ`) — exactly where
   `task-dto.test.ts`'s new TZ-forced regression test catches it. The fix and its automated test remain correct
   and valuable (code consistency + real regression coverage in the test tier that can exercise it); this
-  manual browser-comparison step just cannot demonstrate anything either way on this platform.
+  manual browser-comparison step just cannot demonstrate anything either way on this platform. — 1d0830a
 
 ### Phase 2: Frequency × boundary regression grid
 
 #### Automated
 
-- [ ] 2.1 Unit tests pass: `npm run test`
-- [ ] 2.2 Type checking passes: `npm run check`
-- [ ] 2.3 Linting passes: `npm run lint`
+- [x] 2.1 Unit tests pass: `npm run test`
+- [x] 2.2 Type checking passes: `npm run check`
+- [x] 2.3 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 2.4 Hand-verified sample grid rows against FR-008/FR-009
+- [x] 2.4 Hand-verified 3 sample grid rows against FR-008/FR-009 (`prd.md:110-119`): day/-1d→OVERDUE,
+  month/0d→DUE_SOON, and the leap-year Jan31→Feb29 clamp row/+7d→DUE_SOON — all match the oracle. All 29
+  `status.test.ts` assertions (16 grid rows + 1 leap-year-clamp row) passed on first run with no code change
+  needed; `computeDueDate`/`computeStatus` already handled the combined frequency×boundary space correctly —
+  this phase closes the "never tested together" gap with real coverage, not a bug fix.
 
 ### Phase 3: Extreme-value documenting cases
 

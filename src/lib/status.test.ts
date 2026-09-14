@@ -2,7 +2,7 @@ import { addDays } from "date-fns";
 import { describe, expect, it } from "vitest";
 
 import { compareByUrgency, computeDueDate, computeStatus } from "@/lib/status";
-import type { MaintenanceFrequencyUnit, MaintenanceTaskWithStatus } from "@/types";
+import type { MaintenanceFrequencyUnit, MaintenanceTaskWithStatus, TaskStatus } from "@/types";
 
 describe("computeDueDate", () => {
   const lastDoneDate = new Date(2026, 0, 1);
@@ -51,6 +51,156 @@ describe("computeStatus", () => {
 
   it("should return OK when the due date is 8 days from today", () => {
     expect(computeStatus(addDays(today, 8), today)).toBe("OK");
+  });
+});
+
+describe("computeDueDate + computeStatus combined regression grid (FR-008/FR-009)", () => {
+  // today = 2026-06-15 (local). Boundaries per FR-009: dueDate < today -> OVERDUE;
+  // today <= dueDate <= today+7 -> DUE_SOON; dueDate > today+7 -> OK.
+  const today = new Date(2026, 5, 15);
+
+  const gridRows: {
+    frequencyUnit: MaintenanceFrequencyUnit;
+    frequencyValue: number;
+    lastDoneDate: Date;
+    expectedDueDate: Date;
+    expectedStatus: TaskStatus;
+  }[] = [
+    // day
+    {
+      frequencyUnit: "day",
+      frequencyValue: 1,
+      lastDoneDate: new Date(2026, 5, 13),
+      expectedDueDate: new Date(2026, 5, 14),
+      expectedStatus: "OVERDUE",
+    },
+    {
+      frequencyUnit: "day",
+      frequencyValue: 1,
+      lastDoneDate: new Date(2026, 5, 14),
+      expectedDueDate: new Date(2026, 5, 15),
+      expectedStatus: "DUE_SOON",
+    },
+    {
+      frequencyUnit: "day",
+      frequencyValue: 1,
+      lastDoneDate: new Date(2026, 5, 21),
+      expectedDueDate: new Date(2026, 5, 22),
+      expectedStatus: "DUE_SOON",
+    },
+    {
+      frequencyUnit: "day",
+      frequencyValue: 1,
+      lastDoneDate: new Date(2026, 5, 22),
+      expectedDueDate: new Date(2026, 5, 23),
+      expectedStatus: "OK",
+    },
+    // week
+    {
+      frequencyUnit: "week",
+      frequencyValue: 1,
+      lastDoneDate: new Date(2026, 5, 7),
+      expectedDueDate: new Date(2026, 5, 14),
+      expectedStatus: "OVERDUE",
+    },
+    {
+      frequencyUnit: "week",
+      frequencyValue: 1,
+      lastDoneDate: new Date(2026, 5, 8),
+      expectedDueDate: new Date(2026, 5, 15),
+      expectedStatus: "DUE_SOON",
+    },
+    {
+      frequencyUnit: "week",
+      frequencyValue: 1,
+      lastDoneDate: new Date(2026, 5, 15),
+      expectedDueDate: new Date(2026, 5, 22),
+      expectedStatus: "DUE_SOON",
+    },
+    {
+      frequencyUnit: "week",
+      frequencyValue: 1,
+      lastDoneDate: new Date(2026, 5, 16),
+      expectedDueDate: new Date(2026, 5, 23),
+      expectedStatus: "OK",
+    },
+    // month
+    {
+      frequencyUnit: "month",
+      frequencyValue: 1,
+      lastDoneDate: new Date(2026, 4, 14),
+      expectedDueDate: new Date(2026, 5, 14),
+      expectedStatus: "OVERDUE",
+    },
+    {
+      frequencyUnit: "month",
+      frequencyValue: 1,
+      lastDoneDate: new Date(2026, 4, 15),
+      expectedDueDate: new Date(2026, 5, 15),
+      expectedStatus: "DUE_SOON",
+    },
+    {
+      frequencyUnit: "month",
+      frequencyValue: 1,
+      lastDoneDate: new Date(2026, 4, 22),
+      expectedDueDate: new Date(2026, 5, 22),
+      expectedStatus: "DUE_SOON",
+    },
+    {
+      frequencyUnit: "month",
+      frequencyValue: 1,
+      lastDoneDate: new Date(2026, 4, 23),
+      expectedDueDate: new Date(2026, 5, 23),
+      expectedStatus: "OK",
+    },
+    // year
+    {
+      frequencyUnit: "year",
+      frequencyValue: 1,
+      lastDoneDate: new Date(2025, 5, 14),
+      expectedDueDate: new Date(2026, 5, 14),
+      expectedStatus: "OVERDUE",
+    },
+    {
+      frequencyUnit: "year",
+      frequencyValue: 1,
+      lastDoneDate: new Date(2025, 5, 15),
+      expectedDueDate: new Date(2026, 5, 15),
+      expectedStatus: "DUE_SOON",
+    },
+    {
+      frequencyUnit: "year",
+      frequencyValue: 1,
+      lastDoneDate: new Date(2025, 5, 22),
+      expectedDueDate: new Date(2026, 5, 22),
+      expectedStatus: "DUE_SOON",
+    },
+    {
+      frequencyUnit: "year",
+      frequencyValue: 1,
+      lastDoneDate: new Date(2025, 5, 23),
+      expectedDueDate: new Date(2026, 5, 23),
+      expectedStatus: "OK",
+    },
+  ];
+
+  it.each(gridRows)(
+    "should compute due date $expectedDueDate and status $expectedStatus for $frequencyValue $frequencyUnit(s) since $lastDoneDate",
+    ({ frequencyUnit, frequencyValue, lastDoneDate, expectedDueDate, expectedStatus }) => {
+      const dueDate = computeDueDate(lastDoneDate, frequencyValue, frequencyUnit);
+
+      expect(dueDate).toEqual(expectedDueDate);
+      expect(computeStatus(dueDate, today)).toBe(expectedStatus);
+    },
+  );
+
+  it("should clamp a leap-year Feb 31 rollover to Feb 29 and still resolve the DUE_SOON boundary correctly", () => {
+    const leapYearToday = new Date(2028, 1, 22);
+
+    const dueDate = computeDueDate(new Date(2028, 0, 31), 1, "month");
+
+    expect(dueDate).toEqual(new Date(2028, 1, 29));
+    expect(computeStatus(dueDate, leapYearToday)).toBe("DUE_SOON");
   });
 });
 
