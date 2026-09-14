@@ -579,29 +579,29 @@ Not applicable — no data model or persisted-state changes.
 
 #### Automated
 
-- [x] 2.1 `npx shadcn@latest add card` completes and `card.tsx` exists
-- [x] 2.2 Type checking passes: `npx astro check`
-- [x] 2.3 Linting passes: `npm run lint`
-- [x] 2.4 Build succeeds: `npm run build`
-- [x] 2.5 No remaining `ServerError`/`LibBadge` references
+- [x] 2.1 `npx shadcn@latest add card` completes and `card.tsx` exists — a342026
+- [x] 2.2 Type checking passes: `npx astro check` — a342026
+- [x] 2.3 Linting passes: `npm run lint` — a342026
+- [x] 2.4 Build succeeds: `npm run build` — a342026
+- [x] 2.5 No remaining `ServerError`/`LibBadge` references — a342026
 
 #### Manual
 
-- [x] 2.6 Failed sign-in/sign-up shows the error via `ErrorBanner`
+- [x] 2.6 Failed sign-in/sign-up shows the error via `ErrorBanner` — a342026
 
 ### Phase 3: Shell & Landing
 
 #### Automated
 
-- [ ] 3.1 Type checking passes: `npx astro check`
-- [ ] 3.2 Linting passes: `npm run lint`
-- [ ] 3.3 Build succeeds: `npm run build`
-- [ ] 3.4 No `bg-cosmic` in Header/Footer/Welcome
+- [x] 3.1 Type checking passes: `npx astro check`
+- [x] 3.2 Linting passes: `npm run lint`
+- [x] 3.3 Build succeeds: `npm run build`
+- [x] 3.4 No `bg-cosmic` in Header/Footer/Welcome
 
 #### Manual
 
-- [ ] 3.5 `/` shows one consistent dark background across header/footer/hero
-- [ ] 3.6 `Banner.astro` shows readable text in all 3 variants
+- [x] 3.5 `/` shows one consistent dark background across header/footer/hero
+- [x] 3.6 `Banner.astro` shows readable text in all 3 variants
 
 ### Phase 4: Dashboard & Tasks
 
