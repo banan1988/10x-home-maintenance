@@ -449,8 +449,8 @@ row is the only database action this feature performs directly.
 
 #### Automated
 
-- [x] 4.1 Integration tests pass: `npm run test:integration`
+- [x] 4.1 Integration tests pass: `npm run test:integration` — b994ca1
 
 #### Manual
 
-- [x] 4.2 No leftover disposable users/tasks in Supabase Studio after a full run, including after a failed run
+- [x] 4.2 No leftover disposable users/tasks in Supabase Studio after a full run, including after a failed run — b994ca1
