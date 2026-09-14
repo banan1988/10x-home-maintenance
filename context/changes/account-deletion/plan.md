@@ -422,28 +422,28 @@ row is the only database action this feature performs directly.
 
 #### Automated
 
-- [x] 2.1 Unit tests pass: `npm run test`
-- [x] 2.2 Linting passes: `npm run lint`
-- [x] 2.3 Build succeeds: `npm run build`
+- [x] 2.1 Unit tests pass: `npm run test` — fe72395
+- [x] 2.2 Linting passes: `npm run lint` — fe72395
+- [x] 2.3 Build succeeds: `npm run build` — fe72395
 
 #### Manual
 
-- [x] 2.4 Manual curl walkthrough (400 on mismatch, 204 + row/user gone on success) against local Supabase
+- [x] 2.4 Manual curl walkthrough (400 on mismatch, 204 + row/user gone on success) against local Supabase — fe72395
 
 ### Phase 3: Confirmation UI
 
 #### Automated
 
-- [ ] 3.1 Linting passes: `npm run lint`
-- [ ] 3.2 Build succeeds: `npm run build`
-- [ ] 3.3 Unit tests pass: `npm run test`
+- [x] 3.1 Linting passes: `npm run lint`
+- [x] 3.2 Build succeeds: `npm run build`
+- [x] 3.3 Unit tests pass: `npm run test`
 
 #### Manual
 
-- [ ] 3.4 Unauthenticated `/account/delete` redirects; `/account-deleted` reachable without a session
-- [ ] 3.5 Disabled-until-match button behavior verified in browser
-- [ ] 3.6 "Are you sure?" dialog Cancel/Confirm behavior verified in browser
-- [ ] 3.7 Full delete → redirect → subsequent `/dashboard` redirect-to-signin verified in browser
+- [x] 3.4 Unauthenticated `/account/delete` redirects; `/account-deleted` reachable without a session
+- [x] 3.5 Disabled-until-match button behavior verified in browser
+- [x] 3.6 "Are you sure?" dialog Cancel/Confirm behavior verified in browser
+- [x] 3.7 Full delete → redirect → subsequent `/dashboard` redirect-to-signin verified in browser
 
 ### Phase 4: Real-Supabase integration test
 
