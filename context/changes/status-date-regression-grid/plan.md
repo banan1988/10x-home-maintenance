@@ -319,13 +319,22 @@ parser is called; no persisted data changes shape.
 
 #### Automated
 
-- [ ] 1.1 Unit tests pass: `npm run test`
-- [ ] 1.2 Type checking passes: `npm run check`
-- [ ] 1.3 Linting passes: `npm run lint`
+- [x] 1.1 Unit tests pass: `npm run test`
+- [x] 1.2 Type checking passes: `npm run check`
+- [x] 1.3 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 1.4 Dashboard and tasks list agree on due date/status under a forced non-UTC timezone
+- [x] 1.4 N/A as written — verified inapplicable, not skipped: empirically confirmed (throwaway
+  `wrangler dev --local` worker, `TZ=America/New_York` forced) that Cloudflare Workers' runtime clock is
+  hardcoded to UTC (`Intl.DateTimeFormat().resolvedOptions().timeZone` → `"UTC"`, `getTimezoneOffset()` → `0`)
+  regardless of host `TZ`, in local dev *and* any Cloudflare deployment (preview/prod) — there is no way to
+  force a non-UTC runtime clock on this platform. Consequently `parseISO` and `new Date` on a bare date string
+  always agreed in this app's actual runtime, before and after the Phase 1 fix; the divergence this plan fixes
+  was only ever observable in Node/Vitest (which does honor `process.env.TZ`) — exactly where
+  `task-dto.test.ts`'s new TZ-forced regression test catches it. The fix and its automated test remain correct
+  and valuable (code consistency + real regression coverage in the test tier that can exercise it); this
+  manual browser-comparison step just cannot demonstrate anything either way on this platform.
 
 ### Phase 2: Frequency × boundary regression grid
 

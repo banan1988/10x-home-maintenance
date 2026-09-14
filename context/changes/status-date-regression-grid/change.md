@@ -1,7 +1,7 @@
 ---
 change_id: status-date-regression-grid
 title: Status date regression grid
-status: plan_reviewed
+status: implementing
 created: 2026-09-14
 updated: 2026-09-14
 archived_at:
