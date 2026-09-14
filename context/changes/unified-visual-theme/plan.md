@@ -563,31 +563,31 @@ Not applicable — no data model or persisted-state changes.
 
 #### Automated
 
-- [x] 1.1 Type checking passes: `npx astro check`
-- [x] 1.2 Linting passes: `npm run lint`
-- [x] 1.3 Unit tests pass: `npm run test`
-- [x] 1.4 Build succeeds: `npm run build`
-- [x] 1.5 No remaining `dark:` references
-- [x] 1.6 No remaining `@custom-variant dark` or `.dark {` in `global.css`
+- [x] 1.1 Type checking passes: `npx astro check` — e3015a3
+- [x] 1.2 Linting passes: `npm run lint` — e3015a3
+- [x] 1.3 Unit tests pass: `npm run test` — e3015a3
+- [x] 1.4 Build succeeds: `npm run build` — e3015a3
+- [x] 1.5 No remaining `dark:` references — e3015a3
+- [x] 1.6 No remaining `@custom-variant dark` or `.dark {` in `global.css` — e3015a3
 
 #### Manual
 
-- [x] 1.7 Every shadcn primitive renders with correct dark contrast in isolation
-- [x] 1.8 Toast rendering is dark-themed regardless of OS preference
+- [x] 1.7 Every shadcn primitive renders with correct dark contrast in isolation — e3015a3
+- [x] 1.8 Toast rendering is dark-themed regardless of OS preference — e3015a3
 
 ### Phase 2: Shared Components & Dead-Code Removal
 
 #### Automated
 
-- [ ] 2.1 `npx shadcn@latest add card` completes and `card.tsx` exists
-- [ ] 2.2 Type checking passes: `npx astro check`
-- [ ] 2.3 Linting passes: `npm run lint`
-- [ ] 2.4 Build succeeds: `npm run build`
-- [ ] 2.5 No remaining `ServerError`/`LibBadge` references
+- [x] 2.1 `npx shadcn@latest add card` completes and `card.tsx` exists
+- [x] 2.2 Type checking passes: `npx astro check`
+- [x] 2.3 Linting passes: `npm run lint`
+- [x] 2.4 Build succeeds: `npm run build`
+- [x] 2.5 No remaining `ServerError`/`LibBadge` references
 
 #### Manual
 
-- [ ] 2.6 Failed sign-in/sign-up shows the error via `ErrorBanner`
+- [x] 2.6 Failed sign-in/sign-up shows the error via `ErrorBanner`
 
 ### Phase 3: Shell & Landing
 
