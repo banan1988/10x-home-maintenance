@@ -1,8 +1,10 @@
 ---
+import { Card } from "@/components/ui/card";
+
 const { user } = Astro.locals;
 ---
 
-<div class="bg-cosmic relative min-h-screen w-full overflow-hidden">
+<div class="relative min-h-screen w-full overflow-hidden">
   <!-- Cosmic orbs -->
   <div
     class="pointer-events-none absolute top-1/4 -left-24 h-[350px] w-[350px] rounded-full bg-purple-500/20 blur-[120px]"
@@ -67,7 +69,7 @@ const { user } = Astro.locals;
 
     <!-- How it works -->
     <div class="mx-auto grid max-w-4xl grid-cols-1 gap-6 px-4 pb-24 sm:grid-cols-3">
-      <div class="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
+      <Card className="border-white/10 bg-white/5 p-6 backdrop-blur-xl">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -88,9 +90,9 @@ const { user } = Astro.locals;
         <p class="text-sm leading-relaxed text-blue-100/60">
           Name it, pick a category, set how often it repeats, and when you last did it.
         </p>
-      </div>
+      </Card>
 
-      <div class="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
+      <Card className="border-white/10 bg-white/5 p-6 backdrop-blur-xl">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -112,9 +114,9 @@ const { user } = Astro.locals;
         <p class="text-sm leading-relaxed text-blue-100/60">
           10x Home Maintenance works out whether each task is OK, due soon, or overdue — you don't have to.
         </p>
-      </div>
+      </Card>
 
-      <div class="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
+      <Card className="border-white/10 bg-white/5 p-6 backdrop-blur-xl">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -138,7 +140,7 @@ const { user } = Astro.locals;
         <p class="text-sm leading-relaxed text-blue-100/60">
           Your dashboard sorts everything by urgency, so the most pressing task is always at the top.
         </p>
-      </div>
+      </Card>
     </div>
   </div>
 </div>
