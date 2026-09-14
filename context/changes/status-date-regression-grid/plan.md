@@ -60,8 +60,14 @@ status-boundary regression grid the phase name calls for, plus a couple of extre
   the parsing fix — that's Phase 2/Phase 5's scope.
 - Not introducing a new shared `parseTaskDate()` helper module — the fix reuses the existing `parseISO`
   import pattern already established in `dashboard.astro`, not a new abstraction.
-- Not fixing or guarding `computeDueDate` against extreme `frequency_value`/`last_done_date` inputs — Phase 3's
-  tests document current behavior only.
+- ~~Not fixing or guarding `computeDueDate` against extreme `frequency_value`/`last_done_date` inputs — Phase
+  3's tests document current behavior only.~~ **Deviation (Phase 3, user-directed):** the documenting tests
+  surfaced a real, reachable crash (`format()` throws `Invalid time value` in `TaskList.tsx:70` /
+  `task-dto.ts:11` on an overflowed `dueDate`), and the user chose to fix it in-phase rather than leave it
+  flagged-only — see Phase 3's Progress notes for what changed (`task-schema.ts`'s `frequency_value.max(1000)`)
+  and why the schema-layer guard was preferred over touching the `format()` call sites directly. The
+  `last_done_date` half of this bullet still holds — no guard was added there, since that case doesn't crash
+  (documented, not fixed).
 - Not writing a new `lessons.md` entry for S-07 (`unified-visual-theme`) — captured as an open risk in this
   plan only.
 
@@ -212,6 +218,24 @@ large enough to approach `Date` overflow, and a `last_done_date` from a implausi
 whatever the actual current output is (a valid far-future `Date`, or `Invalid Date` — whichever it turns out to
 be) — do not invent an expected value the code doesn't actually produce.
 
+#### 2. Crash-risk fix (deviation, user-directed — not in the original contract)
+
+**Files**: `src/lib/task-schema.ts`, `src/lib/task-schema.test.ts`
+
+**Intent**: The documenting cases above proved `frequency_value: 100_000_000, frequency_unit: "day"` makes
+`computeDueDate` silently return an `Invalid Date`, which then makes `TaskList.tsx:70`'s and
+`task-dto.ts:11`'s unguarded `format(dueDate, "yyyy-MM-dd")` throw `RangeError: Invalid time value` — an
+unhandled SSR crash reachable by any user submitting a large `frequency_value` (schema-permitted; no
+`.max()` existed). Presented as a flagged risk per the original contract; the user chose to fix it now
+instead of deferring.
+
+**Contract**: Test-first (RED confirmed, then GREEN): added `.max(1000, "Frequency must be 1000 or less")` to
+`frequency_value` in both `addTaskSchema` and `createTaskJsonSchema` (covers `updateTaskJsonSchema` via
+`.partial()`). 1000 is comfortably below the ~100,000,000-day overflow threshold for every `frequency_unit`
+(day/week/month/year), while remaining far larger than any realistic home-maintenance cadence. Chosen over
+guarding the `format()` call sites directly because it stops the invalid value from ever being persisted,
+fixing the root cause rather than patching each downstream symptom.
+
 ### Success Criteria
 
 #### Automated Verification
@@ -340,9 +364,9 @@ parser is called; no persisted data changes shape.
 
 #### Automated
 
-- [x] 2.1 Unit tests pass: `npm run test`
-- [x] 2.2 Type checking passes: `npm run check`
-- [x] 2.3 Linting passes: `npm run lint`
+- [x] 2.1 Unit tests pass: `npm run test` — 42e3b5d
+- [x] 2.2 Type checking passes: `npm run check` — 42e3b5d
+- [x] 2.3 Linting passes: `npm run lint` — 42e3b5d
 
 #### Manual
 
@@ -350,19 +374,30 @@ parser is called; no persisted data changes shape.
   month/0d→DUE_SOON, and the leap-year Jan31→Feb29 clamp row/+7d→DUE_SOON — all match the oracle. All 29
   `status.test.ts` assertions (16 grid rows + 1 leap-year-clamp row) passed on first run with no code change
   needed; `computeDueDate`/`computeStatus` already handled the combined frequency×boundary space correctly —
-  this phase closes the "never tested together" gap with real coverage, not a bug fix.
+  this phase closes the "never tested together" gap with real coverage, not a bug fix. — 42e3b5d
 
 ### Phase 3: Extreme-value documenting cases
 
 #### Automated
 
-- [ ] 3.1 Unit tests pass: `npm run test`
-- [ ] 3.2 Type checking passes: `npm run check`
-- [ ] 3.3 Linting passes: `npm run lint`
+- [x] 3.1 Unit tests pass: `npm run test`
+- [x] 3.2 Type checking passes: `npm run check`
+- [x] 3.3 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 3.4 Extreme-value output reviewed for crash-risk implications
+- [x] 3.4 Extreme-value output reviewed for crash-risk implications — **found a real one, and fixed it
+  (user-directed deviation from "document only")**: with `frequency_value: 100_000_000, frequency_unit: "day"`
+  (schema-permitted; `frequency_value` had no `.max()`), `computeDueDate` silently returns an `Invalid Date`
+  (doesn't throw), but `src/components/tasks/TaskList.tsx:70` (`tasks/index.astro`'s render path) and
+  `src/lib/task-dto.ts:11` (`/api/v1/tasks` JSON path) both call `format(dueDate, "yyyy-MM-dd")` unguarded on
+  that value, which throws `RangeError: Invalid time value` — an unhandled SSR crash for any user with such a
+  task. Pinned in `status.test.ts` (both the silent `Invalid Date` and the downstream `format()` throw), then
+  closed test-first at the schema layer: `task-schema.ts`'s `frequency_value` now has `.max(1000, ...)` in
+  both `addTaskSchema` and `createTaskJsonSchema`, so the overflowing value can never be persisted in the
+  first place. See Phase 3's "Changes Required" §2 for the full contract. The very-old-`last_done_date` case
+  does **not** crash — `computeDueDate`/`format` handle it fine, just produces an implausibly old due date —
+  so no guard was added there, per the original contract.
 
 ### Phase 4: Cookbook update & close-out
 
