@@ -34,3 +34,7 @@ pnpm-debug.log*
 # eslint's includeIgnoreFile(), which only reads the root .gitignore, excludes them too)
 supabase/.temp/
 supabase/.branches/
+
+# stryker temp files and reports
+.stryker-tmp
+reports/
