@@ -1,7 +1,7 @@
 import { addDays, format, parseISO } from "date-fns";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { compareByUrgency, computeDueDate, computeStatus } from "@/lib/status";
+import { compareByUrgency, computeDueDate, computeStatus, shouldConfirmCompletion } from "@/lib/status";
 import type { MaintenanceFrequencyUnit, MaintenanceTaskWithStatus, TaskStatus } from "@/types";
 
 describe("computeDueDate", () => {
@@ -268,5 +268,19 @@ describe("compareByUrgency", () => {
     const sorted = [low, high, medium].sort(compareByUrgency);
 
     expect(sorted.map((task) => task.id)).toEqual(["high", "medium", "low"]);
+  });
+});
+
+describe("shouldConfirmCompletion", () => {
+  it("should return true when status is OK", () => {
+    expect(shouldConfirmCompletion("OK")).toBe(true);
+  });
+
+  it("should return false when status is DUE_SOON", () => {
+    expect(shouldConfirmCompletion("DUE_SOON")).toBe(false);
+  });
+
+  it("should return false when status is OVERDUE", () => {
+    expect(shouldConfirmCompletion("OVERDUE")).toBe(false);
   });
 });

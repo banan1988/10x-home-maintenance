@@ -38,3 +38,7 @@ export function computeStatus(dueDate: Date, today: Date): TaskStatus {
 export function compareByUrgency(a: MaintenanceTaskWithStatus, b: MaintenanceTaskWithStatus): number {
   return STATUS_RANK[a.status] - STATUS_RANK[b.status] || IMPORTANCE_RANK[a.importance] - IMPORTANCE_RANK[b.importance];
 }
+
+export function shouldConfirmCompletion(status: TaskStatus): boolean {
+  return status === "OK";
+}

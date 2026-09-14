@@ -340,18 +340,18 @@ No schema migrations in this plan. Phase 3's audit query is intentionally kept o
 
 #### Automated
 
-- [ ] 2.1 `shouldConfirmCompletion` unit tests pass: `npm run test`
-- [ ] 2.2 Full suite still passes (no regression in `complete.test.ts`): `npm run test`
-- [ ] 2.3 Lint passes: `npm run lint`
-- [ ] 2.4 Type checking passes: `npx tsc --noEmit`
+- [x] 2.1 `shouldConfirmCompletion` unit tests pass: `npm run test`
+- [x] 2.2 Full suite still passes (no regression in `complete.test.ts`): `npm run test`
+- [x] 2.3 Lint passes: `npm run lint`
+- [x] 2.4 Type checking passes: `npx tsc --noEmit`
 
 #### Manual
 
-- [ ] 2.5 `OVERDUE` task completes immediately, no dialog
-- [ ] 2.6 `DUE_SOON` task completes immediately, no dialog
-- [ ] 2.7 `OK` task shows confirmation dialog with its due date
-- [ ] 2.8 Cancel/Esc/overlay-click closes dialog with no effect
-- [ ] 2.9 Confirm completes the task and shows the next-due toast
+- [x] 2.5 `OVERDUE` task completes immediately, no dialog
+- [x] 2.6 `DUE_SOON` task completes immediately, no dialog
+- [x] 2.7 `OK` task shows confirmation dialog with its due date
+- [x] 2.8 Cancel/Esc/overlay-click closes dialog with no effect
+- [x] 2.9 Confirm completes the task and shows the next-due toast
 
 ### Phase 3: One-off audit of legacy `frequency_value` rows
 
