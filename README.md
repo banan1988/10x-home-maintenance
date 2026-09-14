@@ -1,8 +1,25 @@
 # 10x Home Maintenance
 
-![](./public/template.png)
+A web app for tracking cyclical home maintenance tasks — filter changes, inspections, battery swaps, and other
+recurring chores — for a single homeowner or renter managing one property. Instead of relying on memory, notes, or
+a generic calendar, the app automatically computes each task's next due date and status (**OK** / **DUE SOON** /
+**OVERDUE**) from its frequency and last-completed date, and surfaces it on an urgency-sorted dashboard, so you
+always know at a glance what in your home needs attention right now.
 
-A modern, opinionated starter template for building fast, accessible web applications.
+## Key Features
+
+- Email/password authentication (register, sign in, sign out), with each user's data fully isolated from every
+  other user's at the database level (Postgres Row-Level Security)
+- Full CRUD on maintenance tasks: name, predefined category, importance, frequency (`frequency_value` +
+  `frequency_unit`), and last-done date
+- Automatic status calculation — no user ever sets a status directly. `next_due_date` is derived from frequency
+  and last-done date; status is OVERDUE if it's in the past, DUE SOON if within the next 7 days, otherwise OK
+- Urgency-sorted dashboard: tasks ordered by status first (OVERDUE → DUE SOON → OK), then by importance
+  (HIGH → MEDIUM → LOW) within each status group
+- A JSON API exposing the same task CRUD as the UI, authenticated via the same Supabase session cookie (see
+  [API](#api))
+- Self-service account deletion (RODO/GDPR right to erasure) — permanently removes the Supabase auth account and
+  every task belonging to it
 
 ## Tech Stack
 
