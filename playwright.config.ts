@@ -2,6 +2,12 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "tests/e2e",
+  // The default 30s per-test budget is tuned for a production build; Astro's dev server
+  // transforms each route on first request, and shared CI runners are slower than a local
+  // machine, so a multi-page journey test (login -> dashboard -> tasks -> edit -> delete)
+  // can legitimately need more time in CI even though it stays well under a second per step
+  // once each route is warm.
+  timeout: process.env.CI ? 90_000 : 30_000,
   use: {
     baseURL: "http://localhost:4321",
   },

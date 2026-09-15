@@ -1,9 +1,20 @@
 // seed test — the exemplar every generated E2E spec in this project is modeled on.
 // See tests/e2e/E2E_RULES.md for the governing rules this pattern demonstrates.
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 
 const TEST_USER_EMAIL = "isolation-test-user-a@example.com";
 const TEST_USER_PASSWORD = "isolation-test-password";
+
+// Every page here mounts a client:load React island (AddTaskDialog / TaskList). On a cold
+// dev server, Vite's on-demand module transforms for that island's JS can still be in flight
+// when the next interaction sets a DOM value; hydration then mounts with its own (stale/empty)
+// initial state and wipes it. Waiting for the network to settle after each navigation lets
+// that module graph finish loading first — by then hydration has already run synchronously,
+// so subsequent fills/clicks stick. See E2E_RULES.md.
+async function gotoAndWaitForHydration(page: Page, url: string) {
+  await page.goto(url);
+  await page.waitForLoadState("networkidle");
+}
 
 test("maintenance task persists after page reload", async ({ page, baseURL }) => {
   // Authenticate without the UI: page.request shares its cookie jar with the browser
@@ -18,7 +29,7 @@ test("maintenance task persists after page reload", async ({ page, baseURL }) =>
 
   const taskName = `Seed Task ${Date.now()}`;
 
-  await page.goto("/dashboard");
+  await gotoAndWaitForHydration(page, "/dashboard");
   await page.getByRole("button", { name: "Add task" }).click();
 
   const addDialog = page.getByRole("dialog");
@@ -40,7 +51,7 @@ test("maintenance task persists after page reload", async ({ page, baseURL }) =>
   await expect(page.getByText(taskName)).toBeVisible();
 
   // Cleanup: delete the task so re-runs don't accumulate rows.
-  await page.goto("/tasks");
+  await gotoAndWaitForHydration(page, "/tasks");
   const taskRow = page.getByRole("row", { name: taskName });
   await taskRow.getByRole("button", { name: "Delete" }).click();
   await page.getByRole("alertdialog").getByRole("button", { name: "Delete" }).click();

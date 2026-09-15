@@ -1,23 +1,34 @@
 // risk: test-plan.md §3 Phase 5, risk #5 — the full login → add → edit → complete →
 // delete journey works through the real UI (the last open risk in the test rollout).
 // seed: tests/e2e/seed.spec.ts
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 
 const TEST_USER_EMAIL = "isolation-test-user-a@example.com";
 const TEST_USER_PASSWORD = "isolation-test-password";
+
+// Every page here mounts a client:load React island (SignInForm / AddTaskDialog / TaskList).
+// On a cold dev server, Vite's on-demand module transforms for that island's JS can still be
+// in flight when the next interaction sets a DOM value; hydration then mounts with its own
+// (stale/empty) initial state and wipes it. Waiting for the network to settle after each
+// navigation lets that module graph finish loading first — by then hydration has already run
+// synchronously, so subsequent fills/clicks stick.
+async function gotoAndWaitForHydration(page: Page, url: string) {
+  await page.goto(url);
+  await page.waitForLoadState("networkidle");
+}
 
 test("user can sign in, add, view, edit, complete, and delete a maintenance task", async ({ page }) => {
   // Login through the real UI is a deliberate exception to this project's "authenticate
   // without the UI" default rule (see E2E_RULES.md) — login is the risk under test here,
   // not incidental setup.
-  await page.goto("/auth/signin");
+  await gotoAndWaitForHydration(page, "/auth/signin");
   await page.getByRole("textbox", { name: "Email" }).fill(TEST_USER_EMAIL);
   await page.getByRole("textbox", { name: "Password" }).fill(TEST_USER_PASSWORD);
   await page.getByRole("button", { name: "Sign in" }).click();
 
   // Successful sign-in redirects to "/", not "/dashboard" — navigate there explicitly.
   await page.waitForURL("/");
-  await page.goto("/dashboard");
+  await gotoAndWaitForHydration(page, "/dashboard");
 
   const taskName = `E2E Task ${Date.now()}`;
   const editedTaskName = `${taskName} Edited`;
@@ -51,7 +62,7 @@ test("user can sign in, add, view, edit, complete, and delete a maintenance task
   await expect(dashboardRow.getByText("Due soon")).toBeVisible();
 
   // /tasks renders the raw TaskStatus enum ("DUE_SOON") for the same task.
-  await page.goto("/tasks");
+  await gotoAndWaitForHydration(page, "/tasks");
   let taskRow = page.getByRole("row", { name: taskName });
   await expect(taskRow).toBeVisible();
   await expect(taskRow.getByText("DUE_SOON", { exact: true })).toBeVisible();
