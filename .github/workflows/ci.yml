@@ -65,11 +65,14 @@ jobs:
       - name: "Reset database"
         run: npx supabase db reset
       - name: "Export Supabase connection info"
+        # supabase status -o env prints shell-quoted KEY="value" lines (meant for `eval`);
+        # GITHUB_ENV takes the value literally, so the quote characters must be stripped
+        # first or they end up embedded in SUPABASE_URL/SUPABASE_KEY themselves.
         run: >
           npx supabase status -o env
           --override-name api.url=SUPABASE_URL
           --override-name auth.anon_key=SUPABASE_KEY
-          >> "$GITHUB_ENV"
+          | sed 's/"//g' >> "$GITHUB_ENV"
       - name: "Install Playwright browsers"
         run: npx playwright install --with-deps chromium
       - name: "Run e2e tests"
