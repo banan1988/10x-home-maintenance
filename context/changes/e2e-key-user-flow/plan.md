@@ -314,9 +314,9 @@ Not applicable — no data model or existing-data changes.
 
 #### Automated
 
-- [ ] 1.1 Type check passes: `npm run check`
-- [ ] 1.2 Lint passes: `npm run lint`
-- [ ] 1.3 Playwright CLI installed and runs: `npx playwright --version`
+- [x] 1.1 Type check passes: `npm run check`
+- [x] 1.2 Lint passes: `npm run lint`
+- [x] 1.3 Playwright CLI installed and runs: `npx playwright --version`
 
 #### Manual
 
