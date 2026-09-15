@@ -247,7 +247,7 @@ Set `SUPABASE_URL`, `SUPABASE_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` as secrets v
 
 ## CI
 
-GitHub Actions runs lint + test + build on every push and PR to `main`. The repo also contains a `deploy` job wired to `wrangler-action`, but it is currently **parked** (`if: false`) since production auto-deploy is handled by Cloudflare Workers Builds instead — see `context/changes/deployment/deployment-plan.md` for the fallback re-enable steps if Workers Builds is ever disconnected.
+GitHub Actions runs lint + test + build on every push and PR to `main`. A separate, required `e2e` job spins up an ephemeral local Supabase stack (via the official CLI action) and runs the Playwright suite (`npm run test:e2e`) against it. The repo also contains a `deploy` job wired to `wrangler-action`, but it is currently **parked** (`if: false`) since production auto-deploy is handled by Cloudflare Workers Builds instead — see `context/changes/deployment/deployment-plan.md` for the fallback re-enable steps if Workers Builds is ever disconnected.
 
 ## License
 
