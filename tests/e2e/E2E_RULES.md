@@ -50,3 +50,15 @@ for the worked example.
   their `SelectTrigger` has no `id` paired with the adjacent `<label>`, unlike
   `AddTaskDialog`). Only `Name` and `Frequency value` are reliably `getByRole`-addressable
   in the edit dialog; don't touch Category/Importance there.
+- **Wait for network idle after every navigation to a page with a `client:load` island,
+  before interacting with it.** Every page here mounts one (`SignInForm` / `AddTaskDialog` /
+  `TaskList`). On a cold dev server, Vite's on-demand module transforms for that island's JS
+  can still be in flight when a `fill()`/`click()` sets a DOM value; React's hydration then
+  mounts with its own (stale/empty) initial state and silently wipes it — the symptom is a
+  client-side validation error ("Name is required") on a field you just filled, or a hang
+  waiting for a navigation that never happens because the form never actually submitted. Use
+  a small `gotoAndWaitForHydration(page, url)` helper (`page.goto` + `page.waitForLoadState ("networkidle")`) for every navigation onto such a page — see both spec files. This only
+  reproduces on each island's *first* render against a given dev-server process, so a test
+  that happens to run after another test already warmed the same route (alphabetical file
+  order, `workers: 1` in CI) can pass locally while the same spec run standalone or first
+  fails — don't trust a single green run's route-ordering luck as proof this is unnecessary.
