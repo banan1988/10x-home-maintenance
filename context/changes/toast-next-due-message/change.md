@@ -1,9 +1,9 @@
 ---
 change_id: toast-next-due-message
 title: Toast next due message
-status: implementing
+status: implemented
 created: 2026-09-14
-updated: 2026-09-14
+updated: 2026-09-15
 archived_at:
 ---
 
