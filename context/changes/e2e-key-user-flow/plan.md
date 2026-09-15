@@ -314,25 +314,25 @@ Not applicable — no data model or existing-data changes.
 
 #### Automated
 
-- [x] 1.1 Type check passes: `npm run check`
-- [x] 1.2 Lint passes: `npm run lint`
-- [x] 1.3 Playwright CLI installed and runs: `npx playwright --version`
+- [x] 1.1 Type check passes: `npm run check` — 35b7234
+- [x] 1.2 Lint passes: `npm run lint` — 35b7234
+- [x] 1.3 Playwright CLI installed and runs: `npx playwright --version` — 35b7234
 
 #### Manual
 
-- [ ] 1.4 `npm run dev` still starts normally
-- [ ] 1.5 README's new script row and prerequisite note render correctly
+- [x] 1.4 `npm run dev` still starts normally — 35b7234
+- [x] 1.5 README's new script row and prerequisite note render correctly — 35b7234
 
 ### Phase 2: Key-User-Flow E2E Test
 
 #### Automated
 
-- [ ] 2.1 New spec passes standalone: `npx playwright test tests/e2e/key-user-flow.spec.ts`
-- [ ] 2.2 Deliberate-break check confirms the test is risk-tied, then reverted
+- [x] 2.1 New spec passes standalone: `npx playwright test tests/e2e/key-user-flow.spec.ts`
+- [x] 2.2 Deliberate-break check confirms the test is risk-tied, then reverted
 
 #### Manual
 
-- [ ] 2.3 Human visually confirms the flow against the running app
+- [x] 2.3 Human visually confirms the flow against the running app
 
 ### Phase 3: CI Wiring
 
