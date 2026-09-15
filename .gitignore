@@ -30,6 +30,10 @@ pnpm-debug.log*
 # playwright MCP tool scratch output (page snapshots, console logs)
 .playwright-mcp/
 
+# playwright e2e test run artifacts
+test-results/
+playwright-report/
+
 # supabase local runtime artifacts (also listed in supabase/.gitignore; duplicated here so
 # eslint's includeIgnoreFile(), which only reads the root .gitignore, excludes them too)
 supabase/.temp/
