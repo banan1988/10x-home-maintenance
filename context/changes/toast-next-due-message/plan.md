@@ -357,6 +357,6 @@ No schema migrations in this plan. Phase 3's audit query is intentionally kept o
 
 #### Manual
 
-- [x] 3.1 Run the audit query against local/dev Supabase and record the result
-- [x] 3.2 Triage any returned rows manually (no auto-correction) — n/a, 0 rows returned locally
-- [x] 3.3 Repeat against staging/production if accessible, and record the result
+- [x] 3.1 Run the audit query against local/dev Supabase and record the result — 974b80b
+- [x] 3.2 Triage any returned rows manually (no auto-correction) — n/a, 0 rows returned locally — 974b80b
+- [x] 3.3 Repeat against staging/production if accessible, and record the result — 974b80b
