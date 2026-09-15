@@ -59,7 +59,8 @@ test("user can sign in, add, view, edit, complete, and delete a maintenance task
   // Dashboard renders the friendly STATUS_LABEL ("Due soon"), not the raw enum.
   const dashboardRow = page.getByRole("listitem").filter({ hasText: taskName });
   await expect(dashboardRow).toBeVisible();
-  await expect(dashboardRow.getByText("Due soon")).toBeVisible();
+  // THROWAWAY BREAK: verifying the required "E2E" check actually blocks a PR merge.
+  await expect(dashboardRow.getByText("Due soon THIS SHOULD NEVER MATCH")).toBeVisible();
 
   // /tasks renders the raw TaskStatus enum ("DUE_SOON") for the same task.
   await gotoAndWaitForHydration(page, "/tasks");
