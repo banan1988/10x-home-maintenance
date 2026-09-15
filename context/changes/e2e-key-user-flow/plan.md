@@ -327,18 +327,18 @@ Not applicable — no data model or existing-data changes.
 
 #### Automated
 
-- [x] 2.1 New spec passes standalone: `npx playwright test tests/e2e/key-user-flow.spec.ts`
-- [x] 2.2 Deliberate-break check confirms the test is risk-tied, then reverted
+- [x] 2.1 New spec passes standalone: `npx playwright test tests/e2e/key-user-flow.spec.ts` — c3b4c24
+- [x] 2.2 Deliberate-break check confirms the test is risk-tied, then reverted — c3b4c24
 
 #### Manual
 
-- [x] 2.3 Human visually confirms the flow against the running app
+- [x] 2.3 Human visually confirms the flow against the running app — c3b4c24
 
 ### Phase 3: CI Wiring
 
 #### Automated
 
-- [ ] 3.1 Workflow YAML valid; `e2e` job appears and runs
+- [x] 3.1 Workflow YAML valid; `e2e` job appears and runs
 - [ ] 3.2 The `e2e` job passes on a real push/PR
 
 #### Manual
