@@ -1,7 +1,7 @@
 ---
 change_id: e2e-key-user-flow
 title: E2e key user flow
-status: implementing
+status: implemented
 created: 2026-09-14
 updated: 2026-09-15
 archived_at:

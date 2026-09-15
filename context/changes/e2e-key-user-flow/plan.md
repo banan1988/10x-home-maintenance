@@ -338,10 +338,10 @@ Not applicable — no data model or existing-data changes.
 
 #### Automated
 
-- [x] 3.1 Workflow YAML valid; `e2e` job appears and runs
-- [x] 3.2 The `e2e` job passes on a real push/PR
+- [x] 3.1 Workflow YAML valid; `e2e` job appears and runs — c6b8e6b
+- [x] 3.2 The `e2e` job passes on a real push/PR — c6b8e6b
 
 #### Manual
 
-- [x] 3.3 `e2e` check added to branch protection required-status-checks
-- [x] 3.4 Deliberate-break push confirms the required check blocks merge, then reverted
+- [x] 3.3 `e2e` check added to branch protection required-status-checks — c6b8e6b
+- [x] 3.4 Deliberate-break push confirms the required check blocks merge, then reverted — c6b8e6b
