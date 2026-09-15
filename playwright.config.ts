@@ -8,7 +8,12 @@ export default defineConfig({
   webServer: {
     command: "npm run dev",
     url: "http://localhost:4321",
-    reuseExistingServer: !process.env.CI,
+    // Always true (not just locally): in CI the workflow starts and warms up the dev
+    // server itself before running tests (see .github/workflows/ci.yml) to dodge a
+    // first-request Vite SSR dependency pre-bundling reload race against a cold
+    // node_modules cache. reuseExistingServer still starts its own server when none
+    // is already running, so local runs are unaffected.
+    reuseExistingServer: true,
     timeout: 120_000,
   },
   forbidOnly: !!process.env.CI,

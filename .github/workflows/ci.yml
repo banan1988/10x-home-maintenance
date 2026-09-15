@@ -75,6 +75,22 @@ jobs:
           | sed 's/"//g' >> "$GITHUB_ENV"
       - name: "Install Playwright browsers"
         run: npx playwright install --with-deps chromium
+      - name: "Start and warm up dev server"
+        # A cold node_modules/.vite cache can trigger an async Vite SSR dependency
+        # pre-bundling reload on the very first real request, which can crash mid-render
+        # ("Invalid hook call") if a test's navigation lands on it. Starting the server
+        # here and hitting it twice, with a pause between, lets that one-time reload
+        # settle before Playwright's webServer (reuseExistingServer: true) reuses this
+        # same already-warm process instead of spawning a fresh cold one.
+        run: |
+          nohup npm run dev > /tmp/dev-server.log 2>&1 &
+          disown
+          for _ in $(seq 1 30); do
+            curl -sf http://localhost:4321/ > /dev/null 2>&1 && break
+            sleep 2
+          done
+          sleep 3
+          curl -sf http://localhost:4321/ > /dev/null
       - name: "Run e2e tests"
         run: npm run test:e2e
       - name: "Upload Playwright report"
