@@ -125,6 +125,13 @@ layer, with CI-aware retry/worker/reporter settings.
 **Contract**: `testDir: "tests/e2e"`; `use.baseURL: "http://localhost:4321"`; `webServer: { command: "npm run dev", url: "http://localhost:4321", reuseExistingServer: !process.env.CI, timeout: 120_000 }`; `forbidOnly: !!process.env.CI`; `retries: process.env.CI ? 2 : 0`; `workers: process.env.CI ? 1 : undefined`; one project,
 Chromium (`devices["Desktop Chrome"]`).
 
+**Addendum (post-implementation, Phase 3 CI hardening)**: `reuseExistingServer` was changed to unconditional
+`true` (not `!process.env.CI`) — a cold `node_modules/.vite` cache can trigger an async Vite SSR dependency
+pre-bundling reload on the very first real request, crashing a test that navigates mid-reload. The CI job now
+starts and warms up its own dev server before Playwright's `webServer` step runs (see Phase 3's addendum), so
+`reuseExistingServer: true` lets it attach to that already-warm process in CI too, instead of racing a second
+cold spawn.
+
 #### 2. Ignore Playwright artifacts
 
 **File**: `.gitignore`
@@ -240,6 +247,15 @@ triggers as the existing `ci` job, no `needs:` dependency on `ci` (runs in paral
 → `supabase db reset` → capture connection info to `$GITHUB_ENV` via `supabase status -o env --override-name api.url=SUPABASE_URL --override-name auth.anon_key=SUPABASE_KEY` (must run before the next step, per Critical
 Implementation Details) → `npx playwright install --with-deps chromium` → `npm run test:e2e` → upload
 `playwright-report/` as a build artifact on failure (`actions/upload-artifact`, `if: failure()`).
+
+**Addendum (post-implementation)**: an extra "Start and warm up dev server" step was added between the
+Playwright-install and test-run steps — it manually spawns `npm run dev` in the background and curls it twice
+(with a pause between) before `npm run test:e2e` runs. This dodges the same cold-start Vite SSR pre-bundling
+reload race described in Phase 1's addendum: warming the server here means Playwright's `webServer`
+(`reuseExistingServer: true`) attaches to an already-settled process instead of spawning a fresh cold one that
+could crash mid-test. Also, `supabase status -o env`'s output is piped through `sed 's/"//g'` before appending
+to `$GITHUB_ENV` — its shell-quoted `KEY="value"` format otherwise leaves literal quote characters embedded in
+`SUPABASE_URL`/`SUPABASE_KEY`.
 
 #### 2. Document the CI gate
 
